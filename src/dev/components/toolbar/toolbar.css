@@ -1,0 +1,144 @@
+:host {
+	width: 100%;
+	position: fixed;
+	top: 0;
+	left: 0;
+
+	box-sizing: border-box;
+	padding: 10px;
+
+	background: #282828;
+	font-family: Arial, Helvetica, sans-serif;
+	font-size: 14px;
+}
+:host > div {
+	display: flex;
+	justify-content: space-between;
+}
+:host > div > div {
+	display: flex;
+	flex-direction: row-reverse;
+}
+:host > div > div > div {
+	display: flex;
+	align-items: center;
+	margin-left: 20px;
+	position: relative;
+}
+:host > div > div > div > div > div {
+	display: none;
+	position: absolute;
+	background: #282828;
+	padding: 20px;
+	width: 400px;
+	height: 100px;
+	top: 33px;
+	right: 0;
+}
+:host > div > div > div > div {
+	display: flex;
+	align-items: center;
+	height: 100%;
+}
+/* :host > div > div > div > div:hover > div { */
+/* 	display: block; */
+/* } */
+
+:host label {
+	display: inline;
+	margin-right: 10px;
+}
+:host input {
+	vertical-align: baseline !important;
+	padding: 9px;
+	border: 0;
+	border-radius: 2px;
+}
+:host label {
+	color: white;
+}
+:host button {
+	-webkit-appearance: none;
+	font: inherit;
+	border: 0;
+	background: #a2eb26;
+	padding: 10px 20px;
+	border-radius: 2px;
+}
+:host button + button {
+	margin-left: 5px;
+}
+
+/* FF for now*/
+
+
+x-toolbar {
+	width: 100%;
+	position: fixed;
+	top: 0;
+	left: 0;
+
+	box-sizing: border-box;
+	padding: 10px;
+
+	background: #282828;
+	font-family: Arial, Helvetica, sans-serif;
+	font-size: 14px;
+}
+x-toolbar > div {
+	display: flex;
+	justify-content: space-between;
+}
+x-toolbar > div > div {
+	display: flex;
+	flex-direction: row-reverse;
+}
+x-toolbar > div > div > div {
+	display: flex;
+	align-items: center;
+	margin-left: 20px;
+	position: relative;
+}
+x-toolbar > div > div > div > div > div {
+	display: none;
+	position: absolute;
+	background: #282828;
+	padding: 20px;
+	width: 400px;
+	height: 100px;
+	top: 33px;
+	right: 0;
+}
+x-toolbar > div > div > div > div {
+	display: flex;
+	align-items: center;
+	height: 100%;
+}
+/* x-toolbar > div > div > div > div:hover > div { */
+/* 	display: block; */
+/* } */
+
+x-toolbar label {
+	display: inline;
+	margin-right: 10px;
+}
+x-toolbar input {
+	vertical-align: baseline !important;
+	padding: 9px;
+	border: 0;
+	border-radius: 2px;
+}
+x-toolbar label {
+	color: white;
+}
+x-toolbar button {
+	-webkit-appearance: none;
+	font: inherit;
+	border: 0;
+	background: #a2eb26;
+	padding: 10px 20px;
+	border-radius: 2px;
+}
+x-toolbar button + button {
+	margin-left: 5px;
+}

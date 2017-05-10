@@ -1,0 +1,35 @@
+<div>
+	<a href="">
+		<img src="/src/dev/components/toolbar/images/leaf.svg" height="33" alt="GardenHQ" />
+	</a>
+
+	<div>
+		<div>
+			<div>
+				<label>Cache</label>
+				<div>
+					<label>
+						<span>Everything</span>
+						<input type="checkbox" checked="${props.fullclear}" onclick="${ dispatch("fullclear", !props.fullclear) }" />
+					</label>
+				</div>
+			</div>
+			<button onclick="${ dispatch("clear") }">Clear</button>
+		</div>
+		<div>
+			<div>
+				<label>Bundler</label>
+				<div>
+					<input type="text" value="${ props.only }" placeholder="Only modules" oninput="${ dispatch("only", "only") }" />
+					<input type="text" value="${ props.out }" placeholder="Output filename" oninput="${ dispatch("out") }" />
+					<label>
+						<span>Auto bundle</span>
+						<input type="checkbox" checked="${props.autobundle}" onclick="${ dispatch("autobundle", !props.autobundle) }" />
+					</label>
+				</div>
+			</div>
+			<button onclick="${ dispatch("build") }">Bundle Now</button>
+		</div>
+	</div>
+
+</div>

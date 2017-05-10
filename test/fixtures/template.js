@@ -1,0 +1,3 @@
+<div>
+    ${ props.item }
+</div>

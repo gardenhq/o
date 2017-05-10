@@ -1,0 +1,38 @@
+{
+  "name": "@gardenhq/o",
+  "version": "4.0.0",
+  "description": "An in-browser loader, bundler and dependency injection builder.",
+  "author": {
+    "name": "GardenHQ",
+    "email": "gardener@gardenhq.io",
+    "url": "https://gardenhq.io/"
+  },
+  "license": "ISC",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/gardenhq/o.git"
+  },
+  "devDependencies": {
+    "@gardenhq/js-test-harness": "^2.1.0",
+    "uglify-js-harmony": "^2.7.5",
+    "istanbul": "^0.4.5",
+    "mocha": "^3.3.0",
+    "mocha-multi": "^0.11.0"
+  },
+  "main": "index.js",
+  "keywords": [],
+  "scripts": {
+    "prepublish": "cd node_modules && cd ../ && make build",
+    "test": "mkdir -p ./test/results && npm run spec && npm run story",
+    "spec": "istanbul cover --config ./test/istanbul.yml ./node_modules/.bin/_mocha -- --recursive -R mocha-multi --reporter-options tap=./test/results/spec/mocha.tap,spec=- \"./test/spec/**/*.js\"",
+    "story": "mocha --recursive -R mocha-multi --reporter-options tap=./test/results/story/mocha.tap,spec=- \"./test/story/**/*.js\""
+  },
+  "publishConfig": {},
+  "dependencies": {
+    "@gardenhq/parse-template-literal": "^1.1.0",
+    "@gardenhq/willow": "^4.0.0",
+    "babel-core": "^6.24.1",
+    "file-saver": "^1.3.3",
+    "mousetrap": "^1.6.1"
+  }
+}

@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en" class="no-js" xmlns:og="http://ogp.me/ns#">
+	<head>
+		<meta charset="utf-8" />
+		<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+		<meta name="viewport" content="width=device-width, initial-scale=1" />
+		<meta name="description" content="" />
+
+		<title>o</title>
+	</head>
+	<body>
+		<script type="text/javascript" src="/o.js" data-export="o"></script>
+		<script type="text/javascript">
+		(
+			function(load)
+			{
+				load.then(
+					function(System)
+					{
+						System.import("./promised-require/module.js").then(
+							function()
+							{
+								if(typeof document !== "undefined") {
+									document.write(arguments[0]);
+								}
+								console.log(arguments[0]);
+							}
+						).catch(
+							function(e)
+							{
+								console.log(e);
+							}
+						);
+
+					}
+				);
+			}
+		)(o(function(promise){return promise(document)}))
+		</script>
+	</body>
+</html>

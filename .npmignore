@@ -1,0 +1,12 @@
+*
+!/builder.js
+!/src/dev/**
+!/b.c.js
+!/b.js
+!/o.c.js
+!/o.js
+!/transport/**
+!/parser/**
+!/registry/**
+!/proxy/**
+

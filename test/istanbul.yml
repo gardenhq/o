@@ -1,0 +1,6 @@
+---
+reporting:
+  reports:
+      - lcov
+      - clover
+  dir: ./test/results/coverage
