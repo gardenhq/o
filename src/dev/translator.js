@@ -1,5 +1,12 @@
 module.exports = function(builder)
 {
+    // TODO: Refactor this out once the bugfix has gone up, too much repetition
+    var loadable = {
+        "js": ["javascript", "json"],
+        "css": ["css"],
+        "html": ["html"],
+        "yaml": ["yaml", "yml"]
+    };
     return function(file, loader)
     {
         var temp = file.path.split(".");
@@ -8,12 +15,6 @@ module.exports = function(builder)
         if(file.headers && file.headers['Content-Type']) {
             type = file.headers['Content-Type'].split("/").pop();
         }
-        var loadable = {
-            "js": ["javascript", "json"],
-            "css": ["css"],
-            "html": ["html"],
-            "yaml": ["yaml", "yml"]
-        };
         var extension = Object.keys(
             loadable
         ).find(
@@ -28,7 +29,7 @@ module.exports = function(builder)
                 return builder.get(key).then(
                     function(transformer)
                     {
-                        if(actual != extension) {
+                        if(extension && actual != extension) {
                             temp.push(extension);
                             file.path = temp.join(".");
                         }
@@ -55,7 +56,20 @@ module.exports = function(builder)
                 );
             }
         }
-        return loader(file.path);
+        return loader(file.path).then(
+            function(data)
+            {
+                if(file.headers) {
+                    data.headers = Object.assign(
+                        {},
+                        data.headers,
+                        file.headers
+                    );
+                }
+                return data;
+
+            }
+        );
     };
 
 }
