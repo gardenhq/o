@@ -29,6 +29,7 @@
   },
   "publishConfig": {},
   "dependencies": {
+    "@gardenhq/component-factory": "^1.0.0",
     "@gardenhq/parse-template-literal": "^1.1.0",
     "@gardenhq/willow": "^4.0.0",
     "babel-core": "^6.24.1",
