@@ -1,73 +1,48 @@
 <!DOCTYPE html>
 <html lang="en" class="no-js" xmlns:og="http://ogp.me/ns#">
-	<head>
-		<meta charset="utf-8" />
-		<title>Inline Example</title>
-	</head>
-	<body>
-		<script type="text/javascript" src="/node_modules/o/src/o.js"
-   			data-export="o"
-			></script>
-		<script type="text/javascript">
-			var print = function(helloWorld)
-			{
-				if(typeof document !== "undefined") {
-					var h1 = document.createElement("h1");
-					h1.textContent = helloWorld;
-					document.body.appendChild(h1);
-				}
-				console.log(helloWorld);
-			}
-		</script>
-		<script type="text/javascript">
-		(
-			function(load)
-			{
-				// when data-basepath is not set then window.location.pathname is used
-				load.then(
-					function(System)
-					{
-						return System.import("../hello-world.js").then(
-							function(helloWorld)
-							{
-								print(helloWorld + " (using a relative path)");
-							}
-						);
+    <head>
+        <meta charset="utf-8" />
+        <title>Inline Example</title>
+    </head>
+    <body>
+        <script type="text/javascript"
+            src="https://unpkg.com/@gardenhq/o@4/o.js"
+            data-export="o"
+        ></script>
+        <script type="text/javascript">
+            var print = function(helloWorld)
+            {
+                if(typeof document !== "undefined") {
+                    var h1 = document.createElement("h1");
+                    h1.textContent = helloWorld;
+                    document.body.appendChild(h1);
+                }
+                console.log(helloWorld);
+            }
+        </script>
+        <script type="text/javascript">
+        (
+            function(load)
+            {
+                load.then(
+                    function(System)
+                    {
+                        return System.import("../hello-world.js").then(
+                            function(helloWorld)
+                            {
+                                print(helloWorld);
+                            }
+                        );
 
-					}
-				).catch(
-					function(e)
-					{
-						throw e;
-					}
-				);
-			}
-		)(o(function(promised){return promised(document)}))
-		</script>
-		<!-- setting a basepath via data-basepath -->
-		<script type="text/javascript" data-basepath="/">
-		(
-			function(load)
-			{
-				load.then(
-					function(System)
-					{
-						return System.import("./examples/hello-world.js").then(
-							function(helloWorld)
-							{
-								print(helloWorld + " (using a relative path with a basepath set)");
-							}
-						);
-
-					}
-				).catch(
-					function(e)
-					{
-						throw e;
-					}
-				);
-			}
-		)(o(function(promised){return promised(document)}))
-		</script>
-	</body>
+                    }
+                ).catch(
+                    function(e)
+                    {
+                        throw e;
+                    }
+                );
+            }
+        )(o(function(promised){return promised(document)}))
+        </script>
+    </body>
 </html>

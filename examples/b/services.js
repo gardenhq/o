@@ -28,7 +28,7 @@ module.exports = function()
             {
                 return function()
                 {
-                    print(helloWorld + " (using a relative path)");
+                    print(helloWorld);
                 }
             }
         }

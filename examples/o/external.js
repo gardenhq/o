@@ -17,7 +17,7 @@
                 System.import("../hello-world.js").then(
                     function(helloWorld)
                     {
-                        print(helloWorld + " (from examples/o/external.js)");
+                        print(helloWorld);
                     }
                 );
 

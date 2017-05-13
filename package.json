@@ -1,6 +1,6 @@
 {
   "name": "@gardenhq/o",
-  "version": "4.0.2",
+  "version": "4.1.0",
   "description": "An in-browser loader, bundler and dependency injection builder.",
   "author": {
     "name": "GardenHQ",
@@ -14,7 +14,7 @@
   },
   "devDependencies": {
     "@gardenhq/js-test-harness": "^2.1.0",
-    "uglify-js-harmony": "^2.7.5",
+    "uglify-es": "^3.0.4",
     "istanbul": "^0.4.5",
     "mocha": "^3.3.0",
     "mocha-multi": "^0.11.0"
@@ -32,8 +32,10 @@
     "@gardenhq/component-factory": "^1.0.0",
     "@gardenhq/parse-template-literal": "^1.1.0",
     "@gardenhq/willow": "^4.0.0",
-    "babel-core": "^6.24.1",
     "file-saver": "^1.3.3",
     "mousetrap": "^1.6.1"
+  },
+  "optionalDependencies": {
+    "js-yaml": "^3.8.4"
   }
 }

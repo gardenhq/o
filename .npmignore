@@ -1,12 +1,11 @@
 *
 !/builder.js
-!/src/dev/**
-!/b.c.js
+!/src/**
 !/b.js
-!/o.c.js
 !/o.js
 !/transport/**
 !/parser/**
 !/registry/**
 !/proxy/**
 !/dev/**
+

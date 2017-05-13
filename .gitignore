@@ -2,3 +2,12 @@
 /test/results
 /dev/
 /docs/build
+/_examples
+/o.js
+/parser
+/proxy
+/registry
+/transport
+/src/dev/o.js
+/src/dev/oDev.js
+/src/dev/oMaximal.js

@@ -23,7 +23,8 @@ module.exports = function(builder)
         "o.dev.reloader.websocket.url": win.localStorage["o+env://O_DEV_RELOADER_URL"],
         "o.dev.bundler.o.maximal": root + "/oMaximal.js",
         "o.dev.bundler.o.minimal": root + "/oMinimal.js",
-        // "o.dev.bundler.o.minimal": root + "/o.js",
+        // "o.dev.bundler.o.maximal": root + "/oDev.js",
+        // "o.dev.bundler.o.minimal": root + "/oDev.js",
         "main": {
             "callable": root + "/main.js",
             "arguments": [

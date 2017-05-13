@@ -1,4 +1,115 @@
 (
+    function(o)
+    {
+        (
+            function(load)
+            {
+                load.then(
+                    function(System)
+                    {
+                        load = o = undefined;
+                        System.config(
+                            {
+                                bundled: true,
+                                export: "o",
+proxy: "/node_modules/o/src/dev/index.js",
+src: "./external.js",
+baseURL: "/examples/o/",
+includepath: "node_modules/"
+                            }
+                        );
+                        return (
+                    /* o */
+    function(r, o)
+    {
+        return Promise.all(
+            [
+
+r(
+    "/examples/hello-world.js",
+    function(module, exports, require)
+    {
+        module.exports = "Hello World!";
+
+    }
+),
+
+r(
+    "/examples/o/external.js",
+    function(module, exports, require)
+    {
+        (
+    function(load)
+    {
+        var print = function(helloWorld)
+        {
+            if(typeof document !== "undefined") {
+                var h1 = document.createElement("h1");
+                h1.textContent = helloWorld;
+                document.body.appendChild(h1);
+            }
+            console.log(helloWorld);
+        }
+        load.then(
+            function(System)
+            {
+                // when data-basepath is not set then window.location.pathname is used
+                System.import("../hello-world.js").then(
+                    function(helloWorld)
+                    {
+                        print(helloWorld);
+                    }
+                );
+
+            }
+        ).catch(
+            function(e)
+            {
+                console.error(e);
+            }
+        );
+    }
+)(o(function(promised){return promised(document)}))
+
+
+    }
+)
+            ]
+        );
+    }
+)(
+    function(path, func){ return System.registerDynamic(path, [], true, func); },
+        function()
+        {
+            return Promise.resolve(System);
+        }
+)
+.then(
+                            function()
+                            {
+                                System.import("./external.js").then(
+                                    function(module)
+                                    {
+                                        if(typeof module === "function") {
+                                            module(Promise.resolve(System));
+                                        }
+                                    }
+                                );
+                            }
+                        );
+                    }
+                );
+            }
+        )(
+            o(
+                function(promised)
+                {
+                    return promised(document);
+                }
+            )
+        );
+    }
+)((
     function(unique)
     {
         return function(cb)
@@ -112,7 +223,7 @@
                     config: function(_config)
                     {
                         if(_config.baseURL !== config.baseURL) {
-                            this.resolve = _require.resolve = getResolve(_config.includepath, _config.baseURL);
+                            _require.resolve = getResolve(_config.includepath, _config.baseURL);
                         }
                         config = Object.assign(
                             {},
@@ -129,3 +240,4 @@
     }
 )("__")
 
+)

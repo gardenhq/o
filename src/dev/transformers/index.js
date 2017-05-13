@@ -2,9 +2,9 @@ module.exports = function()
 {
     var root = __dirname;
     return {
-        "imports": [
-            root + "/babel/index.js"
-        ],
+        // "imports": [
+        //     root + "/babel/index.js"
+        // ],
         // "babel.plugin.transform.es2015.template-literals": {
         //  "tags": [
         //      "babel.plugin"

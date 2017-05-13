@@ -61,6 +61,23 @@
                 registry            
             )   
         }
+        var discoverMain = function(str)
+        {
+            var id;
+            var container;
+            var args = str.split(":");
+            if(str.indexOf("://") !== -1) {
+                container = args[0] + ":" + args[1];
+                id = args[2];
+            } else {
+                container = args[0];
+                id = args[1];
+            }
+            return {
+                container: container,
+                id: id || "main"
+            };
+        }
         var getCache = function(cachePrefix)
         {
             return function(__filename, findServices)
@@ -115,13 +132,13 @@
                                         ).then(
                                             function(builder)
                                             {
-                                                var args = services.split(":");
+                                                var main = discoverMain(services);
                                                 // TODO: if builder always gets Promises, should it always set promises?
                                                 builder.set(
                                                     "o.dev.delete",
                                                     Promise.resolve(function(key){return Promise.resolve(registry.delete(key))})
                                                 );
-                                                return builder.build(args[0]).get(args[1] || "main").then(
+                                                return builder.build(main.container).get(main.id).then(
                                                     function(devtools)
                                                     {
                                                         builder.set(
@@ -138,8 +155,7 @@
                                                                 }
                                                             )
                                                         );
-                                                        var translator = devtools(config);
-                                                        return translator;
+                                                        return devtools(config);
                                                     }
                                                 );
                                             }

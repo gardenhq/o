@@ -1,101 +1,62 @@
 <!DOCTYPE html>
 <html lang="en" class="no-js" xmlns:og="http://ogp.me/ns#">
-	<head>
-		<meta charset="utf-8" />
-		<title>Inline Example</title>
-	</head>
-	<body>
-		<script type="text/javascript" src="/node_modules/o/src/o.js"
-			data-module="/node_modules/o/src/b.js"
-			data-export="b"
-		></script>
-		<script type="text/javascript">
-			var print = function(helloWorld)
-			{
-				if(typeof document !== "undefined") {
-					var h1 = document.createElement("h1");
-					h1.textContent = helloWorld;
-					document.body.appendChild(h1);
-				}
-				console.log(helloWorld);
-			}
-		</script>
-		<script type="text/javascript">
-		(
-			function(load)
-			{
-				// when data-basepath is not set then window.location.pathname is used
-				load.then(
-					function(builder)
-					{
-						return builder.build(
-							{
-								"app.hello": {
-									"object": "../hello-world.js"
-								},
-								"main": {
-									"resolve": [
-										"@app.hello"
-									],
-									"service": function(helloWorld)
-									{
-										return function()
-										{
-											print(helloWorld + " (using a relative path)");
-										}
-									}
-								}
-							}		
-						).run("main");
+    <head>
+        <meta charset="utf-8" />
+        <title>Inline Example</title>
+    </head>
+    <body>
+        <script type="text/javascript"
+            src="https://unpkg.com/@gardenhq/o@4/o.js"
+            data-module="/node_modules/o/src/b.js"
+            data-export="b"
+        ></script>
+        <script type="text/javascript">
+            var print = function(helloWorld)
+            {
+                if(typeof document !== "undefined") {
+                    var h1 = document.createElement("h1");
+                    h1.textContent = helloWorld;
+                    document.body.appendChild(h1);
+                }
+                console.log(helloWorld);
+            }
+        </script>
+        <script type="text/javascript">
+        (
+            function(load)
+            {
+                load.then(
+                    function(builder)
+                    {
+                        return builder.build(
+                            {
+                                "app.hello": {
+                                    "object": "../hello-world.js"
+                                },
+                                "main": {
+                                    "resolve": [
+                                        "@app.hello"
+                                    ],
+                                    "service": function(helloWorld)
+                                    {
+                                        return function()
+                                        {
+                                            print(helloWorld);
+                                        }
+                                    }
+                                }
+                            }
+                        ).run("main");
 
-					}
-				).catch(
-					function(e)
-					{
-						throw e;
-					}
-				);
-			}
-		)(b(function(promised){return promised(document)}))
-		</script>
-		<!-- setting a basepath via data-basepath -->
-		<script type="text/javascript" data-basepath="/">
-		(
-			function(load)
-			{
-				// when data-basepath is not set then window.location.pathname is used
-				load.then(
-					function(builder)
-					{
-						return builder.build(
-							{
-								"app.hello": {
-									"object": "./examples/hello-world.js"
-								},
-								"main": {
-									"resolve": [
-										"@app.hello"
-									],
-									"service": function(helloWorld)
-									{
-										return function()
-										{
-											print(helloWorld + " (using a relative path with a basepath set)");
-										}
-									}
-								}
-							}		
-						).run("main");
-
-					}
-				).catch(
-					function(e)
-					{
-						throw e;
-					}
-				);
-			}
-		)(b(function(promised){return promised(document)}))
-		</script>
-	</body>
+                    }
+                ).catch(
+                    function(e)
+                    {
+                        throw e;
+                    }
+                );
+            }
+        )(b(function(o){return o(document)}))
+        </script>
+    </body>
 </html>
