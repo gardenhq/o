@@ -56,6 +56,17 @@
                 }
             }
             var modules = {};
+            // TODO: Decide whethe rto annoyingly add process
+            // or pass it in as an extra arg
+            // prefer extra arg for now
+            // window.process = {
+            //     env: {},
+            //     argv: ""
+            // }
+            var process = {
+                env: {},
+                argv: ""
+            };
             /* Module */
             var Module = function(id, parent, module)
             {
@@ -75,15 +86,20 @@
                     this[unique] = undefined;
                     // (exports, require, module, __filename, __dirname)
                     // module.bind(null)(this.exports, _require, this, this.filename, temp.join("/"));
-                    module.bind(null)(this, this.exports, _require, this.filename, temp.join("/"));
+                    module.bind(null)(this, this.exports, _require, this.filename, temp.join("/"), process);
                 }
                 return this.exports;
             }
             /* module */
             var _require = function(path)
             {
+                path = _require.resolve(path.split("#")[0]);
+                var relativeRequire = function(relativePath)
+                {
+                    return _require(relativePath.indexOf("/") === 0 ? relativePath : _require.resolve(relativePath, path));
+                }
                 try {
-                    return modules[_require.resolve(path.split("#")[0])]._load(_require)
+                    return modules[path]._load(relativeRequire)
                 } catch(e) {
                     console.error(path);
                     // e.message = "Unable to require '" + path + "'";

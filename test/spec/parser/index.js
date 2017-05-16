@@ -7,6 +7,11 @@ var builder, expect, metrics, getLoaderDouble, getRegistryDouble, getRequireDoub
         name: "eval",
         path: "../../../src/parser/eval.js"
     },
+    // TODO: evalSync doesn't return a module, it returns a string
+    // {
+    //     name: "evalSync",
+    //     path: "../../../src/parser/evalSync.js"
+    // },
     {
         name: "function",
         path: "../../../src/parser/function.js"

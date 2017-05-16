@@ -13,7 +13,7 @@ module.exports = function(load)
                 function(builder)
                 {
                     return builder(
-                        System,
+                        System.import.bind(System),
                         register,
                         "@gardenhq/willow/conf/javascript"
                     );

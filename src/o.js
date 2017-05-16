@@ -69,7 +69,7 @@
         runner.config = function(script, resolve)
         {
             var temp;
-            // take some bits out? or namespace them with o?
+            // TODO: take some bits out? or namespace them with o?
             var config = [].slice.call(script.attributes).reduce(
                 function(prev, item, i, arr)
                 {
@@ -81,22 +81,38 @@
                 },
                 {}
             );
+            // resolve anything pathlike
+            if(config.basepath) {
+                config.basepath = resolve(config.basepath, pathname);
+            }
+            var basepath = config.basepath || pathname;
+            [
+                "includepath",
+                "src"
+            ].forEach(
+                function(item)
+                {
+                    if(config[item] != null) {
+                        config[item] = resolve(config[item], basepath);
+                    }
+                }
+            );
             // data-src is set
             if(config.src) {
                 temp = config.src.split("#");
                 config.src = temp[0];
                 if(temp[1]) {
                     // if I have a hash resolve it to the page url and save it
-                    config.hash = resolve(temp[1], config.basepath || pathname);
+                    config.hash = resolve(temp[1], basepath);
                 }
                 // baseURL should be the resolved data-src path unless basepath is set
-                config.baseURL = config.basepath || resolve(config.src, pathname);
+                config.baseURL = config.basepath || config.src;
             } else if(script.hasAttribute("src")) {
                 // config.src = script.getAttribute("src") 
                 // data-src isn't set, but src is, surely this is only for bundles?
                 config.baseURL = config.basepath || resolve(script.getAttribute("src"), pathname);
             }
-            config.baseURL = config.baseURL || config.basepath || pathname;
+            config.baseURL = config.baseURL || basepath;
             temp = config.baseURL.split("/");
             temp.pop();
             temp.push("");
@@ -137,7 +153,7 @@
         {
             return function(path, base)
             {
-                if(path.indexOf("//") !== -1) {
+                if(path.indexOf("://") !== -1) {
                     return path;
                 }
                 base = base || defaultBase;
@@ -150,20 +166,21 @@
                     first2Chars != ".." && first2Chars != "./" && firstChar != "/"
                 ) {
                     if(path.indexOf("/") === -1) {
-                        path +=  "/"
+                        path += "/";
                     }
                     path = includePath + path;
                 }
+                // TODO: this should go
                 if(path[path.length - 1] === "/") {
                     path += "index";
                 }
                 path = normalizeName(path, base.split("/").slice(0, -1));
-                //this should go!!
+                // TODO: this should go
                 if(path.indexOf(".") === -1) {
                     path += ".js";
                 }
                 firstChar = path.charAt(0);
-                if(firstChar != "/") {
+                if(firstChar != "/" && path.indexOf("://") === -1) {
                     path = "/" + path;
                 }
                 return path + hash;
@@ -189,10 +206,11 @@
                 var config = Object.assign(
                     {},
                     {
+                        // TODO: Don't export if I'm not asked to, remove this
                         export: "module.exports",
-                        registry: "o/src/registry/memory.js",
-                        parser: "o/src/parser/evalSync.js",
-                        transport: "o/src/transport/xhrNodeResolver.js",
+                        registry: "/src/registry/memory.js",
+                        parser: "/src/parser/evalSync.js",
+                        transport: "/src/transport/xhrNodeResolver.js",
                         includepath: includePath
                     },
                     runner.config(getCurrentScript(doc), resolve)
@@ -295,7 +313,7 @@
                                 return Promise.resolve(registry.set(path, cb));
                             }
 /*_o*/
-                            return getPromisedLoader(resolve, config)(doc)("o/src/_o.js");
+                            return getPromisedLoader(resolve, config)(doc)("/src/_o.js");
                         }
                     ).then(
                         function(_o)
@@ -306,13 +324,12 @@
                                 )(cb),
                                 {
                                     registry: registry,
-                                    // register: registry,
                                     registerDynamic: registerDynamic,
                                     resolve: resolve
                                 }
                             );
                             System.config(config);
-                            registerDynamic("/" + config.includepath + "o/o.js", [], true, function(module){module.exports = System});
+                            registerDynamic("/" + config.includepath + "/@gardenhq/o/o.js", [], true, function(module){module.exports = Promise.resolve(System);});
                             return System;
                         }
                     );

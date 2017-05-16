@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="en" class="no-js" xmlns:og="http://ogp.me/ns#">
+    <head>
+        <meta charset="utf-8" />
+        <title>External Example</title>
+    </head>
+    <body>
+        <script type="text/javascript" src="/src/o.js" data-export="o"></script>
+
+        <!-- Hello World! (from o/external.js) -->
+        <script type="text/javascript" src="../external.js"></script>
+
+        <!-- Hello World! From o/basepath/sub/hello-world.js (from o/external.js) -->
+        <script type="text/javascript" src="../external.js" data-basepath="/test/fixtures/o/basepath/sub/path/"></script>
+
+        <!-- Hello World! From o/basepath/sub/hello-world.js (from o/basepath/sub/external.js) -->
+        <script type="text/javascript" src="./sub/external.js"></script>
+
+        <!-- Hello World! (from o/basepath/sub/external.js) -->
+        <script type="text/javascript" src="./sub/external.js" data-basepath="/test/fixtures/"></script>
+    </body>
+</html>

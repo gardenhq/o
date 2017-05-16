@@ -55,28 +55,53 @@ var builder, expect, metrics, getAjaxDouble;
                     }
                 );
                 context(
-                    "with",
+                    ">",
                     function()
                     {
+                        // TODO: Decide how to make an injectable Module
                         var module = getModule("actual/script/path");
-                        it.skip(
-                            "does",
+                        it(
+                            "is a function",
                             function()
                             {
-                                var double = getAjaxDouble("content");
                                 expect(module).to.be.a("function");
-                                var registry = module();
-                                console.log(registry.set);
-                                // return module(
-                                //  "path.js",
-                                //  double
-                                // ).then(
-                                //  function(data)
-                                //  {
-                                //      expect(data.content).to.equal("content");
+                            }
+                        );
+                        it(
+                            "sets and gets (and too much other stuff)",
+                            function()
+                            {
+                                const filename = "/my/path.js";
+                                const dirname = "/my";
+                                const _exports = "hi";
+                                var called = false;
+                                const cache = {};
+                                const registry = module(cache);// m
 
-                                //  }
-                                // );
+                                registry.set(
+                                    filename,
+                                    // TODO: Change order
+                                    function(module, exports, require, __filename, __dirname)
+                                    {
+                                        expect(__filename).to.equal(filename);
+                                        expect(__dirname).to.equal(dirname);
+                                        module.exports = _exports;
+                                        called = true;
+                                    }
+                                );
+                                expect(registry.set(filename, "")).to.equal(undefined);
+                                expect(cache.keys[filename]).to.equal(true);
+                                expect(cache.modules[filename]).to.not.equal(null);
+                                return registry.get(filename).then(
+                                    function(module)
+                                    {
+                                        expect(module).to.equal(_exports);
+                                        expect(called).to.equal(true);
+                                        
+                                        registry.delete(filename);
+                                        expect(registry.has(filename)).to.equal(false);
+                                    }
+                                );
 
                             }
                         );

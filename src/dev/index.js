@@ -119,15 +119,44 @@
                                         }
                                     }
                                 );
-                                loadTranslator = require("@gardenhq/willow/index.js").then(
+                                var willow = "@gardenhq/willow";
+                                var VersionableRequire = require;
+                                if(__filename.indexOf("://") !== -1) {
+                                    var version = "@^4.1.0";
+                                    var temp = __filename.split("/");
+                                    var domain = temp.slice(0, 3).join("/");
+                                    willow = domain + "/" + willow + version;
+                                    VersionableRequire = function(path, version)
+                                    {
+                                        if(version) {
+                                            var root = __filename.split("/").slice(0, 3).join("/") + "/";
+                                            if(path[0] !== "/" && path[0] != "." && path.indexOf("://") === -1) {
+                                                var temp = path.split("/");
+                                                var index;
+                                                if(path[0] == "@") {
+                                                    index = 1;
+                                                } else {
+                                                    index = 0;
+                                                }
+                                                temp[index] = temp[index] + "@" + version;
+                                                path = root + temp.join("/");
+                                            }
+
+                                        }
+                                        return require(path);
+                                    }
+                                }
+                                loadTranslator = require(willow + "/index.js").then(
                                     function(builder)
                                     {
+                                        // return;
+                                        // console.log(builder);
                                         var registerDynamic = function(path, deps, executingRequire, cb)
                                         {
                                             return registry.set(path, cb);
                                         }
                                         return builder(
-                                            require,
+                                            VersionableRequire,
                                             registerDynamic
                                         ).then(
                                             function(builder)

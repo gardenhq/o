@@ -11,8 +11,8 @@
                         System.config(
                             {
                                 bundled: true,
-                                export: "o",
-proxy: "/node_modules/o/src/dev/index.js",
+                                proxy: "/node_modules/@gardenhq/o/dev/index.js",
+export: "o",
 src: "./external.js",
 baseURL: "/examples/o/",
 includepath: "node_modules/"
@@ -27,7 +27,7 @@ includepath: "node_modules/"
 
 r(
     "/examples/hello-world.js",
-    function(module, exports, require)
+    function(module, exports, require, __filename, __dirname, process)
     {
         module.exports = "Hello World!";
 
@@ -36,7 +36,7 @@ r(
 
 r(
     "/examples/o/external.js",
-    function(module, exports, require)
+    function(module, exports, require, __filename, __dirname, process)
     {
         (
     function(load)
@@ -167,6 +167,17 @@ r(
                 }
             }
             var modules = {};
+            // TODO: Decide whethe rto annoyingly add process
+            // or pass it in as an extra arg
+            // prefer extra arg for now
+            // window.process = {
+            //     env: {},
+            //     argv: ""
+            // }
+            var process = {
+                env: {},
+                argv: ""
+            };
             /* Module */
             var Module = function(id, parent, module)
             {
@@ -186,15 +197,20 @@ r(
                     this[unique] = undefined;
                     // (exports, require, module, __filename, __dirname)
                     // module.bind(null)(this.exports, _require, this, this.filename, temp.join("/"));
-                    module.bind(null)(this, this.exports, _require, this.filename, temp.join("/"));
+                    module.bind(null)(this, this.exports, _require, this.filename, temp.join("/"), process);
                 }
                 return this.exports;
             }
             /* module */
             var _require = function(path)
             {
+                path = _require.resolve(path.split("#")[0]);
+                var relativeRequire = function(relativePath)
+                {
+                    return _require(relativePath.indexOf("/") === 0 ? relativePath : _require.resolve(relativePath, path));
+                }
                 try {
-                    return modules[_require.resolve(path.split("#")[0])]._load(_require)
+                    return modules[path]._load(relativeRequire)
                 } catch(e) {
                     console.error(path);
                     // e.message = "Unable to require '" + path + "'";
@@ -223,7 +239,7 @@ r(
                     config: function(_config)
                     {
                         if(_config.baseURL !== config.baseURL) {
-                            _require.resolve = getResolve(_config.includepath, _config.baseURL);
+                            this.resolve = _require.resolve = getResolve(_config.includepath, _config.baseURL);
                         }
                         config = Object.assign(
                             {},

@@ -1,6 +1,6 @@
 module.exports = function(builder)
 {
-    const root = __dirname;
+    var root = __dirname;
     return {
         "o.dev.toolbar.template":
         {
@@ -21,10 +21,12 @@ module.exports = function(builder)
             ]
         },
         "filesaver": {
-            "object": "file-saver/FileSaver"
+            "object": "file-saver/FileSaver",
+            "version": "^1.3.3"
         },
         "mousetrap": {
-            "object": "mousetrap/mousetrap"
+            "object": "mousetrap/mousetrap",
+            "version": "^1.6.1"
         }
     };
 }

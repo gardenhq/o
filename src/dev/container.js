@@ -6,17 +6,17 @@ module.exports = function(builder)
     var bundlerPrefix = "o+file://";
     var invalidatorPrefix = "*";
     var root = __dirname;
-
     return {
         "imports": [
             {
-                resource: root + "/transformers/index.js"
+                resource: root + "/transformers/index"
             },
             {
-                resource: "@gardenhq/component-factory/conf/index.js"
+                resource: "@gardenhq/component-factory/conf/index",
+                version: "^1.0.0"
             },
             {
-                resource: root + "/components/toolbar/index.js"
+                resource: root + "/components/toolbar/index"
             }
         ],
         // TODO: replace with process and $O_DEV_RELOADER_URL

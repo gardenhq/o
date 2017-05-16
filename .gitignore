@@ -11,3 +11,5 @@
 /src/dev/o.js
 /src/dev/oDev.js
 /src/dev/oMaximal.js
+/test/fixtures/bundled/bundled.js
+/test/fixtures/bundled/sub/bundled.js

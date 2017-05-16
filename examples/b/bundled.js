@@ -11,10 +11,10 @@
                         System.config(
                             {
                                 bundled: true,
-                                src: "/node_modules/o/src/b.js",
-proxy: "/node_modules/o/src/dev/index.js",
+                                proxy: "/node_modules/@gardenhq/o/dev/index.js",
+src: "/node_modules/@gardenhq/o/src/b.js",
 hash: "/examples/b/services.js:main",
-baseURL: "/node_modules/o/src/",
+baseURL: "/node_modules/@gardenhq/o/src/",
 includepath: "node_modules/"
                             }
                         );
@@ -27,7 +27,7 @@ includepath: "node_modules/"
 
 r(
     "/examples/b/services.js",
-    function(module, exports, require)
+    function(module, exports, require, __filename, __dirname, process)
     {
         module.exports = function()
 {
@@ -70,17 +70,72 @@ r(
 ),
 
 r(
-    "/examples/hello-world.js",
-    function(module, exports, require)
+    "/node_modules/@gardenhq/o/src/b.js",
+    function(module, exports, require, __filename, __dirname, process)
     {
-        module.exports = "Hello World!";
+        module.exports = function(load)
+{
+    return load.then(
+        function(System)
+        {
+            var register;
+            if(System.registerDynamic != null) {
+                register = System.registerDynamic.bind(System);
+            }
+            return System.import(
+                "@gardenhq/willow/index.js"
+            ).then(
+                function(builder)
+                {
+                    return builder(
+                        System.import.bind(System),
+                        register,
+                        "@gardenhq/willow/conf/javascript"
+                    );
+                }
+            ).then(
+                function(builder)
+                {
+                    var config = System.getConfig();
+                    var services = config.hash;
+                    if(!services && typeof document !== "undefined") {
+                        var scripts = document.getElementsByTagName("script");
+                        var script = scripts[scripts.length - 1];
+                        if(script.hasAttribute("src")) {
+                            var src = script.getAttribute("src");
+                            var temp  = src.split("#");
+                            if(temp.length > 1) {
+                                services = System.resolve(temp[1], location.pathname);
+                            }
+                        }
+                    }
+                    if(services) {
+                        var temp = services.split(":");
+                        if(!config.basepath) {
+                            System.config(
+                                {
+                                    baseURL: temp[0]
+                                }
+                            );
+                        }
+                        return builder.build(
+                            temp[0]
+                        ).run(temp[1] || "main");
+                    } else {
+                        return builder;
+                    }
+                }
+            );
+        }
+    );
+};
 
     }
 ),
 
 r(
     "/node_modules/@gardenhq/willow/Builder.js",
-    function(module, exports, require)
+    function(module, exports, require, __filename, __dirname, process)
     {
         var Builder = function Builder(container, promisedRequire)
 {
@@ -313,7 +368,7 @@ module.exports = Builder;
 
 r(
     "/node_modules/@gardenhq/willow/Container.js",
-    function(module, exports, require)
+    function(module, exports, require, __filename, __dirname, process)
     {
         /**
  * Default/Reference Container - modified version of pimple js, used under
@@ -509,121 +564,8 @@ module.exports = Container;
 ),
 
 r(
-    "/node_modules/@gardenhq/willow/conf/index.js",
-    function(module, exports, require)
-    {
-        module.exports = function()
-{
-    var root = "@gardenhq/willow";
-    return {
-        "willow.filter.service": {
-            "filter": root + "/filters/service"
-        },
-        "willow.filter.factory": {
-            "filter": root + "/filters/factory"
-        },
-        "willow.filter.tags": {
-            "filter": root + "/filters/tags"
-        }
-    };
-        
-}
-
-    }
-),
-
-r(
-    "/node_modules/@gardenhq/willow/conf/javascript.js",
-    function(module, exports, require)
-    {
-        module.exports = function()
-{
-    var root = "@gardenhq/willow";
-    var id = "willow";
-    return {
-        "willow.filter.class": {
-            "filter": root + "/filters/class",
-            "arguments": [
-                "@" + id + ".loadAndEval",
-                "@" + id + ".resolve.arguments",
-                "@" + id+ ".resolveIdentifier",
-                "@" + id + ".traverse"
-            ],
-            "tags": [
-                id + ".filter"
-            ]
-        },
-        "willow.filter.object": {
-            "filter": root + "/filters/object",
-            "arguments": [
-                "@" + id + ".loadAndEval"
-            ],
-            "tags": [
-                id + ".filter"
-            ]
-        },
-        "willow.filter.share": {
-            "filter": root + "/filters/shared"
-        },
-        "willow.filter.resolve": {
-            "filter": root + "/filters/resolve",
-            "arguments": [
-                "@" + id + ".resolve.resolve"
-            ],
-            "tags": [
-                id + ".filter"
-            ]
-        },
-        "willow.filter.iterator": {
-            "filter": root + "/filters/iterator",
-            "arguments": [
-                "@" + id + ".resolve.arguments"
-            ],
-            "tags": [
-                id + ".filter"
-            ]
-        }
-    };
-        
-}
-
-    }
-),
-
-r(
-    "/node_modules/@gardenhq/willow/filters/callable.js",
-    function(module, exports, require)
-    {
-        module.exports = function(loader, resolveArguments)
-{
-    return loader(
-        "callable",
-        function(resolve, reject, module, object, container, definition)
-        {
-            return resolveArguments(container, definition).then(
-                function(args)
-                {
-                    try {
-                        var result = module.apply(object, args);
-                    } catch(e) {
-                        reject(e);
-                        // reject(new TypeError("'" + definition.callable + "' is not callable/a function"));
-                    }
-                    resolve(
-                        result
-                    );
-                }
-            );
-        }
-    );
-}
-
-    }
-),
-
-r(
-    "/node_modules/@gardenhq/willow/filters/class.js",
-    function(module, exports, require)
+    "/node_modules/@gardenhq/willow/conf/../filters/class.js",
+    function(module, exports, require, __filename, __dirname, process)
     {
         module.exports = function(loader, resolveArguments, resolveIdentifier, traverse)
 {
@@ -701,8 +643,8 @@ r(
 ),
 
 r(
-    "/node_modules/@gardenhq/willow/filters/factory.js",
-    function(module, exports, require)
+    "/node_modules/@gardenhq/willow/conf/../filters/factory.js",
+    function(module, exports, require, __filename, __dirname, process)
     {
         module.exports = function(key)
 {
@@ -721,273 +663,8 @@ r(
 ),
 
 r(
-    "/node_modules/@gardenhq/willow/filters/filter.js",
-    function(module, exports, require)
-    {
-        module.exports = function(loader, resolveArguments, key)
-{
-    key = key || "filter";
-    return function(container, definition, id, definitions)
-    {
-            loader(
-                "filter",
-                function(resolve, reject, module, object, builder, definition)
-                {
-                    // console.log(id);
-                    return resolveArguments(builder, definition).then(
-                        function(args)
-                        {
-                            var result = module.apply(object, args);
-                            // console.log(result);
-                            builder.use(result);
-                            resolve(
-                                result
-                            );
-                        }
-                    ).then(
-                        function(obj)
-                        {
-                            // console.log(id);
-                            return obj;
-                        }
-
-                    );
-                }
-            )(container, definition, id, definitions);
-        // if(!container.has(id)) {
-        //  return container.get(id);
-
-        // }
-    }
-}
-
-
-    }
-),
-
-r(
-    "/node_modules/@gardenhq/willow/filters/imports.js",
-    function(module, exports, require)
-    {
-        module.exports = function(require, key)
-{
-    key = key || "imports";
-    const resourceKey = "resource";
-    return function importer(container, definition, id, definitions)
-    {
-        if(id == key) {
-            return Promise.all(
-                definition.map(
-                    function(item)
-                    {
-                        var path = item;
-                        if(typeof path != "string") {
-                            path = item[resourceKey]
-                        }
-                        return require(path)
-                    }
-                )
-            ).then(
-                function(imports)
-                {
-                    const promises = imports.map(
-                        function(config)
-                        {
-                            // is callable?
-                            if(typeof config === "function") {
-                                config = config(container);
-                            }
-                            if(typeof config !== "object") {
-                                throw new Error("That import doesn't return/resolve to an object");
-                            }
-                            Object.keys(config).forEach(
-                                function(id)
-                                {
-                                    if(id != key) {
-                                        if(typeof definitions[id] === "undefined" || definitions[id].constructor == Object) {
-                                            definitions[id] = Object.assign(
-                                                config[id],
-                                                definitions[id]
-                                            );
-                                        }   
-                                    }
-                                }
-                            );
-                            if(typeof config[key] !== "undefined" ) {
-                                return importer(container, config[key], key, definitions);
-                            } else {
-                                return definitions;
-                            }
-                        }
-                    );
-                    return Promise.all(
-                        promises
-                    ).then(
-                        function(d)
-                        {
-                            return d[0];
-                        }
-                    )
-                }
-            );
-        } else {
-            return Promise.resolve(definitions);
-        }
-    }
-        
-}
-
-    }
-),
-
-r(
-    "/node_modules/@gardenhq/willow/filters/index.js",
-    function(module, exports, require)
-    {
-        module.exports = function(container)
-{ 
-    var root = "willow";
-    var servicePrefix = "@";
-    var tagPrefix = "#";
-    var identifierSplitter = ":";
-
-    var System_import = container.get(root + ".system.import");
-    var System_registerDynamic = container.get(root + ".system.registerDynamic");
-    return Promise.all(
-        [
-            "/filters/util/loader",
-            "/filters/util/walkPath",
-            "/filters/util/resolveIdentifier",
-            "/filters/util/traverse",
-            "/filters/util/resolver",
-            "/filters/util/splitIdentifier",
-            "/filters/util/findIdentifier",
-
-            "/filters/imports",
-            "/filters/callable",
-            "/filters/filter"
-        ].map(
-            function(item)
-            {
-                return "@gardenhq/" + root + item;
-            }
-        ).map(function(item){ return System_import(item) })
-    ).then(
-        function(modules)
-        {
-
-            var loader = modules[0];
-            var walkPath = modules[1];
-            var createResolveIdentifier = modules[2];
-            var traverse = modules[3];
-            var createResolver = modules[4];
-            var splitIdentifier = modules[5](identifierSplitter);
-            var findIdentifier = modules[6](servicePrefix);
-
-            var importer = modules[7];
-            var callabled = modules[8];
-            var filtered = modules[9];
-
-            var loadAndEval = loader(
-                System_import,
-                System_registerDynamic,
-                walkPath,
-                splitIdentifier,
-                findIdentifier
-            );
-            var resolveIdentifier = createResolveIdentifier(
-                walkPath,
-                servicePrefix,
-                tagPrefix,
-                splitIdentifier
-            );
-            var resolver = createResolver(resolveIdentifier, traverse);
-            var resolveArguments = resolver("arguments");
-
-            var importable = importer(System_import);
-            var callable = callabled(loadAndEval, resolveArguments);
-            var filterable = filtered(loadAndEval, resolveArguments);
-
-            container.set(
-                root + ".loadAndEval",
-                function()
-                {
-                    return loadAndEval;
-                }
-            );
-            container.set(
-                root + ".require",
-                function()
-                {
-                    return System_import;
-                }
-            );
-            container.set(
-                root + ".walkPath",
-                function()
-                {
-                    return walkPath;
-                }
-            );
-            container.set(
-                root + ".resolveIdentifier",
-                function()
-                {
-                    return resolveIdentifier
-                }
-            );
-            container.set(
-                root + ".resolver",
-                function()
-                {
-                    return resolver;
-                }
-            );
-            container.set(
-                root + ".traverse",
-                function()
-                {
-                    return traverse;
-                }
-            );
-            container.set(
-                root + ".resolve.arguments",
-                function()
-                {
-                    return resolveArguments;
-                }
-            );
-            container.set(
-                root + ".filter.callable",
-                function()
-                {
-                    return callable;
-                }
-            );
-            
-            return function(container, definition, id, definitions)
-            {
-                var args = arguments;
-                return importable.apply(null, arguments).then(
-                    function(defs)
-                    {
-                        definitions = defs || definitions;
-                        callable(container, definitions[id], id, definitions);
-                        filterable(container, definitions[id], id, definitions);
-                        return definitions;
-                    }
-                );
-            }
-        }
-    );
-}
-
-    }
-),
-
-r(
-    "/node_modules/@gardenhq/willow/filters/iterator.js",
-    function(module, exports, require)
+    "/node_modules/@gardenhq/willow/conf/../filters/iterator.js",
+    function(module, exports, require, __filename, __dirname, process)
     {
         module.exports = function(resolveArguments, key)
 {
@@ -1047,8 +724,8 @@ r(
 ),
 
 r(
-    "/node_modules/@gardenhq/willow/filters/object.js",
-    function(module, exports, require)
+    "/node_modules/@gardenhq/willow/conf/../filters/object.js",
+    function(module, exports, require, __filename, __dirname, process)
     {
         module.exports = function(loader)
 {
@@ -1066,8 +743,8 @@ r(
 ),
 
 r(
-    "/node_modules/@gardenhq/willow/filters/resolve.js",
-    function(module, exports, require)
+    "/node_modules/@gardenhq/willow/conf/../filters/resolve.js",
+    function(module, exports, require, __filename, __dirname, process)
     {
         module.exports = function(resolveResolve, key, serviceKey, servicePrefix)
 {
@@ -1159,8 +836,8 @@ r(
 ),
 
 r(
-    "/node_modules/@gardenhq/willow/filters/service.js",
-    function(module, exports, require)
+    "/node_modules/@gardenhq/willow/conf/../filters/service.js",
+    function(module, exports, require, __filename, __dirname, process)
     {
         module.exports = function(key)
 {
@@ -1178,8 +855,8 @@ r(
 ),
 
 r(
-    "/node_modules/@gardenhq/willow/filters/tags.js",
-    function(module, exports, require)
+    "/node_modules/@gardenhq/willow/conf/../filters/tags.js",
+    function(module, exports, require, __filename, __dirname, process)
     {
         module.exports = function(key)
 {
@@ -1205,8 +882,377 @@ r(
 ),
 
 r(
+    "/node_modules/@gardenhq/willow/conf/index.js",
+    function(module, exports, require, __filename, __dirname, process)
+    {
+        module.exports = function()
+{
+    var root = __dirname + "/..";
+    return {
+        "willow.filter.service": {
+            "filter": root + "/filters/service"
+        },
+        "willow.filter.factory": {
+            "filter": root + "/filters/factory"
+        },
+        "willow.filter.tags": {
+            "filter": root + "/filters/tags"
+        }
+    };
+        
+}
+
+    }
+),
+
+r(
+    "/node_modules/@gardenhq/willow/conf/javascript.js",
+    function(module, exports, require, __filename, __dirname, process)
+    {
+        module.exports = function()
+{
+    var root = __dirname + "/.."
+    var id = "willow";
+    return {
+        "willow.filter.class": {
+            "filter": root + "/filters/class",
+            "arguments": [
+                "@" + id + ".loadAndEval",
+                "@" + id + ".resolve.arguments",
+                "@" + id+ ".resolveIdentifier",
+                "@" + id + ".traverse"
+            ],
+            "tags": [
+                id + ".filter"
+            ]
+        },
+        "willow.filter.object": {
+            "filter": root + "/filters/object",
+            "arguments": [
+                "@" + id + ".loadAndEval"
+            ],
+            "tags": [
+                id + ".filter"
+            ]
+        },
+        "willow.filter.share": {
+            "filter": root + "/filters/shared"
+        },
+        "willow.filter.resolve": {
+            "filter": root + "/filters/resolve",
+            "arguments": [
+                "@" + id + ".resolve.resolve"
+            ],
+            "tags": [
+                id + ".filter"
+            ]
+        },
+        "willow.filter.iterator": {
+            "filter": root + "/filters/iterator",
+            "arguments": [
+                "@" + id + ".resolve.arguments"
+            ],
+            "tags": [
+                id + ".filter"
+            ]
+        }
+    };
+        
+}
+
+    }
+),
+
+r(
+    "/node_modules/@gardenhq/willow/filters/callable.js",
+    function(module, exports, require, __filename, __dirname, process)
+    {
+        module.exports = function(loader, resolveArguments)
+{
+    return loader(
+        "callable",
+        function(resolve, reject, module, object, container, definition)
+        {
+            return resolveArguments(container, definition).then(
+                function(args)
+                {
+                    try {
+                        var result = module.apply(object, args);
+                    } catch(e) {
+                        reject(e);
+                        // reject(new TypeError("'" + definition.callable + "' is not callable/a function"));
+                    }
+                    resolve(
+                        result
+                    );
+                }
+            );
+        }
+    );
+}
+
+    }
+),
+
+r(
+    "/node_modules/@gardenhq/willow/filters/filter.js",
+    function(module, exports, require, __filename, __dirname, process)
+    {
+        module.exports = function(loader, resolveArguments, key)
+{
+    key = key || "filter";
+    return function(container, definition, id, definitions)
+    {
+        loader(
+            "filter",
+            function(resolve, reject, module, object, builder, definition)
+            {
+                return resolveArguments(builder, definition).then(
+                    function(args)
+                    {
+                        var result = module.apply(object, args);
+                        builder.use(result);
+                        resolve(
+                            result
+                        );
+                    }
+                );
+            }
+        )(container, definition, id, definitions);
+    }
+}
+
+
+    }
+),
+
+r(
+    "/node_modules/@gardenhq/willow/filters/imports.js",
+    function(module, exports, require, __filename, __dirname, process)
+    {
+        module.exports = function($require, key)
+{
+    key = key || "imports";
+    var resourceKey = "resource";
+    var versionKey = "version";
+    return function importer(container, definition, id, definitions)
+    {
+        if(id == key) {
+            return Promise.all(
+                definition.map(
+                    function(item)
+                    {
+                        var path = item;
+                        if(typeof path != "string") {
+                            path = item[resourceKey]
+                        }
+                        return $require(path, item[versionKey]);
+                    }
+                )
+            ).then(
+                function(imports)
+                {
+                    var promises = imports.map(
+                        function(config)
+                        {
+                            // is callable?
+                            if(typeof config === "function") {
+                                config = config(container);
+                            }
+                            if(typeof config !== "object") {
+                                throw new Error("That import doesn't return/resolve to an object");
+                            }
+                            Object.keys(config).forEach(
+                                function(id)
+                                {
+                                    if(id != key) {
+                                        if(typeof definitions[id] === "undefined" || definitions[id].constructor == Object) {
+                                            definitions[id] = Object.assign(
+                                                config[id],
+                                                definitions[id]
+                                            );
+                                        }   
+                                    }
+                                }
+                            );
+                            if(typeof config[key] !== "undefined" ) {
+                                return importer(container, config[key], key, definitions);
+                            } else {
+                                return definitions;
+                            }
+                        }
+                    );
+                    return Promise.all(
+                        promises
+                    ).then(
+                        function(d)
+                        {
+                            return d[0];
+                        }
+                    )
+                }
+            );
+        } else {
+            return Promise.resolve(definitions);
+        }
+    }
+        
+}
+
+    }
+),
+
+r(
+    "/node_modules/@gardenhq/willow/filters/index.js",
+    function(module, exports, require, __filename, __dirname, process)
+    {
+        module.exports = function(container)
+{ 
+    var root = "willow";
+    var servicePrefix = "@";
+    var tagPrefix = "#";
+    var identifierSplitter = ":";
+
+    var System_import = container.get(root + ".system.import");
+    var System_registerDynamic = container.get(root + ".system.registerDynamic");
+    return Promise.all(
+        [
+            "/util/loader.js",
+            "/util/walkPath.js",
+            "/util/resolveIdentifier.js",
+            "/util/traverse.js",
+            "/util/resolver.js",
+            "/util/splitIdentifier.js",
+            "/util/findIdentifier.js",
+            "/util/weblikeJavascriptlessImport.js",
+
+            "/imports.js",
+            "/callable.js",
+            "/filter.js"
+        ].map(
+            function(item)
+            {
+                return __dirname + item;
+            }
+        ).map(function(item){ return System_import(item) })
+    ).then(
+        function(modules)
+        {
+
+            var loader = modules[0];
+            var walkPath = modules[1];
+            var createResolveIdentifier = modules[2];
+            var traverse = modules[3];
+            var createResolver = modules[4];
+            var splitIdentifier = modules[5](identifierSplitter);
+            var findIdentifier = modules[6](servicePrefix);
+            var weblikeJavascriptlessImport = modules[7](System_import);
+
+            var importer = modules[8];
+            var callabled = modules[9];
+            var filtered = modules[10];
+
+
+            var loadAndEval = loader(
+                weblikeJavascriptlessImport,
+                System_registerDynamic,
+                walkPath,
+                splitIdentifier,
+                findIdentifier
+            );
+            var resolveIdentifier = createResolveIdentifier(
+                walkPath,
+                servicePrefix,
+                tagPrefix,
+                splitIdentifier
+            );
+            var resolver = createResolver(resolveIdentifier, traverse);
+            var resolveArguments = resolver("arguments");
+
+            var importable = importer(weblikeJavascriptlessImport);
+            var callable = callabled(loadAndEval, resolveArguments);
+            var filterable = filtered(loadAndEval, resolveArguments);
+
+            container.set(
+                root + ".loadAndEval",
+                function()
+                {
+                    return loadAndEval;
+                }
+            );
+            container.set(
+                root + ".require",
+                function()
+                {
+                    return System_import;
+                }
+            );
+            container.set(
+                root + ".walkPath",
+                function()
+                {
+                    return walkPath;
+                }
+            );
+            container.set(
+                root + ".resolveIdentifier",
+                function()
+                {
+                    return resolveIdentifier
+                }
+            );
+            container.set(
+                root + ".resolver",
+                function()
+                {
+                    return resolver;
+                }
+            );
+            container.set(
+                root + ".traverse",
+                function()
+                {
+                    return traverse;
+                }
+            );
+            container.set(
+                root + ".resolve.arguments",
+                function()
+                {
+                    return resolveArguments;
+                }
+            );
+            container.set(
+                root + ".filter.callable",
+                function()
+                {
+                    return callable;
+                }
+            );
+            
+            return function(container, definition, id, definitions)
+            {
+                var args = arguments;
+                return importable.apply(null, arguments).then(
+                    function(defs)
+                    {
+                        definitions = defs || definitions;
+                        callable(container, definitions[id], id, definitions);
+                        filterable(container, definitions[id], id, definitions);
+                        return definitions;
+                    }
+                );
+            }
+        }
+    );
+}
+
+    }
+),
+
+r(
     "/node_modules/@gardenhq/willow/filters/util/findIdentifier.js",
-    function(module, exports, require)
+    function(module, exports, require, __filename, __dirname, process)
     {
         module.exports = function(servicePrefix)
 {
@@ -1229,12 +1275,13 @@ r(
 
 r(
     "/node_modules/@gardenhq/willow/filters/util/loader.js",
-    function(module, exports, require)
+    function(module, exports, require, __filename, __dirname, process)
     {
         module.exports = function(require, register, walkPath, splitIdentifier, findIdentifier)
 {
     var requiresKey = "requires";
     var bundleKey = "bundle";
+    var versionKey = "version";
     return function(key, cb)
     {
         if(require == null) {
@@ -1277,7 +1324,7 @@ r(
                             }
                             // inject something here?
                             // "requires": [{"hyper": @overwrite:./overwrite.js}]
-                            const requires = definition[requiresKey] || [];
+                            var requires = definition[requiresKey] || [];
                             loaded = Promise.all(
                                 requires.map(
                                     function(item)
@@ -1303,7 +1350,8 @@ r(
                                         }
                                     );
                                     return require(
-                                        identifier.file
+                                        identifier.file,
+                                        definition[versionKey]
                                     )
                                 }
                             );
@@ -1338,7 +1386,7 @@ r(
 
 r(
     "/node_modules/@gardenhq/willow/filters/util/resolveIdentifier.js",
-    function(module, exports, require)
+    function(module, exports, require, __filename, __dirname, process)
     {
         /**
  * Shell variable substitution code taken from 'somewhere'?
@@ -1528,7 +1576,7 @@ module.exports = function(walkPath, servicePrefix, tagPrefix, splitIdentifier)
 
 r(
     "/node_modules/@gardenhq/willow/filters/util/resolver.js",
-    function(module, exports, require)
+    function(module, exports, require, __filename, __dirname, process)
     {
         module.exports = function(resolveIdentifier, traverse)
 {
@@ -1573,7 +1621,7 @@ r(
 
 r(
     "/node_modules/@gardenhq/willow/filters/util/splitIdentifier.js",
-    function(module, exports, require)
+    function(module, exports, require, __filename, __dirname, process)
     {
         module.exports = function(separator)
 {
@@ -1608,7 +1656,7 @@ r(
 
 r(
     "/node_modules/@gardenhq/willow/filters/util/traverse.js",
-    function(module, exports, require)
+    function(module, exports, require, __filename, __dirname, process)
     {
         module.exports = function traverse(obj, callback, trail)
 {
@@ -1634,7 +1682,7 @@ r(
 
 r(
     "/node_modules/@gardenhq/willow/filters/util/walkPath.js",
-    function(module, exports, require)
+    function(module, exports, require, __filename, __dirname, process)
     {
         module.exports = function(key, value)
 {
@@ -1652,19 +1700,54 @@ r(
 ),
 
 r(
+    "/node_modules/@gardenhq/willow/filters/util/weblikeJavascriptlessImport.js",
+    function(module, exports, require, __filename, __dirname, process)
+    {
+        module.exports = function($require)
+{
+    return function(path)
+    {
+        // ends in a slash, just force index.js
+        if(path[path.length - 1] === "/") {
+            path = path + "index.js";
+        } else {
+            var temp = path.split("/");
+            // length is 1 so its a simple nodejs module "something"
+            var len = 1;
+            if(path.indexOf("@") === 0) {
+                // starts with a @ and length is 2 its an org nodejs module "@somewhere/something"
+                len = 2;
+            }
+            if(temp.length > len) {
+                var last = temp.pop();
+                if(last.indexOf(".") === -1) {
+                    path = path + ".js";
+                }
+            }
+        }
+        return $require.apply(null, arguments);
+    }
+}
+
+    }
+),
+
+r(
     "/node_modules/@gardenhq/willow/index.js",
-    function(module, exports, require)
+    function(module, exports, require, __filename, __dirname, process)
     {
         module.exports = function(promisedRequire, register, config, containerlike)
 {
-    const name = "@gardenhq/willow";
+    var name = __dirname;
     // this should be in test
-    const id = "willow.";
-    config = name + "/conf/javascript";
+    var id = "willow.";
+    config = name + "/conf/javascript.js";
 
     if(promisedRequire == null) {
         //probably testing
-        var promised = require("./util/promised");
+        var $require = require;
+        var promised = $require("./util/promised");
+        // TODO: This can go for now?
         promisedRequire = promised(
             function(path)
             {
@@ -1672,13 +1755,13 @@ r(
             }
         );
     }
-    const modules = [
-        "Builder",
-        "filters/",
-        "conf/"
+    var modules = [
+        "Builder.js",
+        "filters/index.js",
+        "conf/index.js"
     ];
     if(containerlike == null) {
-        modules.push("Container");
+        modules.push("Container.js");
     }
     return Promise.all(
         modules.map(
@@ -1690,8 +1773,8 @@ r(
     ).then(
         function(modules)
         {
-            const container = containerlike == null ? new modules[3]() : containerlike;
-            const builder = new modules[0](
+            var container = containerlike == null ? new modules[3]() : containerlike;
+            var builder = new modules[0](
                 container,
                 promisedRequire // for importing
             );
@@ -1765,95 +1848,6 @@ r(
                 }
             );
         }
-    
-    );
-
-
-
-};
-
-    }
-),
-
-r(
-    "/node_modules/@gardenhq/willow/util/promised.js",
-    function(module, exports, require)
-    {
-        module.exports = function(callable)
-{
-    return function()
-    {
-        try {
-            var module = callable.apply(null, arguments);
-            return Promise.resolve(module);
-        } catch(e) {
-            return Promise.reject(e);
-        }
-    }
-}
-
-
-    }
-),
-
-r(
-    "/node_modules/o/src/b.js",
-    function(module, exports, require)
-    {
-        module.exports = function(load)
-{
-    return load.then(
-        function(System)
-        {
-            var register;
-            if(System.registerDynamic != null) {
-                register = System.registerDynamic.bind(System);
-            }
-            return System.import(
-                "@gardenhq/willow/index.js"
-            ).then(
-                function(builder)
-                {
-                    return builder(
-                        System,
-                        register,
-                        "@gardenhq/willow/conf/javascript"
-                    );
-                }
-            ).then(
-                function(builder)
-                {
-                    var config = System.getConfig();
-                    var services = config.hash;
-                    if(!services && typeof document !== "undefined") {
-                        var scripts = document.getElementsByTagName("script");
-                        var script = scripts[scripts.length - 1];
-                        if(script.hasAttribute("src")) {
-                            var src = script.getAttribute("src");
-                            var temp  = src.split("#");
-                            if(temp.length > 1) {
-                                services = System.resolve(temp[1], location.pathname);
-                            }
-                        }
-                    }
-                    if(services) {
-                        var temp = services.split(":");
-                        if(!config.basepath) {
-                            System.config(
-                                {
-                                    baseURL: temp[0]
-                                }
-                            );
-                        }
-                        return builder.build(
-                            temp[0]
-                        ).run(temp[1] || "main");
-                    } else {
-                        return builder;
-                    }
-                }
-            );
-        }
     );
 };
 
@@ -1868,7 +1862,7 @@ r(
 .then(
                             function()
                             {
-                                System.import("/node_modules/o/src/b.js").then(
+                                System.import("/node_modules/@gardenhq/o/src/b.js").then(
                                     function(module)
                                     {
                                         if(typeof module === "function") {
@@ -1891,134 +1885,728 @@ r(
         );
     }
 )((
-    function(unique)
+    function(win, doc, script)
     {
-        return function(cb)
+        "use strict";
+        var registryFactory;
+        var registry;
+        var parser;
+        var transport;
+        var pathname = win.location.pathname;
+        var defaultProxy = function(transport)
         {
-            var normalizeName = function (child, parentBase) {
-                if (child[0] === "/") {
-                    child = child.slice(1);
-                }
-                if (child[0] !== ".") {
-                    return child;
-                }
-                parentBase = parentBase.filter(function(item){return item != "."});
-                var parts = child.split("/");
-                while (parts[0] === "." || parts[0] === "..") {
-                    if (parts.shift() === "..") {
-                        parentBase.pop();
-                    }
-                }
-                return parentBase.concat(parts).join("/");
-            }
-            var getResolve = function(includePath, defaultBase)
+            return transport;   
+        };  
+        var runner = function(o, config)
+        {
+            var exportTo = function(where, what, path)
             {
-                return function(path, base)
+                path.split(".").reduce(
+                    function(prev, item, i, arr)
+                    {
+                        return prev[item] = prev[item] == null ? (i == arr.length - 1 ? what : {}) : prev[item];
+                    },
+                    where
+                );
+            };
+            if(config.src || config.module) {
+                var _o = function(doc)
                 {
-                    if(path.indexOf("//") !== -1) {
-                        return path;
-                    }
-                    base = base || defaultBase;
-                    var first2Chars = path.substr(0, 2);
-                    var firstChar = first2Chars[0];
-                    var temp = path.split("#");
-                    var hash = temp.length == 2 ? "#" + temp[1] : "";
-                    path = temp[0];
-                    if(
-                        first2Chars != ".." && first2Chars != "./" && firstChar != "/"
-                    ) {
-                        if(path.indexOf("/") === -1) {
-                            path +=  "/"
+                    return o(
+                        function(promised)
+                        {
+                            return promised(doc)
                         }
-                        path = includePath + path;
+                    ).then(
+                        function(System)
+                        {
+                            exportTo(
+                                win,
+                                function()
+                                {
+                                    return Promise.resolve(System);
+                                },
+                                config.export
+                            );
+                            return System.import((config.src || config.module).split("#")[0]).then(
+                                function(module)
+                                {
+                                    if(typeof module === "function") {
+                                        return module(Promise.resolve(System))
+                                    } else {
+                                        return Promise.resolve(System);
+                                    }
+
+                                }
+                            );
+                        }
+                    );
+                }
+                if(config.module) {
+                    exportTo(win, _o, config.export);
+                } else {
+                    _o();
+                }
+            } else {
+                exportTo(win, o, config.export);
+            }
+
+        }
+        runner.config = function(script, resolve)
+        {
+            var temp;
+            // TODO: take some bits out? or namespace them with o?
+            var config = [].slice.call(script.attributes).reduce(
+                function(prev, item, i, arr)
+                {
+                    var key = item.nodeName;
+                    if(key.indexOf("data-") === 0) {
+                        prev[key.substr(5)] = item.value;
                     }
-                    if(path[path.length - 1] === "/") {
-                        path += "index";
+                    return prev;
+                },
+                {}
+            );
+            // resolve anything pathlike
+            if(config.basepath) {
+                config.basepath = resolve(config.basepath, pathname);
+            }
+            var basepath = config.basepath || pathname;
+            [
+                "includepath",
+                "src"
+            ].forEach(
+                function(item)
+                {
+                    if(config[item] != null) {
+                        config[item] = resolve(config[item], basepath);
                     }
-                    path = normalizeName(path, base.split("/").slice(0, -1));
-                    //this should go!!
-                    if(path.indexOf(".") === -1) {
-                        path += ".js";
-                    }
-                    firstChar = path.charAt(0);
-                    if(firstChar != "/") {
-                        path = "/" + path;
-                    }
-                    return path + hash;
+                }
+            );
+            // data-src is set
+            if(config.src) {
+                temp = config.src.split("#");
+                config.src = temp[0];
+                if(temp[1]) {
+                    // if I have a hash resolve it to the page url and save it
+                    config.hash = resolve(temp[1], basepath);
+                }
+                // baseURL should be the resolved data-src path unless basepath is set
+                config.baseURL = config.basepath || config.src;
+            } else if(script.hasAttribute("src")) {
+                // config.src = script.getAttribute("src") 
+                // data-src isn't set, but src is, surely this is only for bundles?
+                config.baseURL = config.basepath || resolve(script.getAttribute("src"), pathname);
+            }
+            config.baseURL = config.baseURL || basepath;
+            temp = config.baseURL.split("/");
+            temp.pop();
+            temp.push("");
+            config.baseURL = temp.join("/");
+            return config;
+        }
+        var getCurrentScript = function(doc)
+        {
+            var scripts = doc.getElementsByTagName("script");
+            return scripts[scripts.length - 1];
+        }
+        var getAttribute = function(doc, attr, value)
+        {
+            var script = getCurrentScript(doc);
+            return script.hasAttribute(attr) ? script.getAttribute(attr) : value;
+        };
+        var getConfig = function(key, value)
+        {
+            return getAttribute(doc, "data-" + key, value)
+        }
+        var normalizeName = function (child, parentBase) {
+            if (child[0] === "/") {
+                child = child.slice(1);
+            }
+            if (child[0] !== ".") {
+                return child;
+            }
+            parentBase = parentBase.filter(function(item){return item != "."});
+            var parts = child.split("/");
+            while (parts[0] === "." || parts[0] === "..") {
+                if (parts.shift() === "..") {
+                    parentBase.pop();
                 }
             }
-            var modules = {};
-            /* Module */
-            var Module = function(id, parent, module)
+            return parentBase.concat(parts).join("/");
+        }
+        var getResolve = function(includePath, defaultBase)
+        {
+            return function(path, base)
             {
-                this.id = id;
-                this.filename = id;
-                this.parent = parent;
-                this.exports = {};
-                this[unique] = module;
+                if(path.indexOf("://") !== -1) {
+                    return path;
+                }
+                base = base || defaultBase;
+                var first2Chars = path.substr(0, 2);
+                var firstChar = first2Chars[0];
+                var temp = path.split("#");
+                var hash = temp.length == 2 ? "#" + temp[1] : "";
+                path = temp[0];
+                if(
+                    first2Chars != ".." && first2Chars != "./" && firstChar != "/"
+                ) {
+                    if(path.indexOf("/") === -1) {
+                        path += "/";
+                    }
+                    path = includePath + path;
+                }
+                // TODO: this should go
+                if(path[path.length - 1] === "/") {
+                    path += "index";
+                }
+                path = normalizeName(path, base.split("/").slice(0, -1));
+                // TODO: this should go
+                if(path.indexOf(".") === -1) {
+                    path += ".js";
+                }
+                firstChar = path.charAt(0);
+                if(firstChar != "/" && path.indexOf("://") === -1) {
+                    path = "/" + path;
+                }
+                return path + hash;
             }
-            var o = Module.prototype;
-            o._load = function(_require)
+        }
+        var basepath = function(doc, src)
+        {
+            src = getAttribute(doc, src || "src", "");
+            var parts = pathname.split("/");
+            if(src[0] !== "/") {
+                parts[parts.length - 1] = src;
+            }
+            return getConfig(
+                "basepath",
+                parts.join("/")
+            );
+        };
+        return (
+            function(includePath)
             {
-                if(typeof this[unique] !== "undefined") {
-                    var temp = this.filename.split("/");
-                    temp.pop();
-                    var module = this[unique];
-                    this[unique] = undefined;
+                var current = getCurrentScript(doc);
+                var resolve = getResolve(includePath, basepath(doc));
+                var config = Object.assign(
+                    {},
+                    {
+                        // TODO: Don't export if I'm not asked to, remove this
+                        export: "module.exports",
+                        registry: "/src/registry/memory.js",
+                        parser: "/src/parser/evalSync.js",
+                        transport: "/src/transport/xhrNodeResolver.js",
+                        includepath: includePath
+                    },
+                    runner.config(getCurrentScript(doc), resolve)
+                );
+                var utils = [
+                    {
+                        path: config.transport,
+                        key: "transport"
+                    },
+                    {
+                        path: config.parser,
+                        key: "parser"
+                    },
+                    {
+                        path: config.registry,
+                        key: "registry"
+                    }
+                ].concat(
+                    (
+                        config.proxy ? {
+                            path: config.proxy,
+                            key: "proxy"
+                        } : []
+                    )
+                ).map(
+                    function(item)
+                    {
+                        return script(resolve(item.path, config.baseURL), item.key, current)
+                    }
+                ).map(
+                    function(injectScript, i)
+                    {
+                        if(injectScript) {
+                            return new Promise(
+                                function(resolve, reject)
+                                {
+                                    var previous = win[injectScript.callback];
+                                    win[injectScript.callback] = function(func)
+                                    {
+                                        delete win[injectScript.callback];
+                                        if(typeof previous !== "undefined") {
+                                            win[injectScript.callback] = previous;
+                                        }
+                                        var result = func(injectScript.path, config);
+                                        if(i == 2) {
+                                            registryFactory = result;
+                                            result = result();
+                                        }
+                                        resolve(
+                                            result
+                                        );
+                                    }
+                                    injectScript();
+                                }
+                            );
+                        }
+                    }
+                );
+                var getPromisedLoader = function(resolve, config)
+                {
+                    var factory = function(doc, proxy, register)
+                    {
+                        proxy = proxy || defaultProxy;
+                        register = register || registry;
+                        return function(path)
+                        {
+                            var _config = this ? this.getConfig() : config;
+                            return register(
+                                resolve(path, _config.baseURL),
+                                proxy(
+                                    transport,
+                                    factory,
+                                    registryFactory,
+                                    config
+                                ),
+                                parser,
+                                resolve
+                            );
+                        }
+                    }
+                    return factory;
+                };
+                var o = function(cb)
+                {
+                    var resolve = getResolve(includePath, basepath(doc));
+                    var config = runner.config(getCurrentScript(doc), resolve);
+                    config.includepath = config.includepath || includePath;
+                    var registerDynamic;
+                    return Promise.all(
+                        utils
+                    ).then(
+                        function(modules)
+                        {
+                            transport = modules[0];
+                            parser = modules[1];
+                            registry = modules[2];
+                            defaultProxy = modules[3] ? modules[3] : defaultProxy;
+                            registerDynamic = function(path, deps, executingRequire, cb)
+                            {
+                                return Promise.resolve(registry.set(path, cb));
+                            }
+registerDynamic("/@gardenhq/o/_o.js", [], true, function(module, exports, require){ return module.exports = function(promised)
+{
+    var _require;
+    var config = {};
+    var o = Object.assign(
+        function(obj)
+        {
+            if(typeof _require === "undefined" && typeof obj == "function") {
+                _require = obj(promised).bind(o);
+                return o;
+            } else {
+                return _require(obj);
+            }
+        },
+        {
+            import: function(path)
+            {
+                return this.apply(null, arguments);
+            },
+            getConfig: function()
+            {
+                return Object.assign({}, config);
+            },
+            config: function(_config)
+            {
+                config = Object.assign(
+                    {},
+                    config,
+                    _config
+                );
+            }
+        }
+    );
+    return o;
+
+}
+
+})
+                            return getPromisedLoader(resolve, config)(doc)("/@gardenhq/o/_o.js");
+                        }
+                    ).then(
+                        function(_o)
+                        {
+                            var System = Object.assign(
+                                _o(
+                                    getPromisedLoader(resolve, config)
+                                )(cb),
+                                {
+                                    registry: registry,
+                                    registerDynamic: registerDynamic,
+                                    resolve: resolve
+                                }
+                            );
+                            System.config(config);
+                            registerDynamic("/" + config.includepath + "/@gardenhq/o/o.js", [], true, function(module){module.exports = Promise.resolve(System);});
+                            return System;
+                        }
+                    );
+                };
+                runner(o, config);
+                return o;
+            }
+        )(
+            getConfig("includepath", "node_modules/")
+        );
+    }
+)(
+    window,
+    document,
+    function(path, callbackName, script)
+    {
+        /* scripts */var scripts = {"transport": function(){ transport(
+    function(scriptPath)
+    {
+        var throwError = function(cb, path, request)
+        {
+            return function(e)
+            {
+                cb(new Error("Unable to load " + path + " (" + request.status + ")"));
+                return function(){};
+            }
+        }
+        var load = function(path, ajax)
+        {
+            ajax = ajax || XMLHttpRequest;
+            var request = new ajax();
+            request.open('get', path, true);
+            return new Promise(
+                function(resolve, reject)
+                {
+                    request.onreadystatechange = function()
+                    {
+                        if(request.readyState === 4) {
+                            if (request.status === 200) {
+                                resolve(
+                                    {
+                                        headers: {
+                                            "Content-Type": request.getResponseHeader("Content-Type") 
+                                        },
+                                        content: request.responseText
+                                    }
+                                );
+                            } else {
+                                if(path.indexOf(".js") === -1 && path.indexOf("package.json") === -1) {
+                                    load(path + ".js", ajax).then(
+                                        function(data)
+                                        {
+                                            data.path = path;
+                                            resolve(data);
+                                        }
+                                    ).catch(
+                                        throwError(reject, path, request)
+                                    );
+                                } else if(path.indexOf("index.js") === -1 && path.indexOf("package.json") === -1) {
+
+                                    var temp = path.split(".");
+                                    temp.pop();
+                                    path = temp.join(".") + "/index.js";
+                                    load(path, ajax).then(
+                                        function(data)
+                                        {
+                                            data.path = path;
+                                            resolve(data);
+                                        }
+                                    ).catch(
+                                        throwError(reject, path, request)
+                                    );
+                                } else if(path.indexOf("package.json") === -1) {
+                                    var temp = path.split("/");
+                                    temp.pop();
+                                    temp.push("package.json");
+                                    path = temp.join("/");
+                                    temp.pop();
+                                    load(path, ajax).then(
+                                        function(data)
+                                        {
+                                            var path = JSON.parse(data.content).main;
+                                            temp.push(path);
+                                            path = temp.join("/");
+                                            load(path).then(
+                                                function(data)
+                                                {
+                                                    data.path = path;
+                                                    resolve(data);
+                                                }
+                                            );
+                                        }
+                                    ).catch(
+                                        throwError(
+                                            function(e)
+                                            {
+                                                console.error(e);
+                                                resolve({headers: {"Content-Type": "application/javascript"}, content: "module.exports=null"})
+                                            },
+                                            path,
+                                            request
+                                        )
+                                    );
+                                } else {
+                                    throwError(reject, path, request)();
+                                }
+                            }
+                        }
+                    }
+                    request.send();
+                }
+            );
+        }
+        return load;
+    }
+);
+
+ },"parser": function(){ parser(
+    function(scriptPath)
+    {
+        var defaultEvaluate = function(source)
+        {
+            // (exports, require, module, __filename, __dirname)
+            // return function(exports, require, module, __filename, __dirname)
+            return function(module, exports, require, __filename, __dirname)
+            {
+                var process = {
+                    env: {
+                        // NODE_ENV: "production"
+                    },
+                    argv: ""
+                };
+                eval(source)
+            }
+        }
+        var load = function(path, loader, _require, registry, evaluate)
+        {
+            var resolve = _require.resolve;
+            evaluate = evaluate || defaultEvaluate;
+            var loadSynchronousRequires = function(data)
+            {
+                var re = /(?:^|[^\w\$_.])require\s*\(\s*["']([^"']*)["']\s*\)/g;
+                var arr;
+                var syncRequires = [];
+                while((arr = re.exec(data.content)) !== null) {
+                    syncRequires.push(resolve(arr[1], data.path || path));
+                }
+                if(syncRequires.length == 0) {
+                    return data;
+                }
+                syncRequires.push(null);
+                return syncRequires.reduce(
+                    function(prev, item, i, arr)
+                    {
+                        return prev.then(
+                            function(path)
+                            {
+                                if(registry.has(path)) {
+                                    return item;
+                                }
+                                return load(path, loader, _require, registry, evaluate).then(
+                                    function(loaded)
+                                    {
+                                        // TODO: Decide on aliases
+                                        if(!registry.has(loaded.path || path)) {
+                                            registry.set(loaded.path || path, loaded)
+                                        }
+                                        if(!registry.has(path)) {
+                                            registry.set(path, loaded)
+                                        }
+                                        return item;
+                                    }
+                                );
+
+                            }
+                        );
+                    },
+                    Promise.resolve(syncRequires[0])
+                ).then(
+                    function()
+                    {
+                        // TODO: This should always return the main module
+                        return data;
+                    }
+                );
+                
+            }
+            return loader(path).then(
+                function(data)
+                {
+                    var relativeRequire = function(relativePath)
+                    {
+                        var from = data.path || path;
+                        relativePath = relativePath.indexOf("/") === 0 ? relativePath : resolve(relativePath, from);
+                        return _require(relativePath);
+                    }
+                    var contentType = data.headers["Content-Type"].split("/").pop();
+                    registry.set(
+                        path,
+                        function(module, exports, __require, __filename, __dirname)
+                        {
+                            switch(contentType) {
+                                case "javascript":
+                                    // path = data.path;
+                                    var map = "//# sourceURL=" + path;
+                                    if(data.content.indexOf("//# sourceURL") === -1) {
+                                        data.content += map; 
+                                    }
+                                    // (exports, require, module, __filename, __dirname)
+                                    // evaluate(data.content)(exports, relativeRequire, module, __filename, __dirname);
+                                    evaluate(data.content)(module, exports, relativeRequire, __filename, __dirname);
+                                    break;
+                                case "json":
+                                    module.exports = JSON.parse(data.content);
+                                    break;
+                                default:
+                                    module.exports = data.content;
+                                    break;
+                            }
+                            return module.exports;
+                        }
+                    );
                     // (exports, require, module, __filename, __dirname)
-                    // module.bind(null)(this.exports, _require, this, this.filename, temp.join("/"));
-                    module.bind(null)(this, this.exports, _require, this.filename, temp.join("/"));
+                    // return function(exports, __require, module, __filename, __dirname)
+
+                    return data;
+
                 }
-                return this.exports;
+            ).then(
+                loadSynchronousRequires
+            );
+        }
+        return load;
+    }
+);
+
+ },"registry": function(){ registry(
+    function(scriptPath)
+    {
+        var unique = "___"
+        /* module */
+        var Module = function(id, parent, module)
+        {
+            this.id = id;
+            this.filename = id;
+            this.parent = parent;
+            this.exports = {};
+            this[unique] = module;
+        }
+        var o = Module.prototype;
+        o._load = function(_require)
+        {
+            if(typeof this[unique] !== "undefined") {
+                var temp = this.filename.split("/");
+                temp.pop();
+                var module = this[unique];
+                this[unique] = undefined;
+                // (exports, require, module, __filename, __dirname)
+                // module.bind(null)(this.exports, _require, this, this.filename, temp.join("/"));
+                module.bind(null)(this, this.exports, _require, this.filename, temp.join("/"));
             }
-            /* module */
+            return this.exports;
+        }
+        /* module */
+        return function(m)
+        {
+            var cache = m || {};
+            var modules = cache.modules = {};
+            var keys = cache.keys = [];
             var _require = function(path)
             {
                 try {
-                    return modules[_require.resolve(path.split("#")[0])]._load(_require)
+                    return modules[path]._load(_require)
                 } catch(e) {
-                    console.error(path);
+                    // TODO: Would be good to have this just for dev
+                    // People are catching errors for browserify see js-yaml
+                    // console.error("Unable to require '" + path + "'");
                     // e.message = "Unable to require '" + path + "'";
                     throw e;
                 }
             }
-            var config = {};
-            var o = Object.assign(
-                function(path)
-                {
-                    return Promise.resolve(_require(path));
-                },
-                {
-                    registerDynamic: function(path, deps, bool, module)
-                    {
-                        modules[path] = new Module(path, null, module);
-                    },
-                    import: function(path)
-                    {
-                        return this.apply(null, arguments);
-                    },
-                    getConfig: function()
-                    {
-                        return Object.assign({}, config);
-                    },
-                    config: function(_config)
-                    {
-                        if(_config.baseURL !== config.baseURL) {
-                            _require.resolve = getResolve(_config.includepath, _config.baseURL);
-                        }
-                        config = Object.assign(
-                            {},
-                            config,
-                            _config
-                        );
-                    }
-
+            var get = function(path)
+            {
+                return Promise.resolve(_require(path));
+            }
+            var has = function(key)
+            {
+                return keys[key] === true;
+            }
+            var set = function(path, module)
+            {
+                // TODO: This can return null when you might expect the module
+                // return the Module?
+                // always return null ? **
+                // Keep as both means I know whether its already set or not?
+                if(has(path)) {
+                    return;
                 }
-
-            );
-            return Promise.resolve(o);
-        };
+                keys[path] = true;
+                modules[path] = new Module(path, null, module);
+                return module;
+            }
+            var registry = function(path, loader, parser, resolve)
+            {
+                if(typeof _require.resolve === "undefined") {
+                    _require.resolve = resolve;
+                }
+                if(has(path)) {
+                    return get(path);
+                }
+                return parser(
+                    path,
+                    loader,
+                    _require,
+                    {
+                        set: set,
+                        has: has
+                    }
+                ).then(
+                    function(module)
+                    {
+                        // set(path, module);
+                        return get(path);
+                    }
+                );
+            };
+            // TODO: node polyfills
+            // set(
+            //  "/node_modules/tty/index.js",
+            //  function(module)
+            //  {
+            //      module.exports = {
+            //          isatty: function()
+            //          {
+            //              return false;
+            //          }
+            //      };
+            //  }
+            // );
+            registry.set = set;
+            registry.has = has;
+            registry.get = get;
+            registry.delete = function(key)
+            {
+                keys[key] = null;
+                modules[key] = null;
+            };
+            return registry;
+        }
     }
-)("__")
+);
+
+ }};Object.keys(scripts).forEach(function(key){scripts[key].callback = key;});return scripts[callbackName];/* scripts */
+    }
+)
 
 )

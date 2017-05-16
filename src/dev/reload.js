@@ -13,6 +13,7 @@ module.exports = function(url, clear, flash, shouldReload, win, doc)
 
     return function()
     {
+        var reconnect = true;
         var connect = function()
         {
             var ws = new WebSocket(url);
@@ -42,9 +43,16 @@ module.exports = function(url, clear, flash, shouldReload, win, doc)
                             }
                         );
                     },
+                    onerror: function(e)
+                    {
+                        reconnect = false;
+                        console.debug("Unable to connect to websocket");
+                    },
                     onclose: function(e)
                     {
-                        connect();
+                        if(reconnect) {
+                            connect();
+                        }
                     }
                 }
             );

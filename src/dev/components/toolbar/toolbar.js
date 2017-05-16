@@ -7,13 +7,17 @@ module.exports = function(template, css, clearCache, file, Key)
         ],
             function(e)
             {
-                window.dirty();
+                clearCache().then(function(reload){reload()});
                 return false;
             }
     );
-    const definition = {
+    var definition = {
         shadow: true,
         attributes: {
+            root: {
+                value: __dirname,
+                visibility: "hidden"
+            },
             fullclear: {
                 bind: true,
                 value: false

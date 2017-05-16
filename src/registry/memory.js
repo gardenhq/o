@@ -53,6 +53,10 @@ registry(
             }
             var set = function(path, module)
             {
+                // TODO: This can return null when you might expect the module
+                // return the Module?
+                // always return null ? **
+                // Keep as both means I know whether its already set or not?
                 if(has(path)) {
                     return;
                 }
