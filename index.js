@@ -1,11 +1,39 @@
 const o = require("./src/_o.js");
-const createPromisedRequire = require("@gardenhq/willow/util/promised");
+const createPromised = require("@gardenhq/willow/util/promised");
+const promisedRequire = createPromised(require);
 module.exports = function(cb)
 {
-    return new Promise(
-        function(resolve, reject)
+    return Promise.all(
+        [
+            "@gardenhq/willow/util/promisedYaml",
+            "js-yaml"
+        ].map(
+            function(item)
+            {
+                return promisedRequire(item);
+            }
+        )
+    ).then(
+        function(modules)
         {
-            resolve(o(createPromisedRequire)(cb));
+            const createYamlableRequire = modules[0];
+            const yaml = modules[1];
+            return o(
+                createYamlableRequire(
+                    createPromised,
+                    function(path, str)
+                    {
+                        return yaml.load(
+                            str,
+                            {
+                                filename: path,
+                                schema: yaml.CORE_SCHEMA
+                            }
+                        );
+                    }
+
+                )
+            )(cb);
         }
     );
 }

@@ -8,8 +8,9 @@
 /proxy
 /registry
 /transport
-/src/dev/o.js
+/o.dev.js
 /src/dev/oDev.js
 /src/dev/oMaximal.js
 /test/fixtures/bundled/bundled.js
+/test/fixtures/bundled/bundled.min.js
 /test/fixtures/bundled/sub/bundled.js

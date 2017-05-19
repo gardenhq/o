@@ -1,0 +1,4 @@
+#!/usr/bin/env bash
+
+REPORT=$(cat -)
+echo $REPORT | awk '{print $2 ": " $3 " bytes"}'

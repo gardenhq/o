@@ -11,18 +11,22 @@
         {
             return transport;   
         };  
+        var dirname = function(path)
+        {
+            return path.split("/").slice(0, -1).concat("").join("/")
+        }
+        var exportTo = function(where, what, path)
+        {
+            path.split(".").reduce(
+                function(prev, item, i, arr)
+                {
+                    return prev[item] = prev[item] == null ? (i == arr.length - 1 ? what : {}) : prev[item];
+                },
+                where
+            );
+        };
         var runner = function(o, config)
         {
-            var exportTo = function(where, what, path)
-            {
-                path.split(".").reduce(
-                    function(prev, item, i, arr)
-                    {
-                        return prev[item] = prev[item] == null ? (i == arr.length - 1 ? what : {}) : prev[item];
-                    },
-                    where
-                );
-            };
             if(config.src || config.module) {
                 var _o = function(doc)
                 {
@@ -64,7 +68,7 @@
             } else {
                 exportTo(win, o, config.export);
             }
-
+            return o;
         }
         runner.config = function(script, resolve)
         {
@@ -81,9 +85,16 @@
                 },
                 {}
             );
+            // get a default includepath from the src
+            var src = getAttribute(doc, "src", "").split("/");
+            config.includepath = config.includepath || (src.length > 3 ? src.slice(0, -3).concat("").join("/") : "./node_modules/");
             // resolve anything pathlike
             if(config.basepath) {
                 config.basepath = resolve(config.basepath, pathname);
+            }
+            // append / to includepath
+            if(config.includepath.lastIndexOf("/") !== config.includepath.length -1) {
+                config.includepath += "/";
             }
             var basepath = config.basepath || pathname;
             [
@@ -97,6 +108,8 @@
                     }
                 }
             );
+            // pop off the index.js for now
+            config.includepath = dirname(config.includepath);
             // data-src is set
             if(config.src) {
                 temp = config.src.split("#");
@@ -112,11 +125,7 @@
                 // data-src isn't set, but src is, surely this is only for bundles?
                 config.baseURL = config.basepath || resolve(script.getAttribute("src"), pathname);
             }
-            config.baseURL = config.baseURL || basepath;
-            temp = config.baseURL.split("/");
-            temp.pop();
-            temp.push("");
-            config.baseURL = temp.join("/");
+            config.baseURL = dirname(config.baseURL || basepath);
             return config;
         }
         var getCurrentScript = function(doc)
@@ -131,6 +140,7 @@
         };
         var getConfig = function(key, value)
         {
+            // TODO: should doc be an arg?
             return getAttribute(doc, "data-" + key, value)
         }
         var normalizeName = function (child, parentBase) {
@@ -160,7 +170,7 @@
                 var first2Chars = path.substr(0, 2);
                 var firstChar = first2Chars[0];
                 var temp = path.split("#");
-                var hash = temp.length == 2 ? "#" + temp[1] : "";
+                var hash = temp.length === 2 ? "#" + temp[1] : "";
                 path = temp[0];
                 if(
                     first2Chars != ".." && first2Chars != "./" && firstChar != "/"
@@ -168,14 +178,14 @@
                     if(path.indexOf("/") === -1) {
                         path += "/";
                     }
-                    path = includePath + path;
+                    path = (includePath || "") + path;
                 }
-                // TODO: this should go
+                // TODO: this should go?
                 if(path[path.length - 1] === "/") {
                     path += "index";
                 }
                 path = normalizeName(path, base.split("/").slice(0, -1));
-                // TODO: this should go
+                // TODO: this should go, be more specific
                 if(path.indexOf(".") === -1) {
                     path += ".js";
                 }
@@ -199,36 +209,31 @@
             );
         };
         return (
-            function(includePath)
+            function(includePath, currentScript, currentBase)
             {
-                var current = getCurrentScript(doc);
-                var resolve = getResolve(includePath, basepath(doc));
                 var config = Object.assign(
                     {},
                     {
-                        // TODO: Don't export if I'm not asked to, remove this
-                        export: "module.exports",
                         registry: "/src/registry/memory.js",
                         parser: "/src/parser/evalSync.js",
-                        transport: "/src/transport/xhrNodeResolver.js",
-                        includepath: includePath
+                        transport: "/src/transport/xhrNodeResolver.js"
                     },
-                    runner.config(getCurrentScript(doc), resolve)
+                    runner.config(currentScript, getResolve(includePath, currentBase))
                 );
+                var resolve = getResolve(config.includepath, currentBase);
                 var utils = [
+                    "transport",
+                    "parser",
+                    "registry"
+                ].map(
+                    function(item)
                     {
-                        path: config.transport,
-                        key: "transport"
-                    },
-                    {
-                        path: config.parser,
-                        key: "parser"
-                    },
-                    {
-                        path: config.registry,
-                        key: "registry"
+                        return {
+                            path: config[item],
+                            key: item
+                        };
                     }
-                ].concat(
+                ).concat(
                     (
                         config.proxy ? {
                             path: config.proxy,
@@ -238,7 +243,7 @@
                 ).map(
                     function(item)
                     {
-                        return script(resolve(item.path, config.baseURL), item.key, current)
+                        return script(resolve(item.path, config.baseURL), item.key, currentScript)
                     }
                 ).map(
                     function(injectScript, i)
@@ -277,14 +282,14 @@
                         register = register || registry;
                         return function(path)
                         {
-                            var _config = this ? this.getConfig() : config;
                             return register(
-                                resolve(path, _config.baseURL),
+                                resolve(path, (this ? this.getConfig() : config).baseURL),
                                 proxy(
                                     transport,
                                     factory,
                                     registryFactory,
-                                    config
+                                    config,
+                                    resolve
                                 ),
                                 parser,
                                 resolve
@@ -293,52 +298,59 @@
                     }
                     return factory;
                 };
-                var o = function(cb)
-                {
-                    var resolve = getResolve(includePath, basepath(doc));
-                    var config = runner.config(getCurrentScript(doc), resolve);
-                    config.includepath = config.includepath || includePath;
-                    var registerDynamic;
-                    return Promise.all(
-                        utils
-                    ).then(
-                        function(modules)
-                        {
-                            transport = modules[0];
-                            parser = modules[1];
-                            registry = modules[2];
-                            defaultProxy = modules[3] ? modules[3] : defaultProxy;
-                            registerDynamic = function(path, deps, executingRequire, cb)
+                return runner(
+                    function(cb)
+                    {
+                        var registerDynamic;
+                        // TODO: resolve will change here, is that ok?
+                        var localConfig = runner.config(getCurrentScript(doc), resolve);
+                        if(!getConfig("includepath")) {
+                            localConfig.includepath = config.includepath;
+                        }
+
+                        resolve = getResolve(localConfig.includepath, basepath(doc));
+                        return Promise.all(
+                            utils
+                        ).then(
+                            function(modules)
                             {
-                                return Promise.resolve(registry.set(path, cb));
-                            }
-/*_o*/
-                            return getPromisedLoader(resolve, config)(doc)("/src/_o.js");
-                        }
-                    ).then(
-                        function(_o)
-                        {
-                            var System = Object.assign(
-                                _o(
-                                    getPromisedLoader(resolve, config)
-                                )(cb),
+                                transport = modules[0];
+                                parser = modules[1];
+                                registry = modules[2];
+                                defaultProxy = modules[3] ? modules[3] : defaultProxy;
+                                registerDynamic = function(path, deps, executingRequire, cb)
                                 {
-                                    registry: registry,
-                                    registerDynamic: registerDynamic,
-                                    resolve: resolve
+                                    return Promise.resolve(registry.set(path, cb));
                                 }
-                            );
-                            System.config(config);
-                            registerDynamic("/" + config.includepath + "/@gardenhq/o/o.js", [], true, function(module){module.exports = Promise.resolve(System);});
-                            return System;
-                        }
-                    );
-                };
-                runner(o, config);
-                return o;
+/*_o*/
+                                return getPromisedLoader(resolve, localConfig)(doc)("/src/_o.js");
+                            }
+                        ).then(
+                            function(_o)
+                            {
+                                var System = Object.assign(
+                                    _o(
+                                        getPromisedLoader(resolve, localConfig)
+                                    )(cb),
+                                    {
+                                        registry: registry,
+                                        registerDynamic: registerDynamic,
+                                        resolve: resolve
+                                    }
+                                );
+                                System.config(localConfig);
+                                registerDynamic("/" + localConfig.includepath + "/@gardenhq/o/o.js", [], true, function(module){module.exports = Promise.resolve(System);});
+                                return System;
+                            }
+                        );
+                    },
+                    config
+                );
             }
         )(
-            getConfig("includepath", "node_modules/")
+            getConfig("includepath"),
+            getCurrentScript(doc),
+            basepath(doc)
         );
     }
 )(

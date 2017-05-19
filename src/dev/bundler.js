@@ -15,6 +15,7 @@ module.exports = function(storage, prefix, engine, bundleTemplate, appTemplate, 
                 {
                     if(key.indexOf(prefix) === 0) {
                         var path = key.substr(prefix.length);
+                        // TODO: This should change!
                         if(path == "/node_modules/o/_o.js" || path == "/node_modules/o/src/_o.js") {
                             return;
                         }

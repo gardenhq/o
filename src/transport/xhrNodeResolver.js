@@ -1,101 +1,141 @@
 transport(
     function(scriptPath)
     {
-        var throwError = function(cb, path, request)
+        var extension = ".js";
+        var index = "index" + extension;
+        var createCheck = function(str)
         {
-            return function(e)
+            return function(filename)
             {
-                cb(new Error("Unable to load " + path + " (" + request.status + ")"));
-                return function(){};
+                return filename.indexOf(str) === Math.max(0, filename.length - str.length);
             }
         }
-        var load = function(path, ajax)
+        var hasJsExtension = createCheck(extension);
+        var isIndex = createCheck(index);
+        var getFetchLike = function(originalPath, request)
         {
-            ajax = ajax || XMLHttpRequest;
-            var request = new ajax();
-            request.open('get', path, true);
-            return new Promise(
-                function(resolve, reject)
-                {
-                    request.onreadystatechange = function()
+            return function(path)
+            {
+                request.open('get', path, true);
+                return new Promise(
+                    function(resolve, reject)
                     {
-                        if(request.readyState === 4) {
-                            if (request.status === 200) {
-                                resolve(
-                                    {
-                                        headers: {
-                                            "Content-Type": request.getResponseHeader("Content-Type") 
-                                        },
-                                        content: request.responseText
-                                    }
-                                );
-                            } else {
-                                if(path.indexOf(".js") === -1 && path.indexOf("package.json") === -1) {
-                                    load(path + ".js", ajax).then(
-                                        function(data)
+                        // TODO: Consider making this more fetch-like and potentially move into evalSync which would become a node parser
+                        // TODO: Aliases?
+                        request.onreadystatechange = function()
+                        {
+                            if(request.readyState === 4) {
+                                if(request.status === 200) {
+                                    return resolve(
                                         {
-                                            data.path = path;
-                                            resolve(data);
-                                        }
-                                    ).catch(
-                                        throwError(reject, path, request)
-                                    );
-                                } else if(path.indexOf("index.js") === -1 && path.indexOf("package.json") === -1) {
-
-                                    var temp = path.split(".");
-                                    temp.pop();
-                                    path = temp.join(".") + "/index.js";
-                                    load(path, ajax).then(
-                                        function(data)
-                                        {
-                                            data.path = path;
-                                            resolve(data);
-                                        }
-                                    ).catch(
-                                        throwError(reject, path, request)
-                                    );
-                                } else if(path.indexOf("package.json") === -1) {
-                                    var temp = path.split("/");
-                                    temp.pop();
-                                    temp.push("package.json");
-                                    path = temp.join("/");
-                                    temp.pop();
-                                    load(path, ajax).then(
-                                        function(data)
-                                        {
-                                            var path = JSON.parse(data.content).main;
-                                            temp.push(path);
-                                            path = temp.join("/");
-                                            load(path).then(
-                                                function(data)
-                                                {
-                                                    data.path = path;
-                                                    resolve(data);
-                                                }
-                                            );
-                                        }
-                                    ).catch(
-                                        throwError(
-                                            function(e)
-                                            {
-                                                console.error(e);
-                                                resolve({headers: {"Content-Type": "application/javascript"}, content: "module.exports=null"})
+                                            headers: {
+                                                "Content-Type": request.getResponseHeader("Content-Type") 
                                             },
-                                            path,
-                                            request
-                                        )
+                                            path: originalPath,
+                                            content: request.responseText,
+                                            status: request.status
+                                        }
                                     );
                                 } else {
-                                    throwError(reject, path, request)();
+                                    reject(
+                                        {
+                                            path: originalPath,
+                                            status: request.status
+                                        }
+                                    );
                                 }
                             }
                         }
+                        request.send();
+
                     }
-                    request.send();
+                );
+            }
+        }
+        var attempts = [
+            {
+                test: function(filename)
+                {
+                    return !hasJsExtension(filename);
+                },
+                try: function(path, fetch)
+                {
+                    return fetch(path + extension);
+                }
+            },
+            {
+                test: function(filename)
+                {
+                    return !isIndex(filename);
+                },
+                try: function(path, fetch)
+                {
+                    return fetch(path + "/" + index);
+                }
+            },
+            {
+                test: function(filename)
+                {
+                    // right now everything will come in with '/index.js' unless its a real 404
+                    return isIndex(filename);
+                },
+                try: function(path, fetch)
+                {
+                    var temp = path.split("/");
+                    temp.pop();
+                    return fetch(temp.join("/") + "/package.json").then(
+                        function(data)
+                        {
+                            temp.push(JSON.parse(data.content).main);
+                            return fetch(temp.join("/"));
+                        }
+                    );
+                }
+            }
+        ];
+        return function(path, Ajax)
+        {
+            Ajax = Ajax || XMLHttpRequest;
+            // path = version(path);
+            var filename = path.split("/").pop().split("@")[0];
+            var fetchlike = getFetchLike(path, new Ajax());
+            return Object.keys(attempts).reduce(
+                function(prev, item, i)
+                {
+                    var attempt = attempts[item];
+                    return prev.catch(
+                        function(data)
+                        {
+                            if(attempt.test(filename)) {
+                                return attempt.try(
+                                    path,
+                                    fetchlike
+                                );
+                            } else {
+                                return Promise.reject(data);
+                            }
+                        }
+                    );
+                },
+                fetchlike(path)
+            ).catch(
+                function(data)
+                {
+                    if(data instanceof Error) {
+                        throw data;
+                    } else {
+                        console.error(new Error("Unable to load " + data.path + " (" + data.status + ")"));
+                        return Promise.resolve(
+                            {
+                                path: data.path,
+                                headers: {"Content-Type": "application/javascript"},
+                                content: "module.exports=null"
+                            }
+                        );
+                    }
                 }
             );
-        }
-        return load;
+        };
     }
 );
 

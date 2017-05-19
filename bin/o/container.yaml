@@ -1,0 +1,40 @@
+---
+main:
+  callable: "./o/main"
+  arguments:
+    - "@o.cli.services"
+    - "@o.cli.combiner"
+    - "@o.cli.injector"
+    - "@o.cli._o"
+fs:
+  object: "fs"
+o.cli.services.hash:
+  callable: "./o/services"
+  arguments:
+    - "--transport"
+    - "--parser"
+    - "--registry"
+o.cli.services:
+  iterator: "@o.cli.reader"
+  arguments:
+    - "@o.cli.services.hash"
+o.cli.combiner:
+  callable: "./o/combiner"
+  arguments:
+    - "--configurable"
+o.cli.injector:
+  callable: "./o/injector"
+  arguments:
+    - "@fs"
+    - "$PWD"
+    - "--configurable"
+o.cli._o:
+  callable: "./o/replace"
+  arguments:
+    - "@fs"
+    - "$PWD"
+o.cli.reader:
+  callable: "./o/reader"
+  arguments:
+    - "@fs"
+    - "$PWD"

@@ -16,22 +16,25 @@ module.exports = function()
         //  ]
         // },
         "js-yaml": {
-            "object": "js-yaml/dist/js-yaml.js"
+            "object": "js-yaml/index",
+            // "object": "js-yaml/dist/js-yaml",
+            //headers: {"Cache-Control": "private", "Content-Type": ""} etc
+            // "ignore-require": true
         },
         "system.loaders.css": {
-            "callable": root + "/css.js"
+            "callable": root + "/css"
         },
         "system.loaders.yaml": {
-            "callable": root + "/yaml.js",
+            "callable": root + "/yaml",
             "arguments": [
                 "@js-yaml"
             ]
         },
         "system.loaders.html": {
-            "callable": root + "/html.js"
+            "callable": root + "/html"
         },
         "system.loaders.js": {
-            "callable": root + "/js.js",
+            "callable": root + "/js",
             "arguments": [
                 "#system.transformer.js"
             ]

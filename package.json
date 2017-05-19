@@ -1,6 +1,6 @@
 {
   "name": "@gardenhq/o",
-  "version": "4.2.0",
+  "version": "5.0.0",
   "description": "An in-browser loader, bundler and dependency injection builder.",
   "author": {
     "name": "GardenHQ",
@@ -33,7 +33,7 @@
   "dependencies": {
     "@gardenhq/component-factory": "^1.1.0",
     "@gardenhq/parse-template-literal": "^1.1.0",
-    "@gardenhq/willow": "^4.1.0",
+    "@gardenhq/willow": "^5.0.0",
     "file-saver": "^1.3.3",
     "mousetrap": "^1.6.1"
   },

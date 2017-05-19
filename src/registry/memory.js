@@ -26,6 +26,21 @@ registry(
             return this.exports;
         }
         /* module */
+        var version = function(path)
+        {
+            var temp = path.split("#");
+            var hash = temp[1] || "";
+            if(hash && hash.indexOf("@") === 0 && path.indexOf("://") !== -1) {
+                var parts = temp[0].split("/");
+                var index = 3;
+                if(parts[3].indexOf("@") === 0) {
+                    index = 4;
+                }
+                parts[index] += hash;
+                return parts.join("/");
+            }
+            return path;
+        }
         return function(m)
         {
             var cache = m || {};
@@ -33,6 +48,7 @@ registry(
             var keys = cache.keys = [];
             var _require = function(path)
             {
+                path = version(path);
                 try {
                     return modules[path]._load(_require)
                 } catch(e) {
@@ -49,6 +65,7 @@ registry(
             }
             var has = function(key)
             {
+                key = version(key);
                 return keys[key] === true;
             }
             var set = function(path, module)
@@ -60,6 +77,7 @@ registry(
                 if(has(path)) {
                     return;
                 }
+                path = version(path);
                 keys[path] = true;
                 modules[path] = new Module(path, null, module);
                 return module;
@@ -69,11 +87,12 @@ registry(
                 if(typeof _require.resolve === "undefined") {
                     _require.resolve = resolve;
                 }
-                if(has(path)) {
-                    return get(path);
+                var key = path.split("#").shift();
+                if(has(key)) {
+                    return get(key);
                 }
                 return parser(
-                    path,
+                    version(path),
                     loader,
                     _require,
                     {
@@ -106,6 +125,7 @@ registry(
             registry.get = get;
             registry.delete = function(key)
             {
+                key = version(key);
                 keys[key] = null;
                 modules[key] = null;
             };

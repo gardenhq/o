@@ -8,7 +8,7 @@ module.exports = function(load)
                 register = System.registerDynamic.bind(System);
             }
             return System.import(
-                "@gardenhq/willow/index.js"
+                "@gardenhq/willow/index.js#@5.0.0"
             ).then(
                 function(builder)
                 {
@@ -28,9 +28,15 @@ module.exports = function(load)
                         var script = scripts[scripts.length - 1];
                         if(script.hasAttribute("src")) {
                             var src = script.getAttribute("src");
-                            var temp  = src.split("#");
+                            var temp = src.split("#");
                             if(temp.length > 1) {
                                 services = System.resolve(temp[1], location.pathname);
+                            } else if(script.hasAttribute("data-container")) {
+                                src = script.getAttribute("data-container");
+                                temp = src.split("#");
+                                if(temp.length > 1) {
+                                    services = System.resolve(temp[0], location.pathname) + ":" + temp[1];
+                                }
                             }
                         }
                     }

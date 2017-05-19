@@ -1,8 +1,11 @@
 *
+!/bin/**
+!/index.js
 !/builder.js
 !/src/**
 !/b.js
 !/o.js
+!/o.dev.js
 !/transport/**
 !/parser/**
 !/registry/**

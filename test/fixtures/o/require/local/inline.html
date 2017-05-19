@@ -7,6 +7,7 @@
 	<body>
         <script type="text/javascript"
             src="/src/o.js"
+            data-includepath="/node_modules"
             data-export="o"
         ></script>
 		<script type="text/javascript">
@@ -18,8 +19,8 @@
 					{
 					    Promise.all(
 					        [
-					            "react/index.js",
-					            "react-dom/index.js"
+					            "react",
+					            "react-dom"
 					        ].map(
 					            function(item)
 					            {

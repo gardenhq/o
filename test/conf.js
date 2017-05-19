@@ -124,8 +124,7 @@ module.exports = function(builder)
             {
                 return calledWith(
                     [
-                        match.anything()//,
-                // match.anything()
+                        match.anything()
                     ]
                 ).returns("module");
             }

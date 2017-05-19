@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en" class="no-js" xmlns:og="http://ogp.me/ns#">
+	<head>
+		<meta charset="utf-8" />
+		<title>Inline Example</title>
+	</head>
+	<body>
+		<script type="text/javascript" src="/node_modules/@gardenhq/o/o.js"
+   			data-export="o"
+			></script>
+		<script type="text/javascript">
+			var print = function(helloWorld)
+			{
+				if(typeof document !== "undefined") {
+					var h1 = document.createElement("h1");
+					h1.textContent = helloWorld;
+					document.body.appendChild(h1);
+				}
+				console.log(helloWorld);
+			}
+		</script>
+		<script type="text/javascript" data-includepath="/test/">
+		(
+			function(load)
+			{
+				// when data-basepath is not set then window.location.pathname is used
+				load.then(
+					function(System)
+					{
+						return System.import("fixtures/hello-world.js").then(
+							function(helloWorld)
+							{
+								print(helloWorld + " (using a ../../ relative path)");
+							}
+						);
+
+					}
+				).catch(
+					function(e)
+					{
+						throw e;
+					}
+				);
+			}
+		)(o(function(promised){return promised(document)}))
+		</script>
+	</body>
+</html>

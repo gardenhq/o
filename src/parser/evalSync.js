@@ -77,24 +77,30 @@ parser(
                         relativePath = relativePath.indexOf("/") === 0 ? relativePath : resolve(relativePath, from);
                         return _require(relativePath);
                     }
-                    var contentType = data.headers["Content-Type"].split("/").pop();
+                    var temp = data.headers["Content-Type"].split("/");
+                    var type = temp[0];
+                    var format = temp[1];
                     registry.set(
                         path,
                         function(module, exports, __require, __filename, __dirname)
                         {
-                            switch(contentType) {
-                                case "javascript":
-                                    // path = data.path;
-                                    var map = "//# sourceURL=" + path;
-                                    if(data.content.indexOf("//# sourceURL") === -1) {
-                                        data.content += map; 
+                            switch(type) {
+                                case "application":
+                                    switch(true) {
+                                        case format.indexOf("javascript") === 0:
+                                            // path = data.path;
+                                            var map = "//# sourceURL=" + path;
+                                            if(data.content.indexOf("//# sourceURL") === -1) {
+                                                data.content += map; 
+                                            }
+                                            // (exports, require, module, __filename, __dirname)
+                                            // evaluate(data.content)(exports, relativeRequire, module, __filename, __dirname);
+                                            evaluate(data.content)(module, exports, relativeRequire, __filename, __dirname);
+                                            break;
+                                        case format.indexOf("json") === 0:
+                                            module.exports = JSON.parse(data.content);
+                                            break;
                                     }
-                                    // (exports, require, module, __filename, __dirname)
-                                    // evaluate(data.content)(exports, relativeRequire, module, __filename, __dirname);
-                                    evaluate(data.content)(module, exports, relativeRequire, __filename, __dirname);
-                                    break;
-                                case "json":
-                                    module.exports = JSON.parse(data.content);
                                     break;
                                 default:
                                     module.exports = data.content;
@@ -105,12 +111,12 @@ parser(
                     );
                     // (exports, require, module, __filename, __dirname)
                     // return function(exports, __require, module, __filename, __dirname)
-
+                    if(format.indexOf("+bundle") === -1) {
+                        return loadSynchronousRequires(data);
+                    }
                     return data;
 
                 }
-            ).then(
-                loadSynchronousRequires
             );
         }
         return load;
