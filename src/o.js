@@ -170,11 +170,11 @@
                     return path;
                 }
                 base = base || defaultBase;
-                var first2Chars = path.substr(0, 2);
-                var firstChar = first2Chars[0];
                 var temp = path.split("#");
                 var hash = temp.length === 2 ? "#" + temp[1] : "";
                 path = temp[0];
+                var first2Chars = path.substr(0, 2);
+                var firstChar = first2Chars[0];
                 if(
                     first2Chars != ".." && first2Chars != "./" && firstChar != "/"
                 ) {
@@ -189,7 +189,8 @@
                 }
                 path = normalizeName(path, base.split("/").slice(0, -1));
                 // TODO: this should go, be more specific
-                if(path.indexOf(".") === -1) {
+                var filename = path.split("/").pop();
+                if(filename.indexOf(".") === -1) {
                     path += ".js";
                 }
                 firstChar = path.charAt(0);
