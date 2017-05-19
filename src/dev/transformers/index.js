@@ -17,6 +17,7 @@ module.exports = function()
         // },
         "js-yaml": {
             "object": "js-yaml/index",
+            "version": "3.8.4"
             // "object": "js-yaml/dist/js-yaml",
             //headers: {"Cache-Control": "private", "Content-Type": ""} etc
             // "ignore-require": true

@@ -17,6 +17,9 @@
         }
         var exportTo = function(where, what, path)
         {
+            if(path == null) {
+                return;
+            }
             path.split(".").reduce(
                 function(prev, item, i, arr)
                 {
