@@ -1,6 +1,7 @@
 (
     function(win, storage)
     {
+        var version = "#@5.0.1";
         var doc = document;
         var getStore = function(key)
         {
@@ -124,7 +125,7 @@
                                         }
                                     }
                                 );
-                                loadTranslator = require("@gardenhq/willow/index.js#@5.0.0").then(
+                                loadTranslator = require("@gardenhq/willow/index.js" + version).then(
                                     function(builder)
                                     {
                                         var registerDynamic = function(path, deps, executingRequire, cb)

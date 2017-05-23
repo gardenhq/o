@@ -1,5 +1,6 @@
 module.exports = function(load)
 {
+    var version = "#@5.0.1";
     return load.then(
         function(System)
         {
@@ -8,14 +9,14 @@ module.exports = function(load)
                 register = System.registerDynamic.bind(System);
             }
             return System.import(
-                "@gardenhq/willow/index.js#@5.0.0"
+                "@gardenhq/willow/index.js" + version
             ).then(
                 function(builder)
                 {
                     return builder(
                         System.import.bind(System),
                         register,
-                        "@gardenhq/willow/conf/javascript"
+                        "@gardenhq/willow/conf/javascript.js" + version
                     );
                 }
             ).then(

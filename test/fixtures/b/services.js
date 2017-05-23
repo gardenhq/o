@@ -28,7 +28,7 @@ module.exports = function()
             {
                 return function()
                 {
-                    print(helloWorld + " (from services.js)");
+                    print(helloWorld + " (from b/services.js)");
                 }
             }
         }

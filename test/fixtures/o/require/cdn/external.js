@@ -1,14 +1,13 @@
 (
 	function(load)
 	{
-		var cdn = "https://unpkg.com/";
 		load.then(
 			function(System)
 			{
 				Promise.all(
 					[
-					    cdn + "react@15.5.4/index.js",
-					    cdn + "react-dom@15.5.4/index.js"
+					    "react/react.js#@15.5.4",
+					    "react-dom/index.js#@15.5.4"
 					].map(
 					    function(item)
 					    {

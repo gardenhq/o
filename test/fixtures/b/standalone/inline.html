@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en" class="no-js" xmlns:og="http://ogp.me/ns#">
+    <head>
+        <meta charset="utf-8" />
+        <title>External Example</title>
+    </head>
+    <body>
+        <script type="text/javascript"
+            src="/node_modules/@gardenhq/o/o.dev.js"
+            data-module="/node_modules/@gardenhq/o/b.js"
+            data-export="o"
+        ></script>
+		<script type="text/javascript">
+		(
+			function(load)
+			{
+                var print = function(helloWorld)
+                {
+                    if(typeof document !== "undefined") {
+                        var h1 = document.createElement("h1");
+                        h1.textContent = helloWorld;
+                        document.body.appendChild(h1);
+                    }
+                    console.log(helloWorld);
+                }
+				load.then(
+					function(builder)
+					{
+						return builder.build(
+                            {
+                                "app.hello": {
+                                    "object": "../../hello-world.js"
+                                },
+                                "main": {
+                                    "resolve": [
+                                        "@app.hello"
+                                    ],
+                                    "service": function(helloWorld)
+                                    {
+                                        return function()
+                                        {
+                                            print(helloWorld);
+                                        }
+                                    }
+                                }
+                            }       
+						).run("main");
+					}
+				).catch(
+					function(e)
+					{
+						throw e;
+					}
+				);
+			}
+		)(o(function(promised){return promised(document)}))
+		</script>
+    </body>
+</html>

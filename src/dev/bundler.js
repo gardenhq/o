@@ -1,4 +1,4 @@
-module.exports = function(storage, prefix, engine, bundleTemplate, appTemplate, oMin, oMax)
+module.exports = function(storage, prefix, engine, bundleTemplate, appTemplate, oMin, oMax, minner)
 {
     var bundles = engine.compile(bundleTemplate, ["register", "items", "exports"], "/node_modules/o/util/templates/bundle.js");
     var app = engine.compile(appTemplate, ["o", "bundles", "main", "config"], "/node_modules/o/util/templates/app.js");
@@ -43,9 +43,9 @@ module.exports = function(storage, prefix, engine, bundleTemplate, appTemplate, 
                 }
             );
             if(bundleOnly) {
-                console.log(bundled);
                 if(download) {
                     return Promise.resolve(bundled);
+                    // return Promise.resolve(minner.transform(bundled).code);
                 }
                 return "Bundled '" + bundleOnly + "'";
             }
@@ -57,7 +57,7 @@ module.exports = function(storage, prefix, engine, bundleTemplate, appTemplate, 
             ).then(
                 function(o)
                 {
-                    const bundle = app.render(
+                    var bundle = app.render(
                         {
                             o: o,
                             bundles: bundled,
@@ -65,6 +65,7 @@ module.exports = function(storage, prefix, engine, bundleTemplate, appTemplate, 
                             config: config
                         }
                     );
+                    // bundle = minner.transform(bundle).code;
                     console.debug("Bundling " + location.protocol + "//" + location.host + config.src);
                     console.log(bundle);
                     console.debug("Bundled " + location.protocol + "//" + location.host + config.src);

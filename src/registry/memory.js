@@ -29,17 +29,34 @@ registry(
         var version = function(path)
         {
             var temp = path.split("#");
+            path = temp[0];
             var hash = temp[1] || "";
-            if(hash && hash.indexOf("@") === 0 && path.indexOf("://") !== -1) {
-                var parts = temp[0].split("/");
-                var index = 3;
-                if(parts[3].indexOf("@") === 0) {
-                    index = 4;
+            if(hash) {
+                var headers = {};
+                if(hash.indexOf("{") === 0) {
+                    headers = JSON.parse(hash);
+                    hash = "";
+                } else if(hash.indexOf("@") === 0) {
+                    headers["X-Content-Version"] = hash.substr(1);
+                    hash = "";
+                } 
+                if(headers["X-Content-Version"] != null && path.indexOf("://") !== -1) {
+                    var parts = temp[0].split("/");
+                    var index = 3;
+                    if(parts[3].indexOf("@") === 0) {
+                        index = 4;
+                    }
+                    parts[index] += "@" + headers['X-Content-Version'];
+                    path = parts.join("/");
                 }
-                parts[index] += hash;
-                return parts.join("/");
+                if(headers['Content-Type']) {
+                    hash = headers['Content-Type'];
+                }
+                if(hash) {
+                    hash = "#" + hash;
+                }
             }
-            return path;
+            return path + hash;
         }
         return function(m)
         {
@@ -52,9 +69,10 @@ registry(
                 try {
                     return modules[path]._load(_require)
                 } catch(e) {
+
                     // TODO: Would be good to have this just for dev
                     // People are catching errors for browserify see js-yaml
-                    // console.error("Unable to require '" + path + "'");
+                    // console.error(new Error("Unable to require '" + path + "'"));
                     // e.message = "Unable to require '" + path + "'";
                     throw e;
                 }
@@ -74,10 +92,10 @@ registry(
                 // return the Module?
                 // always return null ? **
                 // Keep as both means I know whether its already set or not?
+                path = version(path);
                 if(has(path)) {
                     return;
                 }
-                path = version(path);
                 keys[path] = true;
                 modules[path] = new Module(path, null, module);
                 return module;
@@ -87,12 +105,13 @@ registry(
                 if(typeof _require.resolve === "undefined") {
                     _require.resolve = resolve;
                 }
-                var key = path.split("#").shift();
-                if(has(key)) {
-                    return get(key);
+                path = resolve(path);
+                path = version(path);
+                if(has(path)) {
+                    return get(path);
                 }
                 return parser(
-                    version(path),
+                    path,
                     loader,
                     _require,
                     {
@@ -117,6 +136,38 @@ registry(
             //          {
             //              return false;
             //          }
+            //      };
+            //  }
+            // );
+            // set(
+            //  "/node_modules/fs/index.js",
+            //  function(module)
+            //  {
+            //      module.exports = {
+            //      };
+            //  }
+            // );
+            // set(
+            //  "/node_modules/path/index.js",
+            //  function(module)
+            //  {
+            //      module.exports = {
+            //      };
+            //  }
+            // );
+            // set(
+            //  "/node_modules/module/index.js",
+            //  function(module)
+            //  {
+            //      module.exports = {
+            //      };
+            //  }
+            // );
+            // set(
+            //  "/node_modules/net/index.js",
+            //  function(module)
+            //  {
+            //      module.exports = {
             //      };
             //  }
             // );

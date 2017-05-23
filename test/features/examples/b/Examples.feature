@@ -34,4 +34,5 @@ Feature: Examples
     Then print the last output
 
     Given I am on "/test/fixtures/bundled/index.html"
+    Then I execute "sleep 2"
     Then I should see "Hello World! Hello World!"

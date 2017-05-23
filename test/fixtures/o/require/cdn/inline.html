@@ -5,23 +5,22 @@
 		<title>Inline Example</title>
 	</head>
 	<body>
-        <script type="text/javascript"
-            src="/src/o.js"
-            data-includepath="https://unpkg.com/"
-            data-export="o"
-        ></script>
-		<script type="text/javascript">
+        <!-- <script type="text/javascript" -->
+        <!--     src="/src/o.js" -->
+        <!--     data-includepath="https://unpkg.com/" -->
+        <!--     data-export="o" -->
+        <!-- ></script> -->
+		<script type="text/javascript+wait" id="inline">
 		(
 			function(load)
 			{
-			    var cdn = "https://unpkg.com/";
 				load.then(
 					function(System)
 					{
 					    Promise.all(
 					        [
-					            cdn + "react@15.5.4/index.js",
-					            cdn + "react-dom@15.5.4/index.js"
+					            cdnHost + "/react/react.js",
+					            cdnHost + "/react-dom/index.js"
 					        ].map(
 					            function(item)
 					            {
@@ -55,5 +54,21 @@
 			}
 		)(o(function(o){return o(document)}))
 		</script>
+        <script type="text/javascript">
+            var cdnHost = location.protocol + "//cdn." + location.hostname;
+            var cdn = cdnHost + "/@gardenhq/o@^5.0.0";
+            var $script = document.createElement("script");
+            $script.setAttribute("data-includepath", cdnHost);
+            $script.setAttribute("data-export", "o");
+            $script.setAttribute("src", cdn + "/src/o.js");
+            document.body.appendChild($script);
+            $script.onload = function()
+            {
+                var $inline = document.getElementById("inline");
+                var $script = document.createElement("script");
+                $script.textContent = $inline.textContent;
+                document.body.appendChild($script);
+            }
+        </script>
 	</body>
 </html>

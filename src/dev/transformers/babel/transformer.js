@@ -1,19 +1,9 @@
-module.exports = function(pipeline, plugins)
+module.exports = function(babel)
 {
-    if(plugins.length == 0) {
-        return function(content)
-        {
-            return content;
-        }
-    }
     return function(content)
     {
-        var code = pipeline.transform(
-            content,
-            {
-                plugins: plugins
-            }
-        ).code;
+        var code = babel.transform(content, { presets: ['es2015'] }).code;
+        // console.log(code);
         return code;
     }
 }

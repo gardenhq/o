@@ -5,6 +5,11 @@
         <title>External Example</title>
     </head>
     <body>
-        <script type="text/javascript" src="/b.js#./services.js:main" data-includepath="/node_modules/"></script>
+        <script type="text/javascript"
+            src="https://unpkg.com/@gardenhq/o@5.1.0/o.dev.js"
+            data-module="https://unpkg.com/@gardenhq/o@5.1.0/b.js"
+            data-export="o"
+        ></script>
+        <script type="text/javascript" src="./external.js"></script>
     </body>
 </html>

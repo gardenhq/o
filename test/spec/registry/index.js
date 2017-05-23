@@ -90,6 +90,7 @@ var builder, expect, metrics, getAjaxDouble;
                                     }
                                 );
                                 expect(registry.set(filename, "")).to.equal(undefined);
+                                console.log(cache.keys);
                                 expect(cache.keys[filename]).to.equal(true);
                                 expect(cache.modules[filename]).to.not.equal(null);
                                 return registry.get(filename).then(

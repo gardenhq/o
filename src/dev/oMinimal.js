@@ -3,60 +3,76 @@
     {
         return function(cb)
         {
-            var normalizeName = function (child, parentBase) {
+            var normalizeName = function (child, parentBase)
+            {
+                var parts = child.split("/").filter(
+                    function(item)
+                    {
+                        return item !== "";
+                    }
+                );
                 if (child[0] === "/") {
-                    child = child.slice(1);
+                    parentBase = [parts.shift()];
                 }
                 if (child[0] !== ".") {
-                    return child;
-                }
-                parentBase = parentBase.filter(function(item){return item != "."});
-                var parts = child.split("/");
-                while (parts[0] === "." || parts[0] === "..") {
-                    if (parts.shift() === "..") {
-                        parentBase.pop();
-                    }
-                }
-                return parentBase.concat(parts).join("/");
+                    parts = ["."].concat(parts);
+                } 
+                return parentBase.concat(parts).reduce(
+                    function(prev, item, i, arr)
+                    {
+                        if(item == "..") {
+                            return prev.slice(0, -1);
+                        }
+                        if(item == ".") {
+                            return prev;
+                        }
+                        return prev.concat(item);
+                    },
+                    []
+                ).join("/")
             }
+
             var getResolve = function(includePath, defaultBase)
             {
                 return function(path, base)
                 {
-                    if(path.indexOf("//") !== -1) {
-                        return path;
-                    }
                     base = base || defaultBase;
+                    var temp = path.split("#");
+                    var hash = temp.length === 2 ? "#" + temp[1] : "";
+                    path = temp[0];
                     var first2Chars = path.substr(0, 2);
                     var firstChar = first2Chars[0];
-                    var temp = path.split("#");
-                    var hash = temp.length == 2 ? "#" + temp[1] : "";
-                    path = temp[0];
                     if(
-                        first2Chars != ".." && first2Chars != "./" && firstChar != "/"
+                        first2Chars != ".." && first2Chars != "./" && firstChar != "/" && path.indexOf("://") === -1
                     ) {
                         if(path.indexOf("/") === -1) {
-                            path +=  "/"
+                            path += "/";
                         }
-                        path = includePath + path;
+                        path = (includePath || "") + path;
                     }
+                    // TODO: this should go?
                     if(path[path.length - 1] === "/") {
                         path += "index";
                     }
-                    path = normalizeName(path, base.split("/").slice(0, -1));
-                    //this should go!!
-                    if(path.indexOf(".") === -1) {
-                        path += ".js";
+                    temp = path.split("/");
+                    var filename = temp[temp.length - 1];
+                    if(filename.indexOf(".") === -1) {
+                        temp[temp.length - 1] += ".js";
                     }
-                    firstChar = path.charAt(0);
-                    if(firstChar != "/") {
+                    if(path.indexOf("://") !== -1) {
+                        return temp.slice(0, 3).join("/") + normalizeName(temp.slice(3).join("/"), [""]) + hash;
+                    }
+                    path = normalizeName(temp.join("/"), base.split("/").slice(0, -1));
+                    // TODO: this should go, deal with it in the transport?
+                    firstChar = path[0];
+                    if(firstChar != "/" && path.indexOf("://") === -1) {
                         path = "/" + path;
                     }
                     return path + hash;
                 }
             }
             var modules = {};
-            // TODO: Decide whethe rto annoyingly add process
+            // TODO: Decide whether to annoyingly add process
             // or pass it in as an extra arg
             // prefer extra arg for now
             // window.process = {
@@ -93,7 +109,17 @@
             /* module */
             var _require = function(path)
             {
-                path = _require.resolve(path.split("#")[0]);
+                var temp = path.split("#");
+                path = _require.resolve(temp[0]);
+                if(path.indexOf("://") !== -1 && temp[1] && temp[1].indexOf("@") === 0) {
+                    var parts = path.split("/");
+                    var index = 3;
+                    if(parts[3].indexOf("@") === 0) {
+                        index = 4;
+                    }
+                    parts[index] += temp[1];
+                    path = parts.join("/");
+                }
                 var relativeRequire = function(relativePath)
                 {
                     return _require(relativePath.indexOf("/") === 0 ? relativePath : _require.resolve(relativePath, path));
@@ -101,7 +127,7 @@
                 try {
                     return modules[path]._load(relativeRequire)
                 } catch(e) {
-                    console.error(path);
+                    // console.error(path);
                     // e.message = "Unable to require '" + path + "'";
                     throw e;
                 }

@@ -9,8 +9,10 @@
             var cdnHost = location.protocol + "//cdn." + location.hostname;
             var cdn = cdnHost + "/@gardenhq/o@^5.0.0";
             var $script = document.createElement("script");
-            $script.setAttribute("src", cdn + "/o.dev.js");
-            $script.setAttribute("data-src", cdn + "/src/b.js#../services.js:main");
+            $script.setAttribute("src", cdn + "/src/o.js");
+            $script.setAttribute("data-includepath", cdnHost);
+            $script.setAttribute("data-proxy", cdn + "/dev/index.js");
+            $script.setAttribute("data-src", cdn + "/src/b.js#./services.yaml:main");
             document.body.appendChild($script);
         </script>
     </body>

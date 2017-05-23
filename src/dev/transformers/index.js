@@ -2,23 +2,17 @@ module.exports = function()
 {
     var root = __dirname;
     return {
-        // "imports": [
-        //     root + "/babel/index.js"
-        // ],
-        // "babel.plugin.transform.es2015.template-literals": {
-        //  "tags": [
-        //      "babel.plugin"
-        //  ]
-        // },
-        // "babel.transformer": {
-        //  "tags": [
-        //      "system.transformer.js"
-        //  ]
-        // },
+        "imports": [
+            root + "/babel/index.js"
+        ],
+        "babel.transformer": {
+         "tags": [
+             "system.transformer.js"
+         ]
+        },
         "js-yaml": {
             "object": "js-yaml/index",
             "version": "3.8.4"
-            // "object": "js-yaml/dist/js-yaml",
             //headers: {"Cache-Control": "private", "Content-Type": ""} etc
             // "ignore-require": true
         },

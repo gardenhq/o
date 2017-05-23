@@ -2,13 +2,16 @@
 <html lang="en" class="no-js" xmlns:og="http://ogp.me/ns#">
     <head>
         <meta charset="utf-8" />
-        <title>External Example</title>
+        <title>Development Example</title>
     </head>
     <body>
         <script type="text/javascript"
-            src="https://unpkg.com/@gardenhq/o@5.1.0/o.js"
+            src="/src/o.js"
+            data-proxy="/src/dev/index.js"
+            data-includepath="/node_modules/"
             data-export="o"
-        ></script>
-        <script type="text/javascript" src="./external.js"></script>
+            data-src="../external.js"
+        >
+        </script>
     </body>
 </html>

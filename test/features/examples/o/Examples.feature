@@ -33,6 +33,9 @@ Feature: Examples
     Then I execute "sleep 2"
     And save the html in "pre" to "bundled.js"
 
+    # And I execute "cp ./test/results/bundled.js ./examples/o/bundled.js"
+    # And I execute "chown 1000:1000 ./examples/o/bundled.js"
+
     Given I execute "make report /examples/o/development.html"
     Then print the last error output
     Then print the last output

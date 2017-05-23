@@ -22,11 +22,11 @@
                             "resolve": [
                                 "@app.hello"
                             ],
-                            "service": function(container, helloWorld)
+                            "service": function(helloWorld)
                             {
                                 return function()
                                 {
-                                    print(helloWorld + " (using a relative path)");
+                                    print(helloWorld);
                                 }
                             }
                         }

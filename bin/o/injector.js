@@ -9,7 +9,10 @@ module.exports = function(fs, pwd, configurable)
                     pwd + "/src/o.js",
                     function(err, content)
                     {
-                        const temp = content.toString().split("/* scripts */");
+                        var temp = content.toString().split("/* test */");
+                        temp.splice(1, 1)
+                        content = temp.join("");
+                        temp = content.split("/* scripts */");
                         if(!configurable) {
                             // if I'm not configurable, then get rid of the script function entirely
                             temp[1] = scripts;

@@ -1,6 +1,6 @@
 export PATH := ./node_modules/.bin:${PATH}
 ARGUMENTS := $(wordlist 2,$(words $(MAKECMDGOALS)),$(MAKECMDGOALS))
-FILES=parser/eval.js parser/evalSync.js parser/function.js parser/script.js registry/memory.js transport/xhr.js transport/xhrNodeResolver.js transport/iframe.js proxy/localStorage.js
+FILES=parser/eval.js parser/evalSync.js parser/function.js parser/script.js registry/memory.js transport/xhr.js transport/xhrNodeResolver.js transport/iframe.js proxy/localStorage.js b.js
 clean:
 	rm -rf $(FILES) \
 			o.js o.dev.js \
@@ -23,19 +23,20 @@ report:
 	@ls -al ./test/fixtures/bundled/bundled.min.js | awk '{ print "$(ARGUMENTS) Uglified " $$5}' | ./test/report
     
 build: clean $(FILES);
+	@cp -R src/dev ./dev
 	# Build
 	@./bin/o.js > ./src/o.max.js
-	@./bin/o.js --configurable > ./src/o.dev.js
+	# @./bin/o.js --configurable > ./src/o.dev.js
+	@./bin/o.js --proxy @gardenhq/o@5.1.0/dev/index.js > ./src/o.dev.js 
 	# Uglify
 	@$(MAKE) o.max.js
 	@$(MAKE) o.dev.js
 	# Move templates into place
 	@mv ./src/o.max.js ./src/dev/oMaximal.js
-	@mv ./src/o.dev.js ./src/dev/oDev.js
+	# @mv ./src/o.dev.js ./src/dev/oDev.js
 	# Move max (which is now minned) to o.js
 	@mv o.max.js o.js
 	# @mv o.dev.js ./src/dev/o.js
-	@cp -R src/dev ./dev
 	@echo "-----"
 	# Report
 	@echo "# o.js"

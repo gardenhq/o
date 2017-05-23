@@ -1,4 +1,4 @@
-return (
+(
                     /* o */
     function(r${ exports ? ", " + exports : "" })
     {

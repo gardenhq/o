@@ -2,6 +2,7 @@ transport(
     function(scriptPath)
     {
         var extension = ".js";
+        var jsonExtension = ".json";
         var index = "index" + extension;
         var createCheck = function(str)
         {
@@ -11,6 +12,7 @@ transport(
             }
         }
         var hasJsExtension = createCheck(extension);
+        var hasJsonExtension = createCheck(jsonExtension);
         var isIndex = createCheck(index);
         var getFetchLike = function(originalPath, request)
         {
@@ -31,6 +33,7 @@ transport(
                                             headers: {
                                                 "Content-Type": request.getResponseHeader("Content-Type") 
                                             },
+                                            url: path,
                                             path: originalPath,
                                             content: request.responseText,
                                             status: request.status
@@ -39,6 +42,7 @@ transport(
                                 } else {
                                     reject(
                                         {
+                                            url: path,
                                             path: originalPath,
                                             status: request.status
                                         }
@@ -52,6 +56,7 @@ transport(
                 );
             }
         }
+        // TODO: Order. https://nodejs.org/api/modules.html#modules_file_modules
         var attempts = [
             {
                 test: function(filename)
@@ -66,11 +71,21 @@ transport(
             {
                 test: function(filename)
                 {
+                    return !hasJsonExtension(filename);
+                },
+                try: function(path, fetch)
+                {
+                    return fetch(path.split(".").slice(0, -1) + jsonExtension);
+                }
+            },
+            {
+                test: function(filename)
+                {
                     return !isIndex(filename);
                 },
                 try: function(path, fetch)
                 {
-                    return fetch(path + "/" + index);
+                    return fetch(path.split(".").slice(0, -1) + "/" + index);
                 }
             },
             {
@@ -112,6 +127,7 @@ transport(
                                     fetchlike
                                 );
                             } else {
+
                                 return Promise.reject(data);
                             }
                         }
@@ -127,8 +143,9 @@ transport(
                         console.error(new Error("Unable to load " + data.path + " (" + data.status + ")"));
                         return Promise.resolve(
                             {
-                                path: data.path,
-                                headers: {"Content-Type": "application/javascript"},
+                                path: path,
+                                url: data.path,
+                                headers: {"Content-Type": "application/javascript", "Status": "404"},
                                 content: "module.exports=null"
                             }
                         );

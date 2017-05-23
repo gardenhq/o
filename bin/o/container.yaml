@@ -14,6 +14,7 @@ o.cli.services.hash:
     - "--transport"
     - "--parser"
     - "--registry"
+    - "--proxy"
 o.cli.services:
   iterator: "@o.cli.reader"
   arguments:

@@ -23,8 +23,14 @@ module.exports = function(builder)
         "o.dev.reloader.websocket.url": win.localStorage["o+env://O_DEV_RELOADER_URL"],
         "o.dev.bundler.o.maximal": root + "/oMaximal.js",
         "o.dev.bundler.o.minimal": root + "/oMinimal.js",
-        // "o.dev.bundler.o.maximal": root + "/oDev.js",
-        // "o.dev.bundler.o.minimal": root + "/oDev.js",
+        "babili.standalone": {
+            "requires": {
+                "Babel": "@babel.standalone"
+            },
+            "object": "babili-standalone/babili.min.js",
+            "version": "0.0.10",
+            "ignore-require": true
+        },
         "main": {
             "callable": root + "/main.js",
             "arguments": [
@@ -83,7 +89,8 @@ module.exports = function(builder)
                 "@o.dev.bundler.template.bundle",
                 "@o.dev.bundler.template.app",
                 "@o.dev.bundler.o.minimal",
-                "@o.dev.bundler.o.maximal"
+                "@o.dev.bundler.o.maximal",
+                "@babili.standalone"
             ]
         },
         "parse-template-literal": {

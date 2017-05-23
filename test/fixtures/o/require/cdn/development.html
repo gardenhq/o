@@ -5,12 +5,14 @@
 		<title>Development Example</title>
 	</head>
 	<body>
-        <script type="text/javascript"
-            src="/src/o.js"
-			data-proxy="/src/dev/index.js"
-            data-export="o"
-            data-src="./external.js"
-            data-includepath="https://unpkg.com/"
-        ></script>
+        <script type="text/javascript">
+            var cdnHost = location.protocol + "//cdn." + location.hostname;
+            var cdn = cdnHost + "/@gardenhq/o@^5.0.0";
+            var $script = document.createElement("script");
+            $script.setAttribute("src", cdn + "/o.dev.js");
+            $script.setAttribute("data-export", "o");
+            $script.setAttribute("data-src", "./external.js");
+            document.body.appendChild($script);
+        </script>
 	</body>
 </html>

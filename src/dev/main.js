@@ -6,13 +6,21 @@ module.exports = function(translator, reloader, flash, clearCache, bundler, tool
         var bundle = bundler(config);
         switch(win.location.hash.substr(1)) {
             case "bundle":
+                function htmlEscape(str) {
+                    return str
+                        .replace(/&/g, '&amp;')
+                        .replace(/"/g, '&quot;')
+                        .replace(/'/g, '&#39;')
+                        .replace(/</g, '&lt;')
+                        .replace(/>/g, '&gt;');
+                }
                 setTimeout(
                     function()
                     {
                         bundle(null, null, true).then(
                             function(bundle)
                             {
-                                doc.documentElement.innerHTML = "<pre>\n\n" + bundle + "\n</pre>";
+                                doc.documentElement.innerHTML = "<pre>\n\n" + htmlEscape(bundle) + "\n</pre>";
                             }
                         );
                     },  

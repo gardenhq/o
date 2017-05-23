@@ -26,12 +26,13 @@ parser(
                 var arr;
                 var syncRequires = [];
                 while((arr = re.exec(data.content)) !== null) {
-                    syncRequires.push(resolve(arr[1], data.path || path));
+                    syncRequires.push(resolve(arr[1], data.url));
                 }
                 if(syncRequires.length == 0) {
                     return data;
                 }
                 syncRequires.push(null);
+                var parent = data.url;
                 return syncRequires.reduce(
                     function(prev, item, i, arr)
                     {
@@ -42,15 +43,8 @@ parser(
                                     return item;
                                 }
                                 return load(path, loader, _require, registry, evaluate).then(
-                                    function(loaded)
+                                    function(data)
                                     {
-                                        // TODO: Decide on aliases
-                                        if(!registry.has(loaded.path || path)) {
-                                            registry.set(loaded.path || path, loaded)
-                                        }
-                                        if(!registry.has(path)) {
-                                            registry.set(path, loaded)
-                                        }
                                         return item;
                                     }
                                 );
@@ -71,31 +65,35 @@ parser(
             return loader(path).then(
                 function(data)
                 {
-                    var relativeRequire = function(relativePath)
-                    {
-                        var from = data.path || path;
-                        relativePath = relativePath.indexOf("/") === 0 ? relativePath : resolve(relativePath, from);
-                        return _require(relativePath);
-                    }
                     var temp = data.headers["Content-Type"].split("/");
                     var type = temp[0];
                     var format = temp[1];
+                    var isBundle = format.indexOf("+bundle") !== -1;
+                    var relativeRequire = function(relativePath)
+                    {
+                        var from = data.url;
+                        relativePath = relativePath.indexOf("/") === 0 ? relativePath : resolve(relativePath, from);
+                        return _require(relativePath);
+                    }
                     registry.set(
                         path,
-                        function(module, exports, __require, __filename, __dirname)
+                        function(module, exports, $require, __filename, __dirname)
                         {
                             switch(type) {
                                 case "application":
                                     switch(true) {
                                         case format.indexOf("javascript") === 0:
-                                            // path = data.path;
-                                            var map = "//# sourceURL=" + path;
+                                            var map = "//# sourceURL=" + data.url;
                                             if(data.content.indexOf("//# sourceURL") === -1) {
                                                 data.content += map; 
                                             }
                                             // (exports, require, module, __filename, __dirname)
                                             // evaluate(data.content)(exports, relativeRequire, module, __filename, __dirname);
-                                            evaluate(data.content)(module, exports, relativeRequire, __filename, __dirname);
+                                            if(!isBundle) {
+                                                evaluate(data.content)(module, exports, relativeRequire, __filename, __dirname);
+                                            } else {
+                                                evaluate(data.content)(module, exports, $require, __filename, __dirname);
+                                            }
                                             break;
                                         case format.indexOf("json") === 0:
                                             module.exports = JSON.parse(data.content);
@@ -109,9 +107,7 @@ parser(
                             return module.exports;
                         }
                     );
-                    // (exports, require, module, __filename, __dirname)
-                    // return function(exports, __require, module, __filename, __dirname)
-                    if(format.indexOf("+bundle") === -1) {
+                    if(!isBundle) {
                         return loadSynchronousRequires(data);
                     }
                     return data;

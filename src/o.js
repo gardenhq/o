@@ -6,11 +6,8 @@
         var registry;
         var parser;
         var transport;
+        var proxy;
         var pathname = win.location.pathname;
-        var defaultProxy = function(transport)
-        {
-            return transport;   
-        };  
         var dirname = function(path)
         {
             return path.split("/").slice(0, -1).concat("").join("/")
@@ -88,6 +85,7 @@
                 },
                 {}
             );
+
             // get a default includepath from the src
             var src = getAttribute(doc, "src", "").split("/");
             config.includepath = config.includepath || (src.length > 3 ? src.slice(0, -3).concat("").join("/") : "./node_modules/");
@@ -146,29 +144,39 @@
             // TODO: should doc be an arg?
             return getAttribute(doc, "data-" + key, value)
         }
-        var normalizeName = function (child, parentBase) {
+        var normalizeName = function (child, parentBase)
+        {
+            var parts = child.split("/").filter(
+                function(item)
+                {
+                    return item !== "";
+                }
+            );
             if (child[0] === "/") {
-                child = child.slice(1);
+                parentBase = [parts.shift()];
             }
             if (child[0] !== ".") {
-                return child;
-            }
-            parentBase = parentBase.filter(function(item){return item != "."});
-            var parts = child.split("/");
-            while (parts[0] === "." || parts[0] === "..") {
-                if (parts.shift() === "..") {
-                    parentBase.pop();
-                }
-            }
-            return parentBase.concat(parts).join("/");
+                parts = ["."].concat(parts);
+            } 
+            return parentBase.concat(parts).reduce(
+                function(prev, item, i, arr)
+                {
+                    if(item == "..") {
+                        return prev.slice(0, -1);
+                    }
+                    if(item == ".") {
+                        return prev;
+                    }
+                    return prev.concat(item);
+                },
+                []
+            ).join("/")
         }
+
         var getResolve = function(includePath, defaultBase)
         {
             return function(path, base)
             {
-                if(path.indexOf("://") !== -1) {
-                    return path;
-                }
                 base = base || defaultBase;
                 var temp = path.split("#");
                 var hash = temp.length === 2 ? "#" + temp[1] : "";
@@ -176,7 +184,7 @@
                 var first2Chars = path.substr(0, 2);
                 var firstChar = first2Chars[0];
                 if(
-                    first2Chars != ".." && first2Chars != "./" && firstChar != "/"
+                    first2Chars != ".." && first2Chars != "./" && firstChar != "/" && path.indexOf("://") === -1
                 ) {
                     if(path.indexOf("/") === -1) {
                         path += "/";
@@ -187,13 +195,18 @@
                 if(path[path.length - 1] === "/") {
                     path += "index";
                 }
-                path = normalizeName(path, base.split("/").slice(0, -1));
-                // TODO: this should go, be more specific
-                var filename = path.split("/").pop();
+                temp = path.split("/");
+                var filename = temp[temp.length - 1];
                 if(filename.indexOf(".") === -1) {
-                    path += ".js";
+                    temp[temp.length - 1] += ".js";
                 }
-                firstChar = path.charAt(0);
+                //
+                if(path.indexOf("://") !== -1) {
+                    return temp.slice(0, 3).join("/") + normalizeName(temp.slice(3).join("/"), [""]) + hash;
+                }
+                path = normalizeName(temp.join("/"), base.split("/").slice(0, -1));
+                // TODO: this should go, deal with it in the transport?
+                firstChar = path[0];
                 if(firstChar != "/" && path.indexOf("://") === -1) {
                     path = "/" + path;
                 }
@@ -212,6 +225,21 @@
                 parts.join("/")
             );
         };
+        /* test */
+        if(window.test) {
+            Object.assign(
+                window,
+                {
+                    basepath: basepath,
+                    normalizeName: normalizeName,
+                    getResolve: getResolve,
+                    exportTo: exportTo,
+                    dirname: dirname
+                }
+            );
+            return;
+        }
+        /* test */
         return (
             function(includePath, currentScript, currentBase)
             {
@@ -220,7 +248,8 @@
                     {
                         registry: "/src/registry/memory.js",
                         parser: "/src/parser/evalSync.js",
-                        transport: "/src/transport/xhrNodeResolver.js"
+                        transport: "/src/transport/xhrNodeResolver.js",
+                        proxy: "/src/proxy/noop.js"
                     },
                     runner.config(currentScript, getResolve(includePath, currentBase))
                 );
@@ -228,7 +257,8 @@
                 var utils = [
                     "transport",
                     "parser",
-                    "registry"
+                    "registry",
+                    "proxy"
                 ].map(
                     function(item)
                     {
@@ -237,17 +267,10 @@
                             key: item
                         };
                     }
-                ).concat(
-                    (
-                        config.proxy ? {
-                            path: config.proxy,
-                            key: "proxy"
-                        } : []
-                    )
                 ).map(
                     function(item)
                     {
-                        return script(resolve(item.path, config.baseURL), item.key, currentScript)
+                        return script(resolve(item.path, config.baseURL), item.key, currentScript, config.includepath)
                     }
                 ).map(
                     function(injectScript, i)
@@ -280,15 +303,15 @@
                 );
                 var getPromisedLoader = function(resolve, config)
                 {
-                    var factory = function(doc, proxy, register)
+                    var factory = function(doc, _proxy, register)
                     {
-                        proxy = proxy || defaultProxy;
                         register = register || registry;
+                        _proxy = _proxy || proxy; 
                         return function(path)
                         {
                             return register(
                                 resolve(path, (this ? this.getConfig() : config).baseURL),
-                                proxy(
+                                _proxy(
                                     transport,
                                     factory,
                                     registryFactory,
@@ -321,7 +344,7 @@
                                 transport = modules[0];
                                 parser = modules[1];
                                 registry = modules[2];
-                                defaultProxy = modules[3] ? modules[3] : defaultProxy;
+                                proxy = modules[3];
                                 registerDynamic = function(path, deps, executingRequire, cb)
                                 {
                                     return Promise.resolve(registry.set(path, cb));
@@ -360,7 +383,7 @@
 )(
     window,
     document,
-    function(path, callbackName, script)
+    function(path, callbackName, script, includePath)
     {
         /* scripts */
         var temp = path.split("?");

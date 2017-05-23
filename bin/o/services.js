@@ -1,8 +1,9 @@
-module.exports = function(transport, parser, registry)
+module.exports = function(transport, parser, registry, proxy)
 {
     return {
-        "transport": transport || "src/transport/xhrNodeResolver.js",
-        "parser": parser || "src/parser/evalSync.js",
-        "registry": registry || "src/registry/memory.js"
+        "transport": transport || "@gardenhq/o/src/transport/xhrNodeResolver.js",
+        "parser": parser || "@gardenhq/o/src/parser/evalSync.js",
+        "registry": registry || "@gardenhq/o/src/registry/memory.js",
+        "proxy": proxy || "@gardenhq/o/src/proxy/noop.js"
     };
 }
