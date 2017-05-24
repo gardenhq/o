@@ -21,8 +21,8 @@ Feature: Require
     And I execute "sleep 3"
 
     And save the html in "pre" to "bundled.js"
-    And I execute "head -n -1 ./test/results/bundled.js > ./test/results/bundled.trim.js"
-    And I execute "mv ./test/results/bundled.trim.js ./test/results/bundled.js"
+    # And I execute "head -n -1 ./test/results/bundled.js > ./test/results/bundled.trim.js"
+    # And I execute "mv ./test/results/bundled.trim.js ./test/results/bundled.js"
 
     Given I execute "make report /test/fixtures/o/require/local/development.html"
     Then print the last error output

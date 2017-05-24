@@ -1,7 +1,7 @@
 registry(
     function(scriptPath)
     {
-        var unique = "___"
+        var unique = "o"
         /* module */
         var Module = function(id, parent, module)
         {

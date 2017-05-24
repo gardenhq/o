@@ -44,8 +44,8 @@ module.exports = function(storage, prefix, engine, bundleTemplate, appTemplate, 
             );
             if(bundleOnly) {
                 if(download) {
-                    return Promise.resolve(bundled);
-                    // return Promise.resolve(minner.transform(bundled).code);
+                    // return Promise.resolve(bundled);
+                    return Promise.resolve(minner.transform(bundled).code);
                 }
                 return "Bundled '" + bundleOnly + "'";
             }
@@ -65,7 +65,7 @@ module.exports = function(storage, prefix, engine, bundleTemplate, appTemplate, 
                             config: config
                         }
                     );
-                    // bundle = minner.transform(bundle).code;
+                    bundle = minner.transform(bundle).code;
                     console.debug("Bundling " + location.protocol + "//" + location.host + config.src);
                     console.log(bundle);
                     console.debug("Bundled " + location.protocol + "//" + location.host + config.src);

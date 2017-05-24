@@ -11,14 +11,13 @@
                         System.config(
                             {
                                 bundled: true,
-                                proxy: "/node_modules/@gardenhq/o/dev/index.js",
-src: "/node_modules/@gardenhq/o/src/b.js",
+                                src: "https://unpkg.com/@gardenhq/o@5.1.0/b.js",
+includepath: "https://unpkg.com/",
 hash: "/examples/b/yaml/services.yaml:main",
-baseURL: "/node_modules/@gardenhq/o/src/",
-includepath: "node_modules/"
+baseURL: "https://unpkg.com/@gardenhq/o@5.1.0/"
                             }
                         );
-                        return (
+                        (
                     /* o */
     function(r)
     {
@@ -29,14 +28,13 @@ r(
     "/examples/b/yaml/main.js",
     function(module, exports, require, __filename, __dirname, process)
     {
-        module.exports = function(helloWorld, print)
-{
-    return function()
-    {
-        print(helloWorld);
-    }
-}
+        "use strict";
 
+module.exports = function (helloWorld, print) {
+    return function () {
+        print(helloWorld);
+    };
+};//# sourceURL=/examples/b/yaml/main.js
     }
 ),
 
@@ -44,19 +42,19 @@ r(
     "/examples/b/yaml/print.js",
     function(module, exports, require, __filename, __dirname, process)
     {
-        module.exports = function()/* document */
+        "use strict";
+
+module.exports = function () /* document */
 {
-    return function(str)
-    {
-        if(typeof document !== "undefined") {
+    return function (str) {
+        if (typeof document !== "undefined") {
             var h1 = document.createElement("h1");
             h1.textContent = str;
             document.body.appendChild(h1);
         }
         console.log(str);
-    }
-}
-
+    };
+};//# sourceURL=/examples/b/yaml/print.js
     }
 ),
 
@@ -72,81 +70,47 @@ r(
     "/examples/hello-world.js",
     function(module, exports, require, __filename, __dirname, process)
     {
-        module.exports = "Hello World!";
+        "use strict";
 
+module.exports = "Hello World!";//# sourceURL=/examples/hello-world.js
     }
 ),
 
 r(
-    "/node_modules/@gardenhq/o/src/b.js",
+    "https://unpkg.com/@gardenhq/o@5.1.0/b.js",
     function(module, exports, require, __filename, __dirname, process)
     {
-        module.exports = function(load)
-{
-    return load.then(
-        function(System)
-        {
-            var register;
-            if(System.registerDynamic != null) {
-                register = System.registerDynamic.bind(System);
-            }
-            return System.import(
-                "@gardenhq/willow/index.js"
-            ).then(
-                function(builder)
-                {
-                    return builder(
-                        System.import.bind(System),
-                        register,
-                        "@gardenhq/willow/conf/javascript"
-                    );
-                }
-            ).then(
-                function(builder)
-                {
-                    var config = System.getConfig();
-                    var services = config.hash;
-                    if(!services && typeof document !== "undefined") {
-                        var scripts = document.getElementsByTagName("script");
-                        var script = scripts[scripts.length - 1];
-                        if(script.hasAttribute("src")) {
-                            var src = script.getAttribute("src");
-                            var temp  = src.split("#");
-                            if(temp.length > 1) {
-                                services = System.resolve(temp[1], location.pathname);
-                            }
-                        }
-                    }
-                    if(services) {
-                        var temp = services.split(":");
-                        if(!config.basepath) {
-                            System.config(
-                                {
-                                    baseURL: temp[0]
-                                }
-                            );
-                        }
-                        return builder.build(
-                            temp[0]
-                        ).run(temp[1] || "main");
-                    } else {
-                        return builder;
-                    }
-                }
-            );
+        "use strict";
+
+module.exports = function (t) {
+  return t.then(function (t) {
+    var e;return null != t.registerDynamic && (e = t.registerDynamic.bind(t)), t.import("@gardenhq/willow/index.js#@5.0.1").then(function (n) {
+      return n(t.import.bind(t), e, "@gardenhq/willow/conf/javascript.js#@5.0.1");
+    }).then(function (e) {
+      var n = t.getConfig(),
+          r = n.hash;if (!r && "undefined" != typeof document) {
+        var i = document.getElementsByTagName("script"),
+            a = i[i.length - 1];if (a.hasAttribute("src")) {
+          var o = a.getAttribute("src");(s = o.split("#")).length > 1 ? r = t.resolve(s[1], location.pathname) : a.hasAttribute("data-container") && (s = (o = a.getAttribute("data-container")).split("#")).length > 1 && (r = t.resolve(s[0], location.pathname) + ":" + s[1]);
         }
-    );
-};
-
+      }if (r) {
+        var s = r.split(":");return n.basepath || t.config({ baseURL: s[0] }), e.build(s[0]).run(s[1] || "main");
+      }return e;
+    });
+  });
+};//# sourceURL=https://unpkg.com/@gardenhq/o@5.1.0/b.js
     }
 ),
 
 r(
-    "/node_modules/@gardenhq/willow/Builder.js",
+    "https://unpkg.com/@gardenhq/willow@5.0.1/Builder.js",
     function(module, exports, require, __filename, __dirname, process)
     {
-        var Builder = function Builder(container, promisedRequire)
-{
+        "use strict";
+
+var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
+
+var Builder = function Builder(container, promisedRequire) {
     this.container = container;
     this.loading = null;
     this.import = promisedRequire;
@@ -158,227 +122,167 @@ r(
     //      return this;
     //  }
     // );
-}
-Object.assign(
-    Builder.prototype,
-    {
-        use: function(filters)
-        {
-            if(typeof filters === "function") {
-                filters = [filters];
-            }
-            // console.log(this.filters);
-            this.filters = this.filters.concat(filters);
-            return this;
-        },
-        clear: function()
-        {
-            this.filters = [];
-            return this;
-        },
-        get: function(key)
-        {
-            const container = this.container;
-            var service;
-            if(this.loading != null) {
-                service = this.loading.then(
-                    function()
-                    {
-                        // this.loading = null;
-                        return container.get(key);
-                    }.bind(this)
-                );
-            } else {
-                service = container.get(key);
-            }
-            // TODO: Should always be a promise? Unless within a service definition argument?
-            if(service instanceof Promise) {
-                service.catch(
-                    function(e)
-                    {
-                        // TODO: is there a better way to do this?
-                        e.message = e.message + "\n @" + key + "";
-                    }
-                );
-            }   
-            return service;
-        },
-        set: function(key, value)
-        {
-            this.container.set.apply(this.container, arguments);
-            return this;
-        },
-        has: function(key)
-        {
-            return this.container.has.apply(this.container, arguments);
-        },
-        tag: function()
-        {
-            this.container.tag.apply(this.container, arguments);
-            return this;
-        },
-        getTagged: function(key)
-        {
-            return this.container.getTagged(key);
-        },
-        run: function(key, args)
-        {
-            return this.get(key).then(
-                function(service)
-                {
-                    if(typeof service === "function") {
-                        return service.apply(null, args)
-                    }
-                }
-            );
-        },
-        // TODO: if I can run stuff I should be able to instantiate also?
-        // instantiate: function()
-        // {
-        //  this.get(key).then(function(service){ service.apply(null, args) });
-        //  return this;
-        // },
-        build: function(config)
-        {
-            // TODO: I think this should push onto loading for multiple .build calls?
-            this.loading = this.load.apply(this, arguments).catch(
-                function(e)
-                {
-                    throw e;
-                }
-            )
-            return this;
-        },
-        applyFilters: function(service, id, services)
-        {
-            const container = this;
-            const type = typeof service;
-            if(
-                service == null ||
-                type !== "object" ||
-                (
-                    (
-                        service.constructor != Object && id != "imports" //TODO: We shouldn't know about imports
-                    )
-                )
-            ) {
-                this.container.set(
-                    id,
-                    function()
-                    {
-                        return Promise.resolve(service)
-                    }
-                );
-                return Promise.resolve(services);
-            }
-            if(this.filters.length == 0) {
-                return Promise.resolve(services);
-            }
-            const first = this.filters[0](container, service, id, services);
-            return this.filters.reduce(
-                function(prev, filter, i, arr)
-                {
-                    return prev.then(
-                        function(definitions)
-                        {
-                            services = definitions || services;
-                            const result = filter(container, services[id], id, services);
-                            if(result == null) {
-                                return services;
-                            }
-                            return result;
-                        }
-                    )
-                },
-                first instanceof Promise ? first : Promise.resolve(first)
-            );
-        },
-        processKey: function(index, key, services)
-        {
-            return this.applyFilters(services[key], key, services).then(
-                function(services)
-                {
-                    const keys = Object.keys(services);
-                    const next = index + 1;
-                    if(next < keys.length) {
-                        return this.processKey(next, keys[next], services);
-                    }
-                    return services;
-                }.bind(this)
-            )
-        },
-        _load: function(services)
-        {
-            //callable?
-            if(typeof services === "function") {
-                services = services(this);
-            }
-            // TODO: You should be able to use promises resolving to objects
-            var process = function(services)
-            {
-                if(services == null || typeof services !== "object") {
-                    throw new Error("Service definitions should be an object, a function returning an object (or a !!promise resolving to an object!!)")
-                }
-                var index = 0;
-                const next = Object.keys(services)[index];
-                return this.processKey(index, next, services).then(
-                    function()
-                    {
-                        return this;
-                    }.bind(this)
-                )
-            }
-            if(services instanceof Promise) {
-                return services.then(
-                    process.bind(this)
-                );
-            }
-            return process.bind(this)(services)
-        },
-        load: function(services)
-        {
-            if(typeof services == "string") {
-                // const systems = this.getTagged("dom.system.import");
-                // if(!systems || systems.length < 1) {
-                //  throw new Error("A System.import implementation is not defined, tag a callable dom.system.import service that implements `import` to use load")
-                // }
-                // const System_import = systems[systems.length - 1];
-                // if(typeof System_import !== "function") {
-                //  throw new Error("A System.import implementation is not defined but is not callable, tag a callable dom.system.import service that implements `import` to use load")
-                // }
-                if(typeof this.import !== "function") {
-                    throw new Error("This builder doesn't know how to load");
-                    // throw new Error("A System.import implementation is not defined but is not callable, tag a callable dom.system.import service that implements `import` to use load")
-                }
-                return this.import(
-                    services
-                ).then(
-                    function(services)
-                    {
-                        return this._load(services);
-                    }.bind(this)
-                );
-            } else {
-                return this._load(services);
-            }
-        },
-        getContainer: function()
-        {
-            return this.container;
+};
+Object.assign(Builder.prototype, {
+    use: function use(filters) {
+        if (typeof filters === "function") {
+            filters = [filters];
         }
-    
+        // console.log(this.filters);
+        this.filters = this.filters.concat(filters);
+        return this;
+    },
+    clear: function clear() {
+        this.filters = [];
+        return this;
+    },
+    get: function get(key) {
+        var container = this.container;
+        var service;
+        if (this.loading != null) {
+            service = this.loading.then(function () {
+                // this.loading = null;
+                return container.get(key);
+            }.bind(this));
+        } else {
+            service = container.get(key);
+        }
+        // TODO: Should always be a promise? Unless within a service definition argument?
+        if (service instanceof Promise) {
+            service.catch(function (e) {
+                // TODO: is there a better way to do this?
+                e.message = e.message + "\n @" + key + "";
+            });
+        }
+        return service;
+    },
+    set: function set(key, value) {
+        this.container.set.apply(this.container, arguments);
+        return this;
+    },
+    has: function has(key) {
+        return this.container.has.apply(this.container, arguments);
+    },
+    tag: function tag() {
+        this.container.tag.apply(this.container, arguments);
+        return this;
+    },
+    getTagged: function getTagged(key) {
+        return this.container.getTagged(key);
+    },
+    run: function run(key, args) {
+        return this.get(key).then(function (service) {
+            if (typeof service === "function") {
+                return service.apply(null, args);
+            }
+        });
+    },
+    // TODO: if I can run stuff I should be able to instantiate also?
+    // instantiate: function()
+    // {
+    //  this.get(key).then(function(service){ service.apply(null, args) });
+    //  return this;
+    // },
+    build: function build(config) {
+        // TODO: I think this should push onto loading for multiple .build calls?
+        this.loading = this.load.apply(this, arguments).catch(function (e) {
+            throw e;
+        });
+        return this;
+    },
+    applyFilters: function applyFilters(service, id, services) {
+        var container = this;
+        var type = typeof service === "undefined" ? "undefined" : _typeof(service);
+        if (service == null || type !== "object" || service.constructor != Object && id != "imports" //TODO: We shouldn't know about imports
+        ) {
+            this.container.set(id, function () {
+                return Promise.resolve(service);
+            });
+            return Promise.resolve(services);
+        }
+        if (this.filters.length == 0) {
+            return Promise.resolve(services);
+        }
+        var first = this.filters[0](container, service, id, services);
+        return this.filters.reduce(function (prev, filter, i, arr) {
+            return prev.then(function (definitions) {
+                services = definitions || services;
+                var result = filter(container, services[id], id, services);
+                if (result == null) {
+                    return services;
+                }
+                return result;
+            });
+        }, first instanceof Promise ? first : Promise.resolve(first));
+    },
+    processKey: function processKey(index, key, services) {
+        return this.applyFilters(services[key], key, services).then(function (services) {
+            var keys = Object.keys(services);
+            var next = index + 1;
+            if (next < keys.length) {
+                return this.processKey(next, keys[next], services);
+            }
+            return services;
+        }.bind(this));
+    },
+    _load: function _load(services) {
+        //callable?
+        if (typeof services === "function") {
+            services = services(this);
+        }
+        // TODO: You should be able to use promises resolving to objects
+        var process = function process(services) {
+            if (services == null || (typeof services === "undefined" ? "undefined" : _typeof(services)) !== "object") {
+                throw new Error("Service definitions should be an object, a function returning an object (or a !!promise resolving to an object!!)");
+            }
+            var index = 0;
+            var next = Object.keys(services)[index];
+            return this.processKey(index, next, services).then(function () {
+                return this;
+            }.bind(this));
+        };
+        if (services instanceof Promise) {
+            return services.then(process.bind(this));
+        }
+        return process.bind(this)(services);
+    },
+    load: function load(services) {
+        if (typeof services == "string") {
+            // const systems = this.getTagged("dom.system.import");
+            // if(!systems || systems.length < 1) {
+            //  throw new Error("A System.import implementation is not defined, tag a callable dom.system.import service that implements `import` to use load")
+            // }
+            // const System_import = systems[systems.length - 1];
+            // if(typeof System_import !== "function") {
+            //  throw new Error("A System.import implementation is not defined but is not callable, tag a callable dom.system.import service that implements `import` to use load")
+            // }
+            if (typeof this.import !== "function") {
+                throw new Error("This builder doesn't know how to load");
+                // throw new Error("A System.import implementation is not defined but is not callable, tag a callable dom.system.import service that implements `import` to use load")
+            }
+            return this.import(services).then(function (services) {
+                return this._load(services);
+            }.bind(this));
+        } else {
+            return this._load(services);
+        }
+    },
+    getContainer: function getContainer() {
+        return this.container;
     }
-);
-module.exports = Builder;
 
+});
+module.exports = Builder;//# sourceURL=https://unpkg.com/@gardenhq/willow@5.0.1/Builder.js
     }
 ),
 
 r(
-    "/node_modules/@gardenhq/willow/Container.js",
+    "https://unpkg.com/@gardenhq/willow@5.0.1/Container.js",
     function(module, exports, require, __filename, __dirname, process)
     {
-        /**
+        "use strict";
+
+/**
  * Default/Reference Container - modified version of pimple js, used under
  * the below license.
  *
@@ -397,504 +301,144 @@ r(
  * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 */
 var utils = {
-    isDefined: function(obj)
-    {
-        return (typeof obj !== "undefined");
+    isDefined: function isDefined(obj) {
+        return typeof obj !== "undefined";
     },
-    isCallable: function(obj)
-    {
-        return (typeof obj === "function");
+    isCallable: function isCallable(obj) {
+        return typeof obj === "function";
     }
 };
-var Container = function Container(services)
-{
+var Container = function Container(services) {
     this._keys = {};
     this._values = {};
     this._factories = [];
     this._definitions = {};
     this._tags = {};
     if (services) {
-        Object.keys(
-            services
-        ).forEach(
-            function(service)
-            {
-                this.set(service, services[service])
-            },
-            this
-        )
-    }
-    
-}
-Object.assign(
-    Container.prototype,
-    {
-        set: function(id, value, tags)
-        {
-            if (utils.isDefined(this._values[id])) {
-                throw new Error('Cannot set "' + id + '", it is already set and has been instantiated')
-            }
-            if(utils.isDefined( this._definitions[id]) && this._definitions[id] !== null) {
-                this.removeTags(id);
-            }
-            this._definitions[id] = value;
-            this._keys[id] = true;
-            if(tags != null) {
-                tags.forEach(
-                    function(item, i, arr)
-                    {
-                        if(typeof item === 'string') {
-                            this.tag(id, item);
-                        } else {
-                            this.tag(id, item.name, item)
-                        }
-                    },
-                    this
-                );
-
-            }
-            return this;
-        },
-        tag: function(id, tag, attributes)
-        {
-            if (!utils.isDefined(this._keys[id])) {
-                this.set(id, null);
-                // throw new Error('Cannot tag "' + id + '", identifier is not defined');
-            }
-            if (!utils.isDefined(this._tags[tag])) {
-                this._tags[tag] = {};
-            }
-            if (!utils.isDefined(this._tags[tag][id])) {
-                this._tags[tag][id] = [];
-            }
-            this._tags[tag][id].push(attributes || {});
-            return this;
-        },
-        get: function(id)
-        {
-            if (!this.has(id)) {
-                throw new Error('Cannot get "' + id + '", identifier is not defined');
-            }
-
-            if (utils.isDefined(this._values[id])) {
-                return this._values[id];
-            }
-            if (utils.isDefined(this._factories[id])) {
-                return this._factories[id](this, []);
-            }
-            if (utils.isCallable(this._definitions[id])) {
-                this._values[id] = this._definitions[id].apply(this, []);
-            } else {
-                this._values[id] = this._definitions[id];
-            }
-            return this._values[id];
-        },
-        has: function(id)
-        {
-            return utils.isDefined(this._keys[id]);
-        },
-        factory: function(id, value)
-        {
-            if (!utils.isCallable(value)) {
-                throw new Error('Cannot set "' + id + '", service factories must be callable')
-            }
-            this._factories[id] = value;
-            this._keys[id] = true;
-
-            return this;
-        },
-        removeTags: function(id)
-        {
-            if(this.has(id)) {
-                Object.keys(
-                    this._tags
-                ).forEach(
-                    function(item, i, arr)
-                    {
-                        if(this._tags[item][id] != null) {
-                            delete this._tags[item][id];
-                        }
-                    },
-                    this
-                );
-            }
-        },
-        findTaggedIds: function(tag)
-        {
-            if (!utils.isDefined(this._tags[tag])) {
-                return {};
-            }
-            return this._tags[tag];
-        },
-        getTagged: function(tag)
-        {
-            var tags = this.findTaggedIds(tag);
-            var services = [];
-            Object.keys(
-                tags
-            ).forEach(
-                function(item, i, arr)
-                {
-                    var service = this.get(item);
-                    // this needs woking in somemore
-                    // so instead of using 0 it should look for the tagname
-                    // equalling what I'm looking for
-                    var key = tags[item].reduce(
-                        function(prev, item, i, arr)
-                        {
-                            if(item.name != null && item.name == tag) {
-                                return item.key;
-                            }
-                            return prev;
-                        },
-                        i
-                    )
-                    services[key] = service;
-                    // if(tags[item][0].key != null) {
-                    //  services[tags[item][0].key] = service;
-                    // } else if(tags[item][1] != null && tags[item][1].key != null) {
-                    //  services[tags[item][1].key] = service;
-
-                    // } else {
-                    //  services[i] = service;
-                    // }
-                },
-                this
-            );
-            return services;
-        }
-    
-    }
-);
-module.exports = Container;
-
-    }
-),
-
-r(
-    "/node_modules/@gardenhq/willow/conf/../filters/class.js",
-    function(module, exports, require, __filename, __dirname, process)
-    {
-        module.exports = function(loader, resolveArguments, resolveIdentifier, traverse)
-{
-    const callsKey = "calls";
-    return loader(
-        "class",
-        function(resolve, reject, module, object, container, definition)
-        {
-            return resolveArguments(container, definition).then(
-                function(args)
-                {
-                    const promises = [];
-                    (definition[callsKey] || []).forEach(
-                        function(item, i, arr)
-                        {
-                            const args = item[1] || [];
-                            traverse(
-                                args,
-                                function(item, i, obj)
-                                {
-                                    promises.push(resolveIdentifier(item, container));
-                                    return promises.length - 1;
-                                }
-                            );
-                        }
-                    );
-
-                    Promise.all(
-                        promises
-                    ).then(
-                        function(results)
-                        {
-                            const instance = new (
-                                Function.prototype.bind.apply(
-                                    module,
-                                    [module].concat(args)
-                                )
-                            );
-                            (definition[callsKey] || []).forEach(
-                                function(item, i, arr)
-                                {
-                                    const method = item[0];
-                                    const args = item[1] || [];
-                                    traverse(
-                                        args,
-                                        function(item, i, obj)
-                                        {
-                                            return results[item];
-                                        }
-                                    );
-                                    instance[method].apply(instance, args);
-                                }
-                            );
-                            resolve(
-                                instance
-                            );
-
-                        }
-                    ).catch(
-                        function(e)
-                        {
-                            reject(e);
-                        }
-                    );
-
-
-                }
-            );
-        }
-    );
-    
-}
-
-    }
-),
-
-r(
-    "/node_modules/@gardenhq/willow/conf/../filters/factory.js",
-    function(module, exports, require, __filename, __dirname, process)
-    {
-        module.exports = function(key)
-{
-    key = key || "factory";
-    return function factory(container, definition, id, definitions)
-    {
-        if(typeof definition[key] !== "undefined") {
-            container.factory(id, definition[key]);
-        }
-    }
-}
-
-
-
-    }
-),
-
-r(
-    "/node_modules/@gardenhq/willow/conf/../filters/iterator.js",
-    function(module, exports, require, __filename, __dirname, process)
-    {
-        module.exports = function(resolveArguments, key)
-{
-    key = key || "iterator";
-    return function iterator(container, definition, id, definitions)
-    {
-        if(typeof definition[key] !== "undefined") {
-            container.set(
-                id,
-                function()
-                {
-                    return resolveArguments(container, definition).then(
-                        function(args)
-                        {
-                            return container.get(definition[key].substr(1)).then(
-                                function(iterator)
-                                {
-                                    var iterable = args[0];
-                                    // var res = args[0].map(
-                                    //  function(items, i, arr)
-                                    //  {
-                                    //      return Object.keys(items).map(
-                                    //          function(key, i, arr)
-                                    //          {
-                                    //              return iterator(items[key], key);
-                                    //          }
-                                    //      );
-                                    //  }
-                                    // )
-                                    var res = Object.keys(iterable).map(
-                                        function(key, i, arr)
-                                        {
-                                            return iterator(iterable[key], key);
-                                        }
-                                    );
-                                    //the function is returned and therefore can be called and called etc etc
-                                    // why?
-                                    return res;
-                                    return function()
-                                    {
-                                        return res;
-                                    };
-                                }
-                            );
-
-                        }
-                    );
-
-                }
-            );
-        }
-    }
-}
-
-
-    }
-),
-
-r(
-    "/node_modules/@gardenhq/willow/conf/../filters/object.js",
-    function(module, exports, require, __filename, __dirname, process)
-    {
-        module.exports = function(loader)
-{
-    return loader(
-        "object",
-        function(resolve, reject, module, object, container, definition)
-        {
-            resolve(module);
-        }
-    );
-        
-}
-
-    }
-),
-
-r(
-    "/node_modules/@gardenhq/willow/conf/../filters/resolve.js",
-    function(module, exports, require, __filename, __dirname, process)
-    {
-        module.exports = function(resolveResolve, key, serviceKey, servicePrefix)
-{
-    key = key || "resolve";
-    serviceKey = serviceKey || "service";
-    servicePrefix = servicePrefix || "@";
-
-    return function(container, definition, id, definitions)
-    {
-        if(definition[key] == null) {
-            return;
-        }
-        const service = definition[serviceKey];
-        const newService = function()
-        {
-            var container = this;
-            let keys = definition[key].filter(
-                function(item, i, arr)
-                {
-                    return (item.indexOf(servicePrefix) === 0);
-                }
-            );
-            return resolveResolve(container, definition).then(
-                function(result)
-                {
-                    const get = container.get.bind(container);
-                    // const getTagged = container.getTagged.bind(container);
-                    keys = keys.map(
-                        function(item, i, arr)
-                        {
-                            if(!container.has(item)) {
-                                container.set(
-                                    item,
-                                    function(container){return result[i]}
-                                );
-                            }
-                            return item.substr(servicePrefix.length);
-                        }
-                    );
-
-                    // hackity hack, look at a better proxy?
-                    // and use Symbols instead of servicePrefix?
-                    // also needs to work for getTagged
-                    container.get = function(key)
-                    {
-                        if(keys.indexOf(key) !== -1) {
-                            key = servicePrefix + key;
-                        }
-                        return get(key);
-                    };
-                    return new Promise(
-                        function(resolve, reject)
-                        {
-                            //if(typeof service == "function") {
-                                try {
-                                    resolve(
-                                        service.apply(
-                                            container,
-                                            keys.map(
-                                                function(item)
-                                                {
-                                                    return container.get(item);
-                                                }
-                                            )
-                                        )
-                                    )
-                                } catch (e) {
-                                    reject(e);
-                                }
-                            //} else {
-                            //  resolve();
-                            //}
-                        }
-                    );
-                }
-            );  
-        };
-        definition[serviceKey] = null;
-        container.set(
-            id,
-            newService
-        );
-    }
-}
-
-
-
-    }
-),
-
-r(
-    "/node_modules/@gardenhq/willow/conf/../filters/service.js",
-    function(module, exports, require, __filename, __dirname, process)
-    {
-        module.exports = function(key)
-{
-    key = key || "service";
-    return function service(container, definition, id, definitions)
-    {
-        if(typeof definition[key] !== "undefined") {
-            container.set(id, definition[key]);
-        }
-    }
-}
-
-
-    }
-),
-
-r(
-    "/node_modules/@gardenhq/willow/conf/../filters/tags.js",
-    function(module, exports, require, __filename, __dirname, process)
-    {
-        module.exports = function(key)
-{
-    key = key || "tags";
-    return function tags(builder, definition, id, definitions)
-    {
-        (definition[key] || []).forEach(
-            function(item, i, arr)
-            {
-                var tag = item;
-                var meta = {};
-                if(typeof tag !== "string") {
-                    tag = item.name;
-                    meta = item;
-                }
-                builder.tag(id, tag, meta);
-            }
-        );
+        Object.keys(services).forEach(function (service) {
+            this.set(service, services[service]);
+        }, this);
     }
 };
+Object.assign(Container.prototype, {
+    set: function set(id, value, tags) {
+        if (utils.isDefined(this._values[id])) {
+            throw new Error('Cannot set "' + id + '", it is already set and has been instantiated');
+        }
+        if (utils.isDefined(this._definitions[id]) && this._definitions[id] !== null) {
+            this.removeTags(id);
+        }
+        this._definitions[id] = value;
+        this._keys[id] = true;
+        if (tags != null) {
+            tags.forEach(function (item, i, arr) {
+                if (typeof item === 'string') {
+                    this.tag(id, item);
+                } else {
+                    this.tag(id, item.name, item);
+                }
+            }, this);
+        }
+        return this;
+    },
+    tag: function tag(id, _tag, attributes) {
+        if (!utils.isDefined(this._keys[id])) {
+            this.set(id, null);
+            // throw new Error('Cannot tag "' + id + '", identifier is not defined');
+        }
+        if (!utils.isDefined(this._tags[_tag])) {
+            this._tags[_tag] = {};
+        }
+        if (!utils.isDefined(this._tags[_tag][id])) {
+            this._tags[_tag][id] = [];
+        }
+        this._tags[_tag][id].push(attributes || {});
+        return this;
+    },
+    get: function get(id) {
+        if (!this.has(id)) {
+            throw new Error('Cannot get "' + id + '", identifier is not defined');
+        }
 
+        if (utils.isDefined(this._values[id])) {
+            return this._values[id];
+        }
+        if (utils.isDefined(this._factories[id])) {
+            return this._factories[id](this, []);
+        }
+        if (utils.isCallable(this._definitions[id])) {
+            this._values[id] = this._definitions[id].apply(this, []);
+        } else {
+            this._values[id] = this._definitions[id];
+        }
+        return this._values[id];
+    },
+    has: function has(id) {
+        return utils.isDefined(this._keys[id]);
+    },
+    factory: function factory(id, value) {
+        if (!utils.isCallable(value)) {
+            throw new Error('Cannot set "' + id + '", service factories must be callable');
+        }
+        this._factories[id] = value;
+        this._keys[id] = true;
+
+        return this;
+    },
+    removeTags: function removeTags(id) {
+        if (this.has(id)) {
+            Object.keys(this._tags).forEach(function (item, i, arr) {
+                if (this._tags[item][id] != null) {
+                    delete this._tags[item][id];
+                }
+            }, this);
+        }
+    },
+    findTaggedIds: function findTaggedIds(tag) {
+        if (!utils.isDefined(this._tags[tag])) {
+            return {};
+        }
+        return this._tags[tag];
+    },
+    getTagged: function getTagged(tag) {
+        var tags = this.findTaggedIds(tag);
+        var services = [];
+        Object.keys(tags).forEach(function (item, i, arr) {
+            var service = this.get(item);
+            // this needs woking in somemore
+            // so instead of using 0 it should look for the tagname
+            // equalling what I'm looking for
+            var key = tags[item].reduce(function (prev, item, i, arr) {
+                if (item.name != null && item.name == tag) {
+                    return item.key;
+                }
+                return prev;
+            }, i);
+            services[key] = service;
+            // if(tags[item][0].key != null) {
+            //  services[tags[item][0].key] = service;
+            // } else if(tags[item][1] != null && tags[item][1].key != null) {
+            //  services[tags[item][1].key] = service;
+
+            // } else {
+            //  services[i] = service;
+            // }
+        }, this);
+        return services;
+    }
+
+});
+module.exports = Container;//# sourceURL=https://unpkg.com/@gardenhq/willow@5.0.1/Container.js
     }
 ),
 
 r(
-    "/node_modules/@gardenhq/willow/conf/index.js",
+    "https://unpkg.com/@gardenhq/willow@5.0.1/conf/index.js",
     function(module, exports, require, __filename, __dirname, process)
     {
-        module.exports = function()
-{
+        "use strict";
+
+module.exports = function () {
     var root = __dirname + "/..";
     return {
         "willow.filter.service": {
@@ -907,215 +451,215 @@ r(
             "filter": root + "/filters/tags"
         }
     };
-        
-}
-
+};//# sourceURL=https://unpkg.com/@gardenhq/willow@5.0.1/conf/index.js
     }
 ),
 
 r(
-    "/node_modules/@gardenhq/willow/conf/javascript.js",
+    "https://unpkg.com/@gardenhq/willow@5.0.1/conf/javascript.js",
     function(module, exports, require, __filename, __dirname, process)
     {
-        module.exports = function()
-{
-    var root = __dirname + "/.."
+        "use strict";
+
+module.exports = function () {
+    var root = __dirname + "/..";
     var id = "willow";
     return {
         "willow.filter.class": {
             "filter": root + "/filters/class",
-            "arguments": [
-                "@" + id + ".loadAndEval",
-                "@" + id + ".resolve.arguments",
-                "@" + id+ ".resolveIdentifier",
-                "@" + id + ".traverse"
-            ],
-            "tags": [
-                id + ".filter"
-            ]
+            "arguments": ["@" + id + ".loadAndEval", "@" + id + ".resolve.arguments", "@" + id + ".resolveIdentifier", "@" + id + ".traverse"],
+            "tags": [id + ".filter"]
         },
         "willow.filter.object": {
             "filter": root + "/filters/object",
-            "arguments": [
-                "@" + id + ".loadAndEval"
-            ],
-            "tags": [
-                id + ".filter"
-            ]
+            "arguments": ["@" + id + ".loadAndEval"],
+            "tags": [id + ".filter"]
         },
         "willow.filter.share": {
             "filter": root + "/filters/shared"
         },
         "willow.filter.resolve": {
             "filter": root + "/filters/resolve",
-            "arguments": [
-                "@" + id + ".resolve.resolve"
-            ],
-            "tags": [
-                id + ".filter"
-            ]
+            "arguments": ["@" + id + ".resolve.resolve"],
+            "tags": [id + ".filter"]
         },
         "willow.filter.iterator": {
             "filter": root + "/filters/iterator",
-            "arguments": [
-                "@" + id + ".resolve.arguments"
-            ],
-            "tags": [
-                id + ".filter"
-            ]
+            "arguments": ["@" + id + ".resolve.arguments"],
+            "tags": [id + ".filter"]
         }
     };
-        
-}
-
+};//# sourceURL=https://unpkg.com/@gardenhq/willow@5.0.1/conf/javascript.js
     }
 ),
 
 r(
-    "/node_modules/@gardenhq/willow/filters/callable.js",
+    "https://unpkg.com/@gardenhq/willow@5.0.1/filters/callable.js",
     function(module, exports, require, __filename, __dirname, process)
     {
-        module.exports = function(loader, resolveArguments)
-{
-    return loader(
-        "callable",
-        function(resolve, reject, module, object, container, definition)
-        {
-            return resolveArguments(container, definition).then(
-                function(args)
-                {
-                    try {
-                        var result = module.apply(object, args);
-                    } catch(e) {
-                        reject(e);
-                        // reject(new TypeError("'" + definition.callable + "' is not callable/a function"));
-                    }
-                    resolve(
-                        result
-                    );
-                }
-            );
-        }
-    );
-}
+        "use strict";
 
-    }
-),
-
-r(
-    "/node_modules/@gardenhq/willow/filters/filter.js",
-    function(module, exports, require, __filename, __dirname, process)
-    {
-        module.exports = function(loader, resolveArguments, key)
-{
-    key = key || "filter";
-    return function(container, definition, id, definitions)
-    {
-        loader(
-            "filter",
-            function(resolve, reject, module, object, builder, definition)
-            {
-                return resolveArguments(builder, definition).then(
-                    function(args)
-                    {
-                        var result = module.apply(object, args);
-                        builder.use(result);
-                        resolve(
-                            result
-                        );
-                    }
-                );
+module.exports = function (loader, resolveArguments) {
+    return loader("callable", function (resolve, reject, module, object, container, definition) {
+        return resolveArguments(container, definition).then(function (args) {
+            try {
+                var result = module.apply(object, args);
+            } catch (e) {
+                reject(e);
+                // reject(new TypeError("'" + definition.callable + "' is not callable/a function"));
             }
-        )(container, definition, id, definitions);
-    }
-}
-
-
+            resolve(result);
+        });
+    });
+};//# sourceURL=https://unpkg.com/@gardenhq/willow@5.0.1/filters/callable.js
     }
 ),
 
 r(
-    "/node_modules/@gardenhq/willow/filters/imports.js",
+    "https://unpkg.com/@gardenhq/willow@5.0.1/filters/class.js",
     function(module, exports, require, __filename, __dirname, process)
     {
-        module.exports = function($require, key)
-{
+        "use strict";
+
+module.exports = function (loader, resolveArguments, resolveIdentifier, traverse) {
+    var callsKey = "calls";
+    return loader("class", function (resolve, reject, module, object, container, definition) {
+        return resolveArguments(container, definition).then(function (args) {
+            var promises = [];
+            (definition[callsKey] || []).forEach(function (item, i, arr) {
+                var args = item[1] || [];
+                traverse(args, function (item, i, obj) {
+                    promises.push(resolveIdentifier(item, container));
+                    return promises.length - 1;
+                });
+            });
+
+            Promise.all(promises).then(function (results) {
+                var instance = new (Function.prototype.bind.apply(module, [module].concat(args)))();
+                (definition[callsKey] || []).forEach(function (item, i, arr) {
+                    var method = item[0];
+                    var args = item[1] || [];
+                    traverse(args, function (item, i, obj) {
+                        return results[item];
+                    });
+                    instance[method].apply(instance, args);
+                });
+                resolve(instance);
+            }).catch(function (e) {
+                reject(e);
+            });
+        });
+    });
+};//# sourceURL=https://unpkg.com/@gardenhq/willow@5.0.1/filters/class.js
+    }
+),
+
+r(
+    "https://unpkg.com/@gardenhq/willow@5.0.1/filters/factory.js",
+    function(module, exports, require, __filename, __dirname, process)
+    {
+        "use strict";
+
+module.exports = function (key) {
+    key = key || "factory";
+    return function factory(container, definition, id, definitions) {
+        if (typeof definition[key] !== "undefined") {
+            container.factory(id, definition[key]);
+        }
+    };
+};//# sourceURL=https://unpkg.com/@gardenhq/willow@5.0.1/filters/factory.js
+    }
+),
+
+r(
+    "https://unpkg.com/@gardenhq/willow@5.0.1/filters/filter.js",
+    function(module, exports, require, __filename, __dirname, process)
+    {
+        "use strict";
+
+module.exports = function (loader, resolveArguments, key) {
+    key = key || "filter";
+    return function (container, definition, id, definitions) {
+        loader("filter", function (resolve, reject, module, object, builder, definition) {
+            return resolveArguments(builder, definition).then(function (args) {
+                var result = module.apply(object, args);
+                builder.use(result);
+                resolve(result);
+            });
+        })(container, definition, id, definitions);
+    };
+};//# sourceURL=https://unpkg.com/@gardenhq/willow@5.0.1/filters/filter.js
+    }
+),
+
+r(
+    "https://unpkg.com/@gardenhq/willow@5.0.1/filters/imports.js",
+    function(module, exports, require, __filename, __dirname, process)
+    {
+        "use strict";
+
+var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
+
+module.exports = function ($require, key) {
     key = key || "imports";
     var resourceKey = "resource";
     var versionKey = "version";
-    return function importer(container, definition, id, definitions)
-    {
-        if(id == key) {
-            return Promise.all(
-                definition.map(
-                    function(item)
-                    {
-                        var path = item;
-                        if(typeof path != "string") {
-                            path = item[resourceKey]
-                        }
-                        return $require(path, item[versionKey]);
-                    }
-                )
-            ).then(
-                function(imports)
-                {
-                    var promises = imports.map(
-                        function(config)
-                        {
-                            // is callable?
-                            if(typeof config === "function") {
-                                config = config(container);
-                            }
-                            if(typeof config !== "object") {
-                                throw new Error("That import doesn't return/resolve to an object");
-                            }
-                            Object.keys(config).forEach(
-                                function(id)
-                                {
-                                    if(id != key) {
-                                        if(typeof definitions[id] === "undefined" || definitions[id].constructor == Object) {
-                                            definitions[id] = Object.assign(
-                                                config[id],
-                                                definitions[id]
-                                            );
-                                        }   
-                                    }
-                                }
-                            );
-                            if(typeof config[key] !== "undefined" ) {
-                                return importer(container, config[key], key, definitions);
-                            } else {
-                                return definitions;
-                            }
-                        }
-                    );
-                    return Promise.all(
-                        promises
-                    ).then(
-                        function(d)
-                        {
-                            return d[0];
-                        }
-                    )
+    return function importer(container, definition, id, definitions) {
+        if (id == key) {
+            return Promise.all(definition.map(function (item) {
+                var path = item;
+                if (typeof path != "string") {
+                    path = item[resourceKey];
                 }
-            );
+                if (item[versionKey] != null) {
+                    path += "#@" + item[versionKey];
+                }
+                return $require(path);
+            })).then(function (imports) {
+                var promises = imports.map(function (config) {
+                    // is callable?
+                    if (typeof config === "function") {
+                        config = config(container);
+                    }
+                    if ((typeof config === "undefined" ? "undefined" : _typeof(config)) !== "object") {
+                        throw new Error("That import doesn't return/resolve to an object");
+                    }
+                    Object.keys(config).forEach(function (id) {
+                        if (id != key) {
+                            if (typeof definitions[id] === "undefined" || definitions[id].constructor == Object) {
+                                if (config[id] == null || config[id].constructor !== Object) {
+                                    definitions[id] = config[id];
+                                } else {
+                                    definitions[id] = Object.assign(config[id], definitions[id]);
+                                }
+                            }
+                        }
+                    });
+                    if (typeof config[key] !== "undefined") {
+                        return importer(container, config[key], key, definitions);
+                    } else {
+                        return definitions;
+                    }
+                });
+                return Promise.all(promises).then(function (d) {
+                    return d[0];
+                });
+            });
         } else {
             return Promise.resolve(definitions);
         }
-    }
-        
-}
-
+    };
+};//# sourceURL=https://unpkg.com/@gardenhq/willow@5.0.1/filters/imports.js
     }
 ),
 
 r(
-    "/node_modules/@gardenhq/willow/filters/index.js",
+    "https://unpkg.com/@gardenhq/willow@5.0.1/filters/index.js",
     function(module, exports, require, __filename, __dirname, process)
     {
-        module.exports = function(container)
-{ 
+        "use strict";
+
+module.exports = function (container) {
     var root = "willow";
     var servicePrefix = "@";
     var tagPrefix = "#";
@@ -1123,280 +667,359 @@ r(
 
     var System_import = container.get(root + ".system.import");
     var System_registerDynamic = container.get(root + ".system.registerDynamic");
-    return Promise.all(
-        [
-            "/util/loader.js",
-            "/util/walkPath.js",
-            "/util/resolveIdentifier.js",
-            "/util/traverse.js",
-            "/util/resolver.js",
-            "/util/splitIdentifier.js",
-            "/util/findIdentifier.js",
-            "/util/weblikeJavascriptlessImport.js",
+    return Promise.all(["/util/loader.js", "/util/walkPath.js", "/util/resolveIdentifier.js", "/util/traverse.js", "/util/resolver.js", "/util/splitIdentifier.js", "/util/findIdentifier.js", "/util/weblikeJavascriptlessImport.js", "/imports.js", "/callable.js", "/filter.js"].map(function (item) {
+        return __dirname + item;
+    }).map(function (item) {
+        return System_import(item);
+    })).then(function (modules) {
 
-            "/imports.js",
-            "/callable.js",
-            "/filter.js"
-        ].map(
-            function(item)
-            {
-                return __dirname + item;
-            }
-        ).map(function(item){ return System_import(item) })
-    ).then(
-        function(modules)
-        {
+        var loader = modules[0];
+        var walkPath = modules[1];
+        var createResolveIdentifier = modules[2];
+        var traverse = modules[3];
+        var createResolver = modules[4];
+        var splitIdentifier = modules[5](identifierSplitter);
+        var findIdentifier = modules[6](servicePrefix);
+        var weblikeJavascriptlessImport = modules[7](System_import);
 
-            var loader = modules[0];
-            var walkPath = modules[1];
-            var createResolveIdentifier = modules[2];
-            var traverse = modules[3];
-            var createResolver = modules[4];
-            var splitIdentifier = modules[5](identifierSplitter);
-            var findIdentifier = modules[6](servicePrefix);
-            var weblikeJavascriptlessImport = modules[7](System_import);
+        var importer = modules[8];
+        var callabled = modules[9];
+        var filtered = modules[10];
 
-            var importer = modules[8];
-            var callabled = modules[9];
-            var filtered = modules[10];
+        var loadAndEval = loader(weblikeJavascriptlessImport, System_registerDynamic, walkPath, splitIdentifier, findIdentifier);
+        var resolveIdentifier = createResolveIdentifier(walkPath, servicePrefix, tagPrefix, splitIdentifier);
+        var resolver = createResolver(resolveIdentifier, traverse);
+        var resolveArguments = resolver("arguments");
 
+        var importable = importer(weblikeJavascriptlessImport);
+        var callable = callabled(loadAndEval, resolveArguments);
+        var filterable = filtered(loadAndEval, resolveArguments);
 
-            var loadAndEval = loader(
-                weblikeJavascriptlessImport,
-                System_registerDynamic,
-                walkPath,
-                splitIdentifier,
-                findIdentifier
-            );
-            var resolveIdentifier = createResolveIdentifier(
-                walkPath,
-                servicePrefix,
-                tagPrefix,
-                splitIdentifier
-            );
-            var resolver = createResolver(resolveIdentifier, traverse);
-            var resolveArguments = resolver("arguments");
+        container.set(root + ".loadAndEval", function () {
+            return loadAndEval;
+        });
+        container.set(root + ".require", function () {
+            return System_import;
+        });
+        container.set(root + ".walkPath", function () {
+            return walkPath;
+        });
+        container.set(root + ".resolveIdentifier", function () {
+            return resolveIdentifier;
+        });
+        container.set(root + ".resolver", function () {
+            return resolver;
+        });
+        container.set(root + ".traverse", function () {
+            return traverse;
+        });
+        container.set(root + ".resolve.arguments", function () {
+            return resolveArguments;
+        });
+        container.set(root + ".filter.callable", function () {
+            return callable;
+        });
 
-            var importable = importer(weblikeJavascriptlessImport);
-            var callable = callabled(loadAndEval, resolveArguments);
-            var filterable = filtered(loadAndEval, resolveArguments);
-
-            container.set(
-                root + ".loadAndEval",
-                function()
-                {
-                    return loadAndEval;
-                }
-            );
-            container.set(
-                root + ".require",
-                function()
-                {
-                    return System_import;
-                }
-            );
-            container.set(
-                root + ".walkPath",
-                function()
-                {
-                    return walkPath;
-                }
-            );
-            container.set(
-                root + ".resolveIdentifier",
-                function()
-                {
-                    return resolveIdentifier
-                }
-            );
-            container.set(
-                root + ".resolver",
-                function()
-                {
-                    return resolver;
-                }
-            );
-            container.set(
-                root + ".traverse",
-                function()
-                {
-                    return traverse;
-                }
-            );
-            container.set(
-                root + ".resolve.arguments",
-                function()
-                {
-                    return resolveArguments;
-                }
-            );
-            container.set(
-                root + ".filter.callable",
-                function()
-                {
-                    return callable;
-                }
-            );
-            
-            return function(container, definition, id, definitions)
-            {
-                var args = arguments;
-                return importable.apply(null, arguments).then(
-                    function(defs)
-                    {
-                        definitions = defs || definitions;
-                        callable(container, definitions[id], id, definitions);
-                        filterable(container, definitions[id], id, definitions);
-                        return definitions;
-                    }
-                );
-            }
-        }
-    );
-}
-
+        return function (container, definition, id, definitions) {
+            var args = arguments;
+            return importable.apply(null, arguments).then(function (defs) {
+                definitions = defs || definitions;
+                callable(container, definitions[id], id, definitions);
+                filterable(container, definitions[id], id, definitions);
+                return definitions;
+            });
+        };
+    });
+};//# sourceURL=https://unpkg.com/@gardenhq/willow@5.0.1/filters/index.js
     }
 ),
 
 r(
-    "/node_modules/@gardenhq/willow/filters/util/findIdentifier.js",
+    "https://unpkg.com/@gardenhq/willow@5.0.1/filters/iterator.js",
     function(module, exports, require, __filename, __dirname, process)
     {
-        module.exports = function(servicePrefix)
-{
-    servicePrefix = servicePrefix || "@";
-    return function(identifier)
+        "use strict";
+
+module.exports = function (resolveArguments, key) {
+    key = key || "iterator";
+    return function iterator(container, definition, id, definitions) {
+        if (typeof definition[key] !== "undefined") {
+            container.set(id, function () {
+                return resolveArguments(container, definition).then(function (args) {
+                    return container.get(definition[key].substr(1)).then(function (iterator) {
+                        var iterable = args[0];
+                        // var res = args[0].map(
+                        //  function(items, i, arr)
+                        //  {
+                        //      return Object.keys(items).map(
+                        //          function(key, i, arr)
+                        //          {
+                        //              return iterator(items[key], key);
+                        //          }
+                        //      );
+                        //  }
+                        // )
+                        var res = Object.keys(iterable).map(function (key, i, arr) {
+                            return iterator(iterable[key], key);
+                        });
+                        //the function is returned and therefore can be called and called etc etc
+                        // why?
+                        return res;
+                        return function () {
+                            return res;
+                        };
+                    });
+                });
+            });
+        }
+    };
+};//# sourceURL=https://unpkg.com/@gardenhq/willow@5.0.1/filters/iterator.js
+    }
+),
+
+r(
+    "https://unpkg.com/@gardenhq/willow@5.0.1/filters/object.js",
+    function(module, exports, require, __filename, __dirname, process)
     {
+        "use strict";
+
+module.exports = function (loader) {
+    return loader("object", function (resolve, reject, module, object, container, definition) {
+        resolve(module);
+    });
+};//# sourceURL=https://unpkg.com/@gardenhq/willow@5.0.1/filters/object.js
+    }
+),
+
+r(
+    "https://unpkg.com/@gardenhq/willow@5.0.1/filters/resolve.js",
+    function(module, exports, require, __filename, __dirname, process)
+    {
+        "use strict";
+
+module.exports = function (resolveResolve, key, serviceKey, servicePrefix) {
+    key = key || "resolve";
+    serviceKey = serviceKey || "service";
+    servicePrefix = servicePrefix || "@";
+
+    return function (container, definition, id, definitions) {
+        if (definition[key] == null) {
+            return;
+        }
+        var service = definition[serviceKey];
+        var newService = function newService() {
+            var container = this;
+            var keys = definition[key].filter(function (item, i, arr) {
+                return item.indexOf(servicePrefix) === 0;
+            });
+            return resolveResolve(container, definition).then(function (result) {
+                var get = container.get.bind(container);
+                // const getTagged = container.getTagged.bind(container);
+                keys = keys.map(function (item, i, arr) {
+                    if (!container.has(item)) {
+                        container.set(item, function (container) {
+                            return result[i];
+                        });
+                    }
+                    return item.substr(servicePrefix.length);
+                });
+
+                // hackity hack, look at a better proxy?
+                // and use Symbols instead of servicePrefix?
+                // also needs to work for getTagged
+                container.get = function (key) {
+                    if (keys.indexOf(key) !== -1) {
+                        key = servicePrefix + key;
+                    }
+                    return get(key);
+                };
+                return new Promise(function (resolve, reject) {
+                    //if(typeof service == "function") {
+                    try {
+                        resolve(service.apply(container, keys.map(function (item) {
+                            return container.get(item);
+                        })));
+                    } catch (e) {
+                        reject(e);
+                    }
+                    //} else {
+                    //  resolve();
+                    //}
+                });
+            });
+        };
+        definition[serviceKey] = null;
+        container.set(id, newService);
+    };
+};//# sourceURL=https://unpkg.com/@gardenhq/willow@5.0.1/filters/resolve.js
+    }
+),
+
+r(
+    "https://unpkg.com/@gardenhq/willow@5.0.1/filters/service.js",
+    function(module, exports, require, __filename, __dirname, process)
+    {
+        "use strict";
+
+module.exports = function (key) {
+    key = key || "service";
+    return function service(container, definition, id, definitions) {
+        if (typeof definition[key] !== "undefined") {
+            container.set(id, definition[key]);
+        }
+    };
+};//# sourceURL=https://unpkg.com/@gardenhq/willow@5.0.1/filters/service.js
+    }
+),
+
+r(
+    "https://unpkg.com/@gardenhq/willow@5.0.1/filters/tags.js",
+    function(module, exports, require, __filename, __dirname, process)
+    {
+        "use strict";
+
+module.exports = function (key) {
+    key = key || "tags";
+    return function tags(builder, definition, id, definitions) {
+        (definition[key] || []).forEach(function (item, i, arr) {
+            var tag = item;
+            var meta = {};
+            if (typeof tag !== "string") {
+                tag = item.name;
+                meta = item;
+            }
+            builder.tag(id, tag, meta);
+        });
+    };
+};//# sourceURL=https://unpkg.com/@gardenhq/willow@5.0.1/filters/tags.js
+    }
+),
+
+r(
+    "https://unpkg.com/@gardenhq/willow@5.0.1/filters/util/findIdentifier.js",
+    function(module, exports, require, __filename, __dirname, process)
+    {
+        "use strict";
+
+module.exports = function (servicePrefix) {
+    servicePrefix = servicePrefix || "@";
+    return function (identifier) {
         // npm has introduced '@orgs' with an at sign
         // Assume orgs will always have at least 1 folder in them as an @org on its own
         // wouldn't make sense
         var isIdentifier = identifier.file.indexOf("/") == -1 && identifier.file.indexOf(servicePrefix) === 0;
-        if(isIdentifier) {
+        if (isIdentifier) {
             return identifier.file.substr(1);
         }
         return false;
-    }
-}
-
+    };
+};//# sourceURL=https://unpkg.com/@gardenhq/willow@5.0.1/filters/util/findIdentifier.js
     }
 ),
 
 r(
-    "/node_modules/@gardenhq/willow/filters/util/loader.js",
+    "https://unpkg.com/@gardenhq/willow@5.0.1/filters/util/loader.js",
     function(module, exports, require, __filename, __dirname, process)
     {
-        module.exports = function(require, register, walkPath, splitIdentifier, findIdentifier)
-{
+        "use strict";
+
+module.exports = function (require, register, walkPath, splitIdentifier, findIdentifier) {
     var requiresKey = "requires";
     var bundleKey = "bundle";
     var versionKey = "version";
-    return function(key, cb)
-    {
-        if(require == null) {
-            return function(){}
+    var ignoreRequireKey = "ignore-require"; // getting too much split out, "headers" again
+    return function (key, cb) {
+        if (require == null) {
+            return function () {};
         }
-        return function(builder, definition, id, definitions)
-        {
+        return function (builder, definition, id, definitions) {
             // i have the builder here, so do I need to pass in
             // require and register??
             //console.log(builder.get("*.system.import"));
-            if(definition[key] == null) {
+            if (definition[key] == null) {
                 return;
             }
-            const service = function()
-            {
+            var service = function service() {
                 var container = this;
-                return new Promise(
-                    function(resolve, reject)
-                    {
-                        // don't ever do this twice
-                        var loaded;
-                        var identifier = splitIdentifier(definition[key]);
-                        var serviceIdentifier = findIdentifier(identifier);
-                        if(serviceIdentifier) {
-                            loaded = container.get(serviceIdentifier);
-                            if(!(loaded instanceof Promise)) {
-                                loaded = Promise.resolve(loaded);   
-                            }
-                        } else {
-                            if(definition[bundleKey] === false) {
-                                var temp = identifier.file.split("#");
-                                var headers = {
-                                    "Cache-Control": "private"
-                                };
-                                if(temp[1]) {
-                                    headers["Content-Type"] = temp[1];
-                                }
-                                identifier.file = temp[0] + "#" + JSON.stringify({"Cache-Control": "private"});
-
-                            }
-                            // inject something here?
-                            // "requires": [{"hyper": @overwrite:./overwrite.js}]
-                            var requires = definition[requiresKey] || [];
-                            loaded = Promise.all(
-                                requires.map(
-                                    function(item)
-                                    {
-                                        return container.get("require." + item)
-                                    }
-                                )
-                            ).then(
-                                function(modules)
-                                {
-                                    requires.forEach(
-                                        function(item, i, arr)
-                                        {
-                                            register(
-                                                item,
-                                                [],
-                                                true,
-                                                function(module)
-                                                {
-                                                    return modules[i]
-                                                }
-                                            );
-                                        }
-                                    );
-                                    return require(
-                                        identifier.file,
-                                        definition[versionKey]
-                                    )
-                                }
-                            );
+                return new Promise(function (resolve, reject) {
+                    // don't ever do this twice
+                    var loaded;
+                    var identifier = splitIdentifier(definition[key]);
+                    var serviceIdentifier = findIdentifier(identifier);
+                    if (serviceIdentifier) {
+                        loaded = container.get(serviceIdentifier);
+                        if (!(loaded instanceof Promise)) {
+                            loaded = Promise.resolve(loaded);
                         }
-                        //
-                        loaded.then(
-                            function(module)
-                            {
-                                var object;
-                                if(identifier.path != null) {
-                                    object = module;
-                                    module = walkPath(identifier.path, module);
-                                }
-                                return cb(resolve, reject, module, object, builder, definition);
-                            }
-                        ).catch(
-                            function(e)
-                            {
-                                reject(e);
-                            }
-                        );
+                    } else {
+                        var headers = {};
+                        var temp = identifier.file.split("#");
+                        if (temp[1]) {
+                            headers["Content-Type"] = temp[1];
+                        }
+                        if (definition[bundleKey] === false) {
+                            headers['Cache-Control'] = "private";
+                        }
+                        if (definition[ignoreRequireKey] === true) {
+                            headers["Content-Type"] = "application/javascript+bundle";
+                        }
+                        if (definition[versionKey] != null) {
+                            headers["X-Content-Version"] = definition[versionKey];
+                        }
+                        if (Object.keys(headers).length > 0) {
+                            identifier.file = temp[0] + "#" + JSON.stringify(headers);
+                        }
+                        var requires = definition[requiresKey] || [];
+                        // TODO: deprecate this
+                        if (Array.isArray(requires)) {
+                            var obj = {};
+                            requires.map(function () {
+                                obj[item] = "@require." + item;
+                            });
+                            requires = obj;
+                        }
+                        var keys = Object.keys(requires);
+                        loaded = Promise.all(keys.map(function (item) {
+                            // TODO: check for other things not just @service.id
+                            return container.get(requires[item].substr(1));
+                        })).then(function (modules) {
+                            keys.forEach(function (item, i, arr) {
+                                register(item, [], true, function (module, exports, require, __filename, __dirname) {
+                                    module.exports = modules[i];
+                                });
+                            });
+                            return modules;
+                        }).then(function (modules) {
+                            return require(identifier.file);
+                        });
                     }
-                );
-            }
+                    //
+                    loaded.then(function (module) {
+                        var object;
+                        if (identifier.path != null) {
+                            object = module;
+                            module = walkPath(identifier.path, module);
+                        }
+                        return cb(resolve, reject, module, object, builder, definition);
+                    }).catch(function (e) {
+                        reject(e);
+                    });
+                });
+            };
             builder.set(id, service);
-        }
-    }
-};
-
+        };
+    };
+};//# sourceURL=https://unpkg.com/@gardenhq/willow@5.0.1/filters/util/loader.js
     }
 ),
 
 r(
-    "/node_modules/@gardenhq/willow/filters/util/resolveIdentifier.js",
+    "https://unpkg.com/@gardenhq/willow@5.0.1/filters/util/resolveIdentifier.js",
     function(module, exports, require, __filename, __dirname, process)
     {
-        /**
+        'use strict';
+
+/**
  * Shell variable substitution code taken from 'somewhere'?
  *
  * Not sure who :(
@@ -1405,242 +1028,240 @@ r(
  */
 
 function substiteVariable(variable, options, cb) {
-        var value;
-        var err = null;
-        var s = variable.split(':', 2);
-        if (s.length == 2) {
-            value = options.env[s[0]];
-            if (typeof value == 'function') {
-                value = value();
-            }
-            if (s[1][0] == '+') { // Substitute replacement, but only if variable is defined and nonempty. Otherwise, substitute nothing
-                value = value ? s[1].substring(1) : '';
-            } else if (s[1][0] == '-') { // Substitute the value of variable, but if that is empty or undefined, use default instead
-                value = value || s[1].substring(1);
-            } else if (s[1][0] == '#') { // Substitute with the length of the value of the variable
-                value = value !== undefined ? String(value).length : 0;
-            } else if (s[1][0] == '=') { // Substitute the value of variable, but if that is empty or undefined, use default instead and set the variable to default
-                if (!value) {
-                    value = s[1].substring(1);
-                    options.env[s[0]] = value;
-                }
-            } else if (s[1][0] == '?') { // If variable is defined and not empty, substitute its value. Otherwise, print message as an error message.
-                if (!value) {
-                    if (s[1].length > 1) {
-                        throw new Error();
-                        // return cb(s[0] + ': ' + s[1].substring(1));
-                    } else {
-                        throw new Error();
-                        // return cb(s[0] + ': parameter null or not set');
-                    }
-                }
-            }
-        } else {
-            value = options.env[variable];
-            if (typeof value == 'function') {
-                value = value();
-            }
+    var value;
+    var err = null;
+    var s = variable.split(':', 2);
+    if (s.length == 2) {
+        value = options.env[s[0]];
+        if (typeof value == 'function') {
+            value = value();
         }
-    return value;
-    }
-function substiteVariablesInternal(str, position, result, options, cb) {
-        if (position == -1 || !str) {
-            return result;
-
-        } else {
-            var index = str.indexOf('$', position);
-
-            if (index == -1) { // no $
-                result += str.substring(position);
-                position = -1;
-                return result;
-
-            } else { // $ found
-                var variable;
-                var endIndex;
-                result += str.substring(position, index);
-
-                if (str.charAt(index+1) == '{') { // ${VAR}
-                    endIndex = str.indexOf('}', index);
-                    if (endIndex == -1) { // '}' not found
-                        if (options.ignoreErrors) {
-                            variable = str.substring(index+2);
-                        } else {
-                            throw new Error();
-                        }
-                    } else { // '}' found
-                        variable = str.substring(index+2, endIndex);
-                        endIndex++;
-                    }
-                    if (!variable) {
-                        result += '${}';
-                    }
-                } else { // $VAR
-                    index++; // skip $
-                    endIndex = -1;
-                    // special single char vars
-                    if (options.specialVars && options.specialVars.indexOf(str[index]) != -1) {
-                        variable = str[index];
-                        endIndex = index + 1;
-                    } else {
-                        // search for var end
-                        for (var i = index, len = str.length; i < len; i++) {
-                            var code = str.charCodeAt(i);
-                            if (!(code > 47 && code < 58) &&  // numeric
-                                !(code > 64 && code < 91) &&  // upper alpha
-                                (code !== 95) &&              // underscore
-                                !(code > 96 && code < 123)) { // lower alpha
-                                endIndex = i;
-                                break;
-                            }
-                        }
-
-                        if (endIndex == -1) { // delimeter not found
-                            variable = str.substring(index);
-                        } else { // delimeted found
-                            variable = str.substring(index, endIndex);
-                        }
-                    }
-                    if (!variable) {
-                        result += '$';
-                    }
-                }
-                position = endIndex;
-                if (! variable) {
-                    return substiteVariablesInternal(str, position, result, options, cb);
+        if (s[1][0] == '+') {
+            // Substitute replacement, but only if variable is defined and nonempty. Otherwise, substitute nothing
+            value = value ? s[1].substring(1) : '';
+        } else if (s[1][0] == '-') {
+            // Substitute the value of variable, but if that is empty or undefined, use default instead
+            value = value || s[1].substring(1);
+        } else if (s[1][0] == '#') {
+            // Substitute with the length of the value of the variable
+            value = value !== undefined ? String(value).length : 0;
+        } else if (s[1][0] == '=') {
+            // Substitute the value of variable, but if that is empty or undefined, use default instead and set the variable to default
+            if (!value) {
+                value = s[1].substring(1);
+                options.env[s[0]] = value;
+            }
+        } else if (s[1][0] == '?') {
+            // If variable is defined and not empty, substitute its value. Otherwise, print message as an error message.
+            if (!value) {
+                if (s[1].length > 1) {
+                    throw new Error();
+                    // return cb(s[0] + ': ' + s[1].substring(1));
                 } else {
-                    return substiteVariable(variable, options,  function callback(err, value) {
-                        if (err && !options.ignoreErrors) {
-                            return cb(err);
-                        }
-                        if (value !== null && value !== undefined) {
-                            result += String(value);
-                        }
-                        substiteVariablesInternal(str, position, result, options, cb);
-                    });
+                    throw new Error();
+                    // return cb(s[0] + ': parameter null or not set');
                 }
             }
         }
+    } else {
+        value = options.env[variable];
+        if (typeof value == 'function') {
+            value = value();
+        }
     }
-module.exports = function(walkPath, servicePrefix, tagPrefix, splitIdentifier)
-{
-    const varPrefix = "$";
-    return function(item, container)
-    {
-        if(typeof item !== "string") {
+    return value;
+}
+function substiteVariablesInternal(str, position, result, options, cb) {
+    if (position == -1 || !str) {
+        return result;
+    } else {
+        var index = str.indexOf('$', position);
+
+        if (index == -1) {
+            // no $
+            result += str.substring(position);
+            position = -1;
+            return result;
+        } else {
+            // $ found
+            var variable;
+            var endIndex;
+            result += str.substring(position, index);
+
+            if (str.charAt(index + 1) == '{') {
+                // ${VAR}
+                endIndex = str.indexOf('}', index);
+                if (endIndex == -1) {
+                    // '}' not found
+                    if (options.ignoreErrors) {
+                        variable = str.substring(index + 2);
+                    } else {
+                        throw new Error();
+                    }
+                } else {
+                    // '}' found
+                    variable = str.substring(index + 2, endIndex);
+                    endIndex++;
+                }
+                if (!variable) {
+                    result += '${}';
+                }
+            } else {
+                // $VAR
+                index++; // skip $
+                endIndex = -1;
+                // special single char vars
+                if (options.specialVars && options.specialVars.indexOf(str[index]) != -1) {
+                    variable = str[index];
+                    endIndex = index + 1;
+                } else {
+                    // search for var end
+                    for (var i = index, len = str.length; i < len; i++) {
+                        var code = str.charCodeAt(i);
+                        if (!(code > 47 && code < 58) && // numeric
+                        !(code > 64 && code < 91) && // upper alpha
+                        code !== 95 && // underscore
+                        !(code > 96 && code < 123)) {
+                            // lower alpha
+                            endIndex = i;
+                            break;
+                        }
+                    }
+
+                    if (endIndex == -1) {
+                        // delimeter not found
+                        variable = str.substring(index);
+                    } else {
+                        // delimeted found
+                        variable = str.substring(index, endIndex);
+                    }
+                }
+                if (!variable) {
+                    result += '$';
+                }
+            }
+            position = endIndex;
+            if (!variable) {
+                return substiteVariablesInternal(str, position, result, options, cb);
+            } else {
+                return substiteVariable(variable, options, function callback(err, value) {
+                    if (err && !options.ignoreErrors) {
+                        return cb(err);
+                    }
+                    if (value !== null && value !== undefined) {
+                        result += String(value);
+                    }
+                    substiteVariablesInternal(str, position, result, options, cb);
+                });
+            }
+        }
+    }
+}
+module.exports = function (walkPath, servicePrefix, tagPrefix, splitIdentifier) {
+    var varPrefix = "$";
+    var argPrefix = "--";
+    return function (item, container) {
+        if (typeof item !== "string") {
             return item;
         }
-        if(item.indexOf(servicePrefix) === 0) {
-            const service = container.get(item.substr(servicePrefix.length));
-            const identifier = splitIdentifier(item);
-            if(identifier.path) {
+        if (item.indexOf(servicePrefix) === 0) {
+            var service = container.get(item.substr(servicePrefix.length));
+            var identifier = splitIdentifier(item);
+            if (identifier.path) {
                 return walkPath(identifier.path, service);
             }
             return service;
-        } else if(item.indexOf(tagPrefix) === 0) {
-            const tagged = container.getTagged(item.substr(tagPrefix.length));
-            if(tagged.length === 0) {
+        } else if (item.indexOf(tagPrefix) === 0) {
+            var tagged = container.getTagged(item.substr(tagPrefix.length));
+            if (tagged.length === 0) {
                 return Promise.resolve([]);
             }
-            const promises = [];
-            const keys = Object.keys(
-                tagged
-            );
-            keys.forEach(
-                function(item, i, arr)
-                {
-                    promises.push(tagged[item]);
+            var promises = [];
+            var keys = Object.keys(tagged);
+            keys.forEach(function (item, i, arr) {
+                promises.push(tagged[item]);
+            });
+            return Promise.all(promises).then(function (services) {
+                var obj = {};
+                // TODO: do this better, maybe after with Array.toArray()
+                if (keys[0] == 0) {
+                    obj = [];
                 }
-            );
-            return Promise.all(
-                promises
-            ).then(
-                function(services)
-                {
-                    var obj = {};
-                    // do this better, maybe after with Array.toArray()
-                    if(keys[0] == 0) {
-                        obj = [];
-                    }
-                    services.forEach(
-                        function(item, i, arr)
-                        {
-                            obj[keys[i]] = item;
-                        }
-                    );
-                    return obj;
-                }
-            );
-        } else if(item.indexOf(varPrefix) === 0) {
+                services.forEach(function (item, i, arr) {
+                    obj[keys[i]] = item;
+                });
+                return obj;
+            });
+        } else if (item.indexOf(varPrefix) === 0) {
             return substiteVariablesInternal(item, "", 0, process);
+        } else if (item.indexOf(argPrefix) === 0) {
+            var value;
+            // TODO: This should only be done once not everytime I encounter a --
+            // TODO: equivalent of args for the web are request vars, or hash, probably hash ?
+            process.argv.forEach(function (arg, i, arr) {
+                var temp = arg.split("=");
+                if (temp[0] === item) {
+                    var next = arr[i + 1] || "-";
+                    if (temp.length === 1 && next.indexOf("-") !== 0) {
+                        value = next;
+                    } else {
+                        value = temp[1] || true;
+                    }
+                }
+            });
+            return value;
         } else {
             return item;
         }
-    }
-};
-
+    };
+};//# sourceURL=https://unpkg.com/@gardenhq/willow@5.0.1/filters/util/resolveIdentifier.js
     }
 ),
 
 r(
-    "/node_modules/@gardenhq/willow/filters/util/resolver.js",
+    "https://unpkg.com/@gardenhq/willow@5.0.1/filters/util/resolver.js",
     function(module, exports, require, __filename, __dirname, process)
     {
-        module.exports = function(resolveIdentifier, traverse)
-{
-    return function(key)
-    {
+        "use strict";
+
+module.exports = function (resolveIdentifier, traverse) {
+    return function (key) {
         key = key || "arguments";
-        return function(container, definition)
-        {
-            if(definition[key] == null) {
+        return function (container, definition) {
+            if (definition[key] == null) {
                 return Promise.resolve();
             }
-            const promises = [];
-            traverse(
-                definition[key],
-                function(item, i, obj)
-                {
-                    promises.push(resolveIdentifier(item, container));
-                    return promises.length - 1;
-                }
-            );
-            return Promise.all(
-                promises
-            ).then(
-                function(results)
-                {
-                    traverse(
-                        definition[key],
-                        function(item, i, obj)
-                        {
-                            return results[item];
-                        }
-                    );
-                    return definition[key];
-                }
-            );
-        }
+            var promises = [];
+            traverse(definition[key], function (item, i, obj) {
+                promises.push(resolveIdentifier(item, container));
+                return promises.length - 1;
+            });
+            return Promise.all(promises).then(function (results) {
+                traverse(definition[key], function (item, i, obj) {
+                    return results[item];
+                });
+                return definition[key];
+            });
+        };
     };
-};
-
+};//# sourceURL=https://unpkg.com/@gardenhq/willow@5.0.1/filters/util/resolver.js
     }
 ),
 
 r(
-    "/node_modules/@gardenhq/willow/filters/util/splitIdentifier.js",
+    "https://unpkg.com/@gardenhq/willow@5.0.1/filters/util/splitIdentifier.js",
     function(module, exports, require, __filename, __dirname, process)
     {
-        module.exports = function(separator)
-{
+        "use strict";
+
+module.exports = function (separator) {
     separator = separator || ":";
-    return function(identifier)
-    {
+    return function (identifier) {
         var pos = identifier.lastIndexOf(separator);
         var protocol = identifier.indexOf("://");
-        if(pos !== -1) {
+        if (pos !== -1) {
             var temp = identifier.split(separator);
-            if(protocol !== -1) {
+            if (protocol !== -1) {
                 return {
                     file: temp[0] + ":" + temp[1],
                     path: temp[2]
@@ -1650,215 +1271,148 @@ r(
                 file: temp[0],
                 path: temp[1]
             };
-        } else  {
+        } else {
             return {
                 file: identifier,
                 path: null
-            }
+            };
         }
-    }
-}
-
+    };
+};//# sourceURL=https://unpkg.com/@gardenhq/willow@5.0.1/filters/util/splitIdentifier.js
     }
 ),
 
 r(
-    "/node_modules/@gardenhq/willow/filters/util/traverse.js",
+    "https://unpkg.com/@gardenhq/willow@5.0.1/filters/util/traverse.js",
     function(module, exports, require, __filename, __dirname, process)
     {
-        module.exports = function traverse(obj, callback, trail)
-{
-    trail = trail || []
+        "use strict";
 
-    Object.keys(obj).forEach(
-        function (key)
-        {
-            var value = obj[key]
+module.exports = function traverse(obj, callback, trail) {
+    trail = trail || [];
 
-            if (value != null && Object.getPrototypeOf(value) === Object.prototype) {
-                traverse(value, callback, trail.concat(key))
-            } else {
-                obj[key] = callback.call(obj, value, key, trail)
-            }
+    Object.keys(obj).forEach(function (key) {
+        var value = obj[key];
+
+        if (value != null && Object.getPrototypeOf(value) === Object.prototype) {
+            traverse(value, callback, trail.concat(key));
+        } else {
+            obj[key] = callback.call(obj, value, key, trail);
         }
-    )
-}
-
-
+    });
+};//# sourceURL=https://unpkg.com/@gardenhq/willow@5.0.1/filters/util/traverse.js
     }
 ),
 
 r(
-    "/node_modules/@gardenhq/willow/filters/util/walkPath.js",
+    "https://unpkg.com/@gardenhq/willow@5.0.1/filters/util/walkPath.js",
     function(module, exports, require, __filename, __dirname, process)
     {
-        module.exports = function(key, value)
-{
-    return key.split(".").reduce(
-        function(previous, item, i, arr)
-        {
-            return previous[item];
-        },
-        value
-    );
-}
+        "use strict";
 
-
+module.exports = function (key, value) {
+    return key.split(".").reduce(function (previous, item, i, arr) {
+        return previous[item];
+    }, value);
+};//# sourceURL=https://unpkg.com/@gardenhq/willow@5.0.1/filters/util/walkPath.js
     }
 ),
 
 r(
-    "/node_modules/@gardenhq/willow/filters/util/weblikeJavascriptlessImport.js",
+    "https://unpkg.com/@gardenhq/willow@5.0.1/filters/util/weblikeJavascriptlessImport.js",
     function(module, exports, require, __filename, __dirname, process)
     {
-        module.exports = function($require)
-{
-    return function(path)
-    {
+        "use strict";
+
+module.exports = function ($require) {
+    return function (path) {
         // ends in a slash, just force index.js
-        if(path[path.length - 1] === "/") {
+        var temp = path.split("#");
+        path = temp[0];
+        var hash = temp[1] == null ? "" : "#" + temp[1];
+        if (path[path.length - 1] === "/") {
             path = path + "index.js";
         } else {
             var temp = path.split("/");
             // length is 1 so its a simple nodejs module "something"
             var len = 1;
-            if(path.indexOf("@") === 0) {
+            if (path.indexOf("@") === 0) {
                 // starts with a @ and length is 2 its an org nodejs module "@somewhere/something"
                 len = 2;
             }
-            if(temp.length > len) {
+            if (temp.length > len) {
                 var last = temp.pop();
-                if(last.indexOf(".") === -1) {
+                if (last.indexOf(".") === -1) {
                     path = path + ".js";
                 }
             }
         }
-        return $require.apply(null, arguments);
-    }
-}
-
+        var args = [].slice.call(arguments);
+        args[0] = path + hash;
+        return $require.apply(null, args);
+    };
+};//# sourceURL=https://unpkg.com/@gardenhq/willow@5.0.1/filters/util/weblikeJavascriptlessImport.js
     }
 ),
 
 r(
-    "/node_modules/@gardenhq/willow/index.js",
+    "https://unpkg.com/@gardenhq/willow@5.0.1/index.js",
     function(module, exports, require, __filename, __dirname, process)
     {
-        module.exports = function(promisedRequire, register, config, containerlike)
-{
+        "use strict";
+
+module.exports = function (promisedRequire, register, config, containerlike) {
     var name = __dirname;
     // this should be in test
     var id = "willow.";
     config = name + "/conf/javascript.js";
-
-    if(promisedRequire == null) {
+    if (promisedRequire == null) {
         //probably testing
         var $require = require;
         var promised = $require("./util/promised");
         // TODO: This can go for now?
-        promisedRequire = promised(
-            function(path)
-            {
-                return require(path.replace(name, "./"));
-            }
-        );
+        promisedRequire = promised(function (path) {
+            return require(path.replace(name, "./"));
+        });
     }
-    var modules = [
-        "Builder.js",
-        "filters/index.js",
-        "conf/index.js"
-    ];
-    if(containerlike == null) {
+    var modules = ["Builder.js", "filters/index.js", "conf/index.js"];
+    if (containerlike == null) {
         modules.push("Container.js");
     }
-    return Promise.all(
-        modules.map(
-            function(item)
-            {
-                return promisedRequire(name + "/" + item);
-            }
-        )
-    ).then(
-        function(modules)
-        {
-            var container = containerlike == null ? new modules[3]() : containerlike;
-            var builder = new modules[0](
-                container,
-                promisedRequire // for importing
-            );
-            builder.set(
-                id + "system.import",
-                function()
-                {
-                    return promisedRequire;
-                },
-                [
-                    "dom.system.import"
-                ]
-            );
-            builder.set(
-                id + "system.registerDynamic",
-                function()
-                {
-                    return register;
-                }
-            );
-            return modules[1](builder).then(
-                function(filters)
-                {
-                    return builder.use(
-                        filters
-                    ).set(
-                        id + "resolve.resolve",
-                        function()
-                        {
-                            return builder.get(id + "resolver")("resolve");
-                        }
-                    );
-                }
-            ).then(
-                function(builder)
-                {
-                    var filters = modules[2]();
-                    return builder.load(filters).then(
-                        function()
-                        {
-                            return Promise.all(
-                                Object.keys(filters).map(
-                                    function(key, i, arr)
-                                    {
-                                        return builder.get(key);
-                                    }
-                                )
-                            ).then(
-                                function(filters)
-                                {
-                                    return builder;
-                                }
-                            );
-                        }
-                    );
-                }
-            ).then(
-                function(builder)
-                {
-                    return builder.load(config);
-                }
-            ).then(
-                function(builder)
-                {
-                    return Promise.all(builder.getTagged(id + "filter")).then(
-                        function()
-                        {
-                            return builder;
-                        }
-                    );
-                }
-            );
-        }
-    );
-};
-
+    return Promise.all(modules.map(function (item) {
+        return promisedRequire(name + "/" + item);
+    })).then(function (modules) {
+        var container = containerlike == null ? new modules[3]() : containerlike;
+        var builder = new modules[0](container, promisedRequire // for importing
+        );
+        builder.set(id + "system.import", function () {
+            return promisedRequire;
+        }, ["dom.system.import"]);
+        builder.set(id + "system.registerDynamic", function () {
+            return register;
+        });
+        return modules[1](builder).then(function (filters) {
+            return builder.use(filters).set(id + "resolve.resolve", function () {
+                return builder.get(id + "resolver")("resolve");
+            });
+        }).then(function (builder) {
+            var filters = modules[2]();
+            return builder.load(filters).then(function () {
+                return Promise.all(Object.keys(filters).map(function (key, i, arr) {
+                    return builder.get(key);
+                })).then(function (filters) {
+                    return builder;
+                });
+            });
+        }).then(function (builder) {
+            return builder.load(config);
+        }).then(function (builder) {
+            return Promise.all(builder.getTagged(id + "filter")).then(function () {
+                return builder;
+            });
+        });
+    });
+};//# sourceURL=https://unpkg.com/@gardenhq/willow@5.0.1/index.js
     }
 )
             ]
@@ -1870,7 +1424,7 @@ r(
 .then(
                             function()
                             {
-                                System.import("/node_modules/@gardenhq/o/src/b.js").then(
+                                System.import("https://unpkg.com/@gardenhq/o@5.1.0/b.js").then(
                                     function(module)
                                     {
                                         if(typeof module === "function") {
@@ -1897,60 +1451,76 @@ r(
     {
         return function(cb)
         {
-            var normalizeName = function (child, parentBase) {
+            var normalizeName = function (child, parentBase)
+            {
+                var parts = child.split("/").filter(
+                    function(item)
+                    {
+                        return item !== "";
+                    }
+                );
                 if (child[0] === "/") {
-                    child = child.slice(1);
+                    parentBase = [parts.shift()];
                 }
                 if (child[0] !== ".") {
-                    return child;
-                }
-                parentBase = parentBase.filter(function(item){return item != "."});
-                var parts = child.split("/");
-                while (parts[0] === "." || parts[0] === "..") {
-                    if (parts.shift() === "..") {
-                        parentBase.pop();
-                    }
-                }
-                return parentBase.concat(parts).join("/");
+                    parts = ["."].concat(parts);
+                } 
+                return parentBase.concat(parts).reduce(
+                    function(prev, item, i, arr)
+                    {
+                        if(item == "..") {
+                            return prev.slice(0, -1);
+                        }
+                        if(item == ".") {
+                            return prev;
+                        }
+                        return prev.concat(item);
+                    },
+                    []
+                ).join("/")
             }
+
             var getResolve = function(includePath, defaultBase)
             {
                 return function(path, base)
                 {
-                    if(path.indexOf("//") !== -1) {
-                        return path;
-                    }
                     base = base || defaultBase;
+                    var temp = path.split("#");
+                    var hash = temp.length === 2 ? "#" + temp[1] : "";
+                    path = temp[0];
                     var first2Chars = path.substr(0, 2);
                     var firstChar = first2Chars[0];
-                    var temp = path.split("#");
-                    var hash = temp.length == 2 ? "#" + temp[1] : "";
-                    path = temp[0];
                     if(
-                        first2Chars != ".." && first2Chars != "./" && firstChar != "/"
+                        first2Chars != ".." && first2Chars != "./" && firstChar != "/" && path.indexOf("://") === -1
                     ) {
                         if(path.indexOf("/") === -1) {
-                            path +=  "/"
+                            path += "/";
                         }
-                        path = includePath + path;
+                        path = (includePath || "") + path;
                     }
+                    // TODO: this should go?
                     if(path[path.length - 1] === "/") {
                         path += "index";
                     }
-                    path = normalizeName(path, base.split("/").slice(0, -1));
-                    //this should go!!
-                    if(path.indexOf(".") === -1) {
-                        path += ".js";
+                    temp = path.split("/");
+                    var filename = temp[temp.length - 1];
+                    if(filename.indexOf(".") === -1) {
+                        temp[temp.length - 1] += ".js";
                     }
-                    firstChar = path.charAt(0);
-                    if(firstChar != "/") {
+                    if(path.indexOf("://") !== -1) {
+                        return temp.slice(0, 3).join("/") + normalizeName(temp.slice(3).join("/"), [""]) + hash;
+                    }
+                    path = normalizeName(temp.join("/"), base.split("/").slice(0, -1));
+                    // TODO: this should go, deal with it in the transport?
+                    firstChar = path[0];
+                    if(firstChar != "/" && path.indexOf("://") === -1) {
                         path = "/" + path;
                     }
                     return path + hash;
                 }
             }
             var modules = {};
-            // TODO: Decide whethe rto annoyingly add process
+            // TODO: Decide whether to annoyingly add process
             // or pass it in as an extra arg
             // prefer extra arg for now
             // window.process = {
@@ -1987,7 +1557,17 @@ r(
             /* module */
             var _require = function(path)
             {
-                path = _require.resolve(path.split("#")[0]);
+                var temp = path.split("#");
+                path = _require.resolve(temp[0]);
+                if(path.indexOf("://") !== -1 && temp[1] && temp[1].indexOf("@") === 0) {
+                    var parts = path.split("/");
+                    var index = 3;
+                    if(parts[3].indexOf("@") === 0) {
+                        index = 4;
+                    }
+                    parts[index] += temp[1];
+                    path = parts.join("/");
+                }
                 var relativeRequire = function(relativePath)
                 {
                     return _require(relativePath.indexOf("/") === 0 ? relativePath : _require.resolve(relativePath, path));
@@ -1995,7 +1575,7 @@ r(
                 try {
                     return modules[path]._load(relativeRequire)
                 } catch(e) {
-                    console.error(path);
+                    // console.error(path);
                     // e.message = "Unable to require '" + path + "'";
                     throw e;
                 }

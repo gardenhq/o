@@ -6,13 +6,17 @@ Feature: YAML Container/Service files
   @javascript
   Scenario: It can load up a YAML service/container file
     Given I am on "/examples/b/yaml/index.html"
-    Then I execute "sleep 2"
+    Then I execute "sleep 5"
     Then I should see "Hello World!"
 
   @javascript
   Scenario: It can run the bundled script
+    Given I am on "/examples/b/yaml/"
+    And I execute "sleep 3"
+    Then I should see "Hello World!"
+    And I am on "/"
     Given I am on "/examples/b/yaml/#bundle"
-    Then I execute "sleep 2"
+    Then I execute "sleep 3"
     And save the html in "pre" to "bundled.js"
 
     Given I execute "make report /examples/b/yaml/index.html"
@@ -20,5 +24,5 @@ Feature: YAML Container/Service files
     Then print the last output
 
     Given I am on "/test/fixtures/bundled/index.html"
-    Then I execute "sleep 2"
+    Then I execute "sleep 3"
     Then I should see "Hello World! Hello World!"

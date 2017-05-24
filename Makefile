@@ -27,7 +27,7 @@ build: clean $(FILES);
 	# Build
 	@./bin/o.js > ./src/o.max.js
 	# @./bin/o.js --configurable > ./src/o.dev.js
-	@./bin/o.js --proxy @gardenhq/o@5.1.0/dev/index.js > ./src/o.dev.js 
+	@./bin/o.js --proxy @gardenhq/o@6.0.0/dev/index.js > ./src/o.dev.js 
 	# Uglify
 	@$(MAKE) o.max.js
 	@$(MAKE) o.dev.js
