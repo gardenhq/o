@@ -10,23 +10,22 @@ module.exports = function(builder)
         {
             "object": root + "/toolbar.css"
         },
+        "o.dev.toolbar.defaults": {
+            "service": function()
+            {
+                return function(key, defaultValue)
+                {
+                    return defaultValue;
+                }
+            }
+        },
         "o.dev.toolbar": {
             "callable": root + "/toolbar.js",
             "arguments": [
                 "@o.dev.toolbar.template",
                 "@o.dev.toolbar.css",
-                "@o.dev.cache.invalidator",
-                "@filesaver",
-                "@mousetrap"
+                "@o.dev.toolbar.defaults"
             ]
         },
-        "filesaver": {
-            "object": "file-saver/FileSaver",
-            "version": "^1.3.3"
-        },
-        "mousetrap": {
-            "object": "mousetrap/mousetrap",
-            "version": "^1.6.1"
-        }
     };
 }

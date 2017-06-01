@@ -6,6 +6,11 @@ module.exports = function(builder)
     var bundlerPrefix = "o+file://";
     var invalidatorPrefix = "*";
     var root = __dirname;
+    var env = function(key, defaultValue)
+    {
+        key = "o+env://" + key;
+        return typeof win.localStorage[key] !== "undefined" ? win.localStorage[key] : defaultValue;
+    }
     return {
         "imports": [
             {
@@ -13,24 +18,46 @@ module.exports = function(builder)
             },
             {
                 resource: "@gardenhq/component-factory/conf/index",
-                version: "^1.0.0"
+                version: "^1.1.0"
             },
             {
                 resource: root + "/components/toolbar/index"
             }
         ],
-        // TODO: replace with process and $O_DEV_RELOADER_URL
-        "o.dev.reloader.websocket.url": win.localStorage["o+env://O_DEV_RELOADER_URL"],
+        "o.dev.toolbar.defaults": {
+            "resolve": [
+                "@o.dev.reloader.websocket.url",
+                "@o.dev.bundler.filename",
+                "@o.dev.cache.invalidator.files"
+            ],
+            "service": function(filewatcher, bundle, files)
+            {
+                return function(key, defaultValue)
+                {
+                    switch(key) {
+                        case "filewatcher":
+                            return filewatcher;
+                            break
+                        case "bundle":
+                            return bundle;
+                            break;
+                        case "invalidate":
+                            return files;
+                            break
+                        default:
+                            return defaultValue;
+                    }
+                }
+            }
+        },
+        // TODO: replace with 'process' and ${O_DEV_RELOADER_URL:-/_index.ws}
+        "o.dev.reloader.websocket.url": env("O_DEV_RELOADER_URL", "/_index.ws"),
+        "o.dev.bundler.filename": env("O_DEV_BUNDLER_FILENAME", "bundle.min.js"),
+        "o.dev.cache.invalidator.files": env("O_DEV_INVALIDATOR_FILES", "*"),
+
         "o.dev.bundler.o.maximal": root + "/oMaximal.js",
         "o.dev.bundler.o.minimal": root + "/oMinimal.js",
-        "babili.standalone": {
-            "requires": {
-                "Babel": "@babel.standalone"
-            },
-            "object": "babili-standalone/babili.min.js",
-            "version": "0.0.10",
-            "ignore-require": true
-        },
+        
         "main": {
             "callable": root + "/main.js",
             "arguments": [
@@ -41,6 +68,8 @@ module.exports = function(builder)
                 "@o.dev.bundler",
                 "@o.dev.toolbar",
                 "@component-factory.factory",
+                "@filesaver",
+                "@mousetrap",
                 win,
                 doc
             ],
@@ -93,8 +122,24 @@ module.exports = function(builder)
                 "@babili.standalone"
             ]
         },
+        "babili.standalone": {
+            "requires": {
+                "Babel": "@babel.standalone"
+            },
+            "object": "babili-standalone/babili.min.js",
+            "version": "0.0.10",
+            "ignore-require": true
+        },
         "parse-template-literal": {
             "object": "@gardenhq/parse-template-literal/index.js"
+        },
+        "filesaver": {
+            "object": "file-saver/FileSaver",
+            "version": "^1.3.3"
+        },
+        "mousetrap": {
+            "object": "mousetrap/mousetrap",
+            "version": "^1.6.1"
         }
     };
 };

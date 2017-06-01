@@ -40,7 +40,8 @@ module.exports = function(storage, reload, flash, prefix)
                         // flash.add("Cache cleared for " + item);
                     }
                 );
-                flash.add("Cleared entire cache.")
+                var cleared = id == "file://" ? "entire cache" : id;
+                flash.add("Cleared " + cleared)
                 return reload;
             }
         );

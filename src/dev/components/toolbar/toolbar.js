@@ -1,39 +1,23 @@
-module.exports = function(template, css, clearCache, file, Key)
+module.exports = function(template, css, defaults)
 {
-    Key.bind(
-        [
-            'command+r',
-            'ctrl+r'
-        ],
-            function(e)
-            {
-                clearCache().then(function(reload){reload()});
-                return false;
-            }
-    );
-    var definition = {
+    return {
         shadow: true,
         attributes: {
             root: {
                 value: __dirname,
                 visibility: "hidden"
             },
-            fullclear: {
+            bundle: {
                 bind: true,
-                value: false
+                value: defaults("bundle", "bundle.min.js")
             },
-            autobundle: {
-                type: Boolean,
+            filewatcher: {
                 bind: true,
-                value: false
+                value: defaults("filewatcher", "/_index.ws")
             },
-            out: {
+            invalidate: {
                 bind: true,
-                value: "bundle"
-            },
-            only: {
-                bind: true,
-                value: ""
+                value: defaults("invalidate", "*")
             },
             uid: {
                 visibility: "hidden",
@@ -43,69 +27,21 @@ module.exports = function(template, css, clearCache, file, Key)
                 })
             }
         },
-        events: {
-            clear: "clearCache"
-        },
-        methods: {
-            "save": function()
-            {
-                window.bundle(null, null, true).then(
-                    function(str)
-                    {
-                        var blob = new Blob(
-                            [str],
-                            {type: "text/javascript;charset=utf-8"}
-                        );
-                        file.saveAs(blob, this.getAttribute("out") + ".js");
-
-                    }.bind(this)
-                );
-            },
-            "clearCache": function()
-            {
-                clearCache().then(function(reload){reload()});
-            }
-        },
         lifecycle: {
-            beforeAnimationFrameCallback: function(props)
-            {
-                // console.log(props.autobundle === true);
-                return arguments;
-            },
             connectedCallback: function()
             {
                 setTimeout(
                     function()
                     {
-                        document.body.style.marginTop = this.offsetHeight + "px";
+                        var marginTop = 0;
+                        this.ownerDocument.body.style.marginTop = marginTop + this.offsetHeight + "px";
                     }.bind(this),
                     200
                 );
-            },
-            constructedCallback: function(props, on)
-            {
-                // on("clear", this.clearCache);
-                // on(
-                //  "clear",
-                //  function()
-                //  {
-
-                //  }
-                // )
-                this.addEventListener(
-                    "clear",
-                    this.clearCache
-                );
-                this.addEventListener(
-                    "build",
-                    this.save
-                );
-                
-            }   
+            }
         },
         template: template,
         css: css
     };
 
-    return definition;
 }

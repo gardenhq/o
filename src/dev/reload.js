@@ -1,5 +1,8 @@
 module.exports = function(url, clear, flash, shouldReload, win, doc)
 {
+    if(url == "") {
+        return function(){};
+    }
     win = win || window;
     doc = doc || document;
     var addHost = function(s)
@@ -7,7 +10,6 @@ module.exports = function(url, clear, flash, shouldReload, win, doc)
         var l = win.location;
         return ((l.protocol === "https:") ? "wss://" : "ws://") + l.host + s;
     }
-    url = url || "/_index.ws";
     url = url.indexOf("://") === -1 ? addHost(url) : url;
     shouldReload = shouldReload || function(){ return true; }
 

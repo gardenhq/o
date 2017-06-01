@@ -32,7 +32,7 @@
 	padding: 20px;
 	width: 400px;
 	height: 100px;
-	top: 33px;
+	top: 36px;
 	right: 0;
 }
 :host > div > div > div > div {
@@ -40,9 +40,26 @@
 	align-items: center;
 	height: 100%;
 }
-/* :host > div > div > div > div:hover > div { */
-/* 	display: block; */
-/* } */
+:host > div > div > div > div:hover > div {
+	display: block;
+}
+:host > div > div > div > div > div label {
+	display: flex;
+	justify-content: space-between;
+	margin-bottom: 5px;
+	align-items: center;
+}
+:host input + button {
+    border-top-left-radius: 0;
+    border-bottom-left-radius: 0;
+}
+:host label input:not(:last-child) {
+    border-top-right-radius: 0;
+    border-bottom-right-radius: 0;
+}
+:host label span {
+    width: 50%;
+}
 
 :host label {
 	display: inline;
@@ -53,6 +70,7 @@
 	padding: 9px;
 	border: 0;
 	border-radius: 2px;
+	height: 18px;
 }
 :host label {
 	color: white;
@@ -114,10 +132,27 @@ x-toolbar > div > div > div > div {
 	align-items: center;
 	height: 100%;
 }
-/* x-toolbar > div > div > div > div:hover > div { */
-/* 	display: block; */
-/* } */
 
+x-toolbar > div > div > div > div:hover > div {
+	display: block;
+}
+x-toolbar > div > div > div > div > div label {
+	display: flex;
+	justify-content: space-between;
+	margin-bottom: 5px;
+	align-items: center;
+}
+x-toolbar input + button {
+    border-top-left-radius: 0;
+    border-bottom-left-radius: 0;
+}
+x-toolbar label input:not(:last-child) {
+    border-top-right-radius: 0;
+    border-bottom-right-radius: 0;
+}
+x-toolbar label span {
+    width: 50%;
+}
 x-toolbar label {
 	display: inline;
 	margin-right: 10px;
@@ -127,6 +162,7 @@ x-toolbar input {
 	padding: 9px;
 	border: 0;
 	border-radius: 2px;
+	height: 18px;
 }
 x-toolbar label {
 	color: white;

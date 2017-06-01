@@ -1,26 +1,38 @@
-module.exports = function(translator, reloader, flash, clearCache, bundler, toolbar, component, win, doc)
+module.exports = function(translator, reloader, flash, clearCache, bundler, toolbar, component, File, Key, win, doc)
 {
+    var htmlEscape = function(str)
+    {
+        return str
+            .replace(/&/g, '&amp;')
+            .replace(/"/g, '&quot;')
+            .replace(/'/g, '&#39;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;');
+    }
+    // TODO: really this has nothing to do with o
+    // beginning of willow's web based env vars
+    var exportEnv = function(key)
+    {
+        return function(e)
+        {
+            var value = e.detail.callback.bind(e.target);
+            var val = value(e.detail.event);
+            win.localStorage.setItem("o+env://" + key, val);
+        }
+    }
     return function(config)
     {
         flash();
         var bundle = bundler(config);
         switch(win.location.hash.substr(1)) {
             case "bundle":
-                function htmlEscape(str) {
-                    return str
-                        .replace(/&/g, '&amp;')
-                        .replace(/"/g, '&quot;')
-                        .replace(/'/g, '&#39;')
-                        .replace(/</g, '&lt;')
-                        .replace(/>/g, '&gt;');
-                }
                 setTimeout(
                     function()
                     {
                         bundle(null, null, true).then(
                             function(bundle)
                             {
-                                doc.documentElement.innerHTML = "<pre>\n\n" + htmlEscape(bundle) + "\n</pre>";
+                                doc.documentElement.innerHTML = "<pre>" + htmlEscape(bundle) + "</pre>";
                             }
                         );
                     },  
@@ -36,23 +48,50 @@ module.exports = function(translator, reloader, flash, clearCache, bundler, tool
                 );
                 break;
             default:
-                win.dirty = function()
+                reloader();
+                component(toolbar, "toolbar");
+                var $toolbar = doc.createElement("x-toolbar")
+                doc.body.appendChild($toolbar);
+                $toolbar.addEventListener("filewatcher", exportEnv("O_DEV_RELOADER_URL"));
+                $toolbar.addEventListener("bundle", exportEnv("O_DEV_BUNDLER_FILENAME"));
+                $toolbar.addEventListener("invalidate", exportEnv("O_DEV_INVALIDATOR_FILES"));
+                win.dirty = function(file)
                 {
-                    clearCache().then(function(reload){reload()});  
+                    file = file == "*" ? null : file;
+                    clearCache(file).then(function(reload){reload()});  
                 };
+                Key.bind(
+                    [
+                        'command+r',
+                        'ctrl+r'
+                    ],
+                    function()
+                    {
+                        win.dirty($toolbar.getAttribute("invalidate"))
+                    }
+                );
                 win.bundle = function()
                 {
                     bundle(null, null, true).then(
                         function(bundle)
                         {
-                            // console.log(bundle);
+                            var blob = new Blob(
+                                [bundle],
+                                {type: "text/javascript;charset=utf-8"}
+                            );
+                            File.saveAs(blob, $toolbar.getAttribute("bundle"));
                         }
                     );   
                 };
+                $toolbar.addEventListener(
+                    "clear",
+                    function(e)
+                    {
+                        win.dirty(e.target.getAttribute("invalidate"));
+                    }
+                );
+                $toolbar.addEventListener("build", win.bundle);
                 console.info("Type `bundle()` to bundle. Type `dirty()` to clear the entire cache.");
-                reloader();
-                component(toolbar, "toolbar");
-                doc.body.appendChild(doc.createElement("x-toolbar"));
         }
         return translator;
     }

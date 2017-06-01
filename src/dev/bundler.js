@@ -1,5 +1,6 @@
 module.exports = function(storage, prefix, engine, bundleTemplate, appTemplate, oMin, oMax, minner)
 {
+    // these are just filenames for debugging
     var bundles = engine.compile(bundleTemplate, ["register", "items", "exports"], "/node_modules/o/util/templates/bundle.js");
     var app = engine.compile(appTemplate, ["o", "bundles", "main", "config"], "/node_modules/o/util/templates/app.js");
     return function(config)

@@ -11,4 +11,4 @@ We don't want to have to load in a YAML parsing library in production, so this i
 ## Caveats
 
 * You can only use when using the devtoolbar (but of course once you've bundled out the bundle doesn't contain any YAML at all).
-* If people ever distribute further modules based on this work, right now we'd prefer not to distribute YAML container files as it forces a YAML dependency, for the moment a pre-publish to compile it down to JSON would be prefereable.
+* If people ever distribute further modules based on this work, right now we'd prefer not to distribute YAML container files as it forces a YAML dependency, for the moment a pre-publish to compile it down to JSON would be preferable.

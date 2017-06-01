@@ -22,12 +22,13 @@ report:
 	@$(MAKE) ./test/fixtures/bundled/bundled.min.js | awk '{ print "$(ARGUMENTS) " $$1 " " $$3}' | ./test/report
 	@ls -al ./test/fixtures/bundled/bundled.min.js | awk '{ print "$(ARGUMENTS) Uglified " $$5}' | ./test/report
     
+build: VERSION=6.2.0
 build: clean $(FILES);
 	@cp -R src/dev ./dev
 	# Build
 	@./bin/o.js > ./src/o.max.js
 	# @./bin/o.js --configurable > ./src/o.dev.js
-	@./bin/o.js --proxy @gardenhq/o@6.0.0/dev/index.js > ./src/o.dev.js 
+	@./bin/o.js --proxy @gardenhq/o@$(VERSION)/dev/index.js > ./src/o.dev.js 
 	# Uglify
 	@$(MAKE) o.max.js
 	@$(MAKE) o.dev.js
