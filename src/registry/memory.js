@@ -105,8 +105,7 @@ registry(
                 if(typeof _require.resolve === "undefined") {
                     _require.resolve = resolve;
                 }
-                path = resolve(path);
-                path = version(path);
+                path = version(resolve(path));
                 if(has(path)) {
                     return get(path);
                 }

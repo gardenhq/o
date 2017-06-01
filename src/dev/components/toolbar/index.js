@@ -4,7 +4,7 @@ module.exports = function(builder)
     return {
         "o.dev.toolbar.template":
         {
-            "object": root + "/template.html#text/html+moustache"
+            "object": root + "/template.html"
         },
         "o.dev.toolbar.css":
         {

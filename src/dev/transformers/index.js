@@ -5,16 +5,14 @@ module.exports = function()
         "imports": [
             root + "/babel/index.js"
         ],
-        "babel.transformer": {
+        "babel.transformer.js": {
          "tags": [
              "system.transformer.js"
          ]
         },
         "js-yaml": {
-            "object": "js-yaml/index",
+            "object": "js-yaml/dist/js-yaml.min.js",
             "version": "3.8.4"
-            //headers: {"Cache-Control": "private", "Content-Type": ""} etc
-            // "ignore-require": true
         },
         "system.loaders.css": {
             "callable": root + "/css"
@@ -33,6 +31,6 @@ module.exports = function()
             "arguments": [
                 "#system.transformer.js"
             ]
-        }
+        } 
     };
 }

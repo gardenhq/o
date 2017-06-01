@@ -17,6 +17,7 @@ module.exports = function(transformers)
             function(content)
             {
                 data.content = content + "//# sourceURL=" + path;
+                data.headers['Content-Type'] = "application/javascript";
                 return data;
             }
         );

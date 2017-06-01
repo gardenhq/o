@@ -87,13 +87,13 @@ parser(
                                             if(data.content.indexOf("//# sourceURL") === -1) {
                                                 data.content += map; 
                                             }
-                                            // (exports, require, module, __filename, __dirname)
-                                            // evaluate(data.content)(exports, relativeRequire, module, __filename, __dirname);
-                                            if(!isBundle) {
-                                                evaluate(data.content)(module, exports, relativeRequire, __filename, __dirname);
-                                            } else {
-                                                evaluate(data.content)(module, exports, $require, __filename, __dirname);
-                                            }
+                                            evaluate(data.content)(
+                                                module,
+                                                exports,
+                                                relativeRequire,
+                                                __filename,
+                                                __dirname
+                                            );
                                             break;
                                         case format.indexOf("json") === 0:
                                             module.exports = JSON.parse(data.content);

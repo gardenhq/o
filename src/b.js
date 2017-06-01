@@ -1,20 +1,27 @@
 module.exports = function(load)
 {
-    var version = "#@5.0.1";
+    var version = "#@6.0.0";
     return load.then(
         function(System)
         {
             var register;
+            var resolve;
+            // not available in node
             if(System.registerDynamic != null) {
                 register = System.registerDynamic.bind(System);
+            }
+            // not available in node, but should? be on require.resolve
+            if(System.resolve != null) {
+                resolve = System.resolve.bind(System);
             }
             return System.import(
                 "@gardenhq/willow/index.js" + version
             ).then(
-                function(builder)
+                function(createJsBuilder)
                 {
-                    return builder(
+                    return createJsBuilder(
                         System.import.bind(System),
+                        resolve,
                         register,
                         "@gardenhq/willow/conf/javascript.js" + version
                     );

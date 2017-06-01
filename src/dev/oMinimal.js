@@ -154,7 +154,7 @@
                     config: function(_config)
                     {
                         if(_config.baseURL !== config.baseURL) {
-                            this.resolve = _require.resolve = getResolve(_config.includepath, _config.baseURL);
+                            this.resolve = _require.resolve = getResolve(_config.includepath || config.includepath, _config.baseURL);
                         }
                         config = Object.assign(
                             {},

@@ -2,7 +2,10 @@ module.exports = function(builder)
 {
     // TODO: Refactor this out once the bugfix has gone up, too much repetition
     var loadable = {
-        "js": ["javascript", "json", "js"], // why wasn't this here yonks ago?
+        "js": [
+            "javascript", "json", "js",
+            "jsx", "es6" // its just javascript!
+        ], 
         "css": ["css"],
         "html": ["html"],
         "yaml": ["yaml", "yml"]

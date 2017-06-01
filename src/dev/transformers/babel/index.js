@@ -1,10 +1,24 @@
 module.exports = function()
 {
     return {
-        "babel.transformer": {
+        "babel.presets": ['es2015', 'react'],
+        "babel.plugins": [],
+        "babel.transformer.js": {
             "callable": __dirname + "/transformer.js",
             "arguments": [
-                "@babel.standalone"
+                "@babel.standalone",
+                "@babel.presets",
+                "@babel.plugins"
+            ]
+        },
+        "babel.transformer.jsx.args": [],
+        "babel.transformer.jsx": {
+            "callable": __dirname + "/jsx-transformer.js",
+            "arguments": [
+                "@babel.standalone",
+                "@babel.presets",
+                "@babel.plugins",
+                "@babel.transformer.jsx.args"
             ]
         },
         "babel.standalone": {

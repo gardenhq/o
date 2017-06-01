@@ -1,0 +1,14 @@
+main:
+  callable: ./main
+  arguments:
+    - "@react"
+    - "@react.dom"
+react:
+  object: "react/dist/react.min.js"
+  # ignore-require: true
+react.dom:
+  requires:
+    react: "@react"
+  object: "react-dom/dist/react-dom.min.js"
+  # ignore-require: true
+
