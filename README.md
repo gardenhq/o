@@ -52,7 +52,7 @@ app.main:
   callable: "./index"
   arguments:
     - "@react"
-    - "@react-dom"
+    - "@react.dom"
     - "@app.some.nice.logic"
 app.some.nice.logic:
   class: "./LogicCalculator"
