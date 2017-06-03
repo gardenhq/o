@@ -63,7 +63,7 @@ app.data:
   object: "./someJsonMaybe"
 react:
   object: "react"
-react.dom
+react.dom:
   object: "react-dom"
 
 ```
