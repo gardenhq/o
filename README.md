@@ -1,3 +1,4 @@
+
 # o
 
 An in-browser loader, bundler and dependency injection builder (using `@gardenhq/willow`)
@@ -15,14 +16,14 @@ Currently a usable work-in-progress.
 A CLI and/or Node is entirely optional, and not required at all. You can get going with module loading with a:
 
 ```html
-<script src="https://unpkg.com/@gardenhq/o@6.2.0/o.js"></script>
+<script src="https://unpkg.com/@gardenhq/o@6.2.1/o.js"></script>
 ```
 
 To be able to bundle (amongst other things - live reloading, transpiling and more), use the dev version. This is most
 likely what you want.
 
 ```html
-<script src="https://unpkg.com/@gardenhq/o@6.2.0/o.dev.js"></script>
+<script src="https://unpkg.com/@gardenhq/o@6.2.1/o.dev.js"></script>
 ```
 
 [View a 'Hello World'
@@ -38,7 +39,7 @@ Once you are bundled you can remove `o` and just load your bundle.
 ```
 
 Small bundles **will be slightly bigger than `browserify`** at least for the
-moment, but bundling with `o` also gives you `resolve`, `__dirname` and `__filename`. On the other hand, in some initial comparisons we did with a larger bundle with `require("react")` and `o` bundle came out smaller than a `browserify` one. We can't quite believe this as we've not even looked at optimizations yet, once we've spent some time doing more comparisions and verifying we'll publish some results. With this same test `webpack` kills us due to tree shaking, but we've not looked at this 'yet' - plus we'd prefer to use `willow` and build/grow our tree, rather than include everything and shake it to death.
+moment, but bundling with `o` also gives you `resolve`, `__dirname` and `__filename`. On the other hand, in some initial comparisons we did with a larger bundle with `require("react")` and an `o` bundle came out smaller than a `browserify` one. We can't quite believe this as we've not even looked at optimizations yet, once we've spent some time doing more comparisions and verifying we'll publish some results. With this same test `webpack` kills us due to tree shaking, but we've not looked at this 'yet' - plus we'd prefer to use `willow` and build/grow our tree, rather than include everything and shake it to death.
 
 Things get far more interesting when used with `@gardenhq/willow` which is why `o` exists. The fact that `o` also works as a 'common or garden' module loader is a bit of a by-product.
 
