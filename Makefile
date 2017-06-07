@@ -21,9 +21,10 @@ report:
 	@ls -al ./test/fixtures/bundled/bundled.js | awk '{ print "$(ARGUMENTS) Raw " $$5}' | ./test/report
 	@$(MAKE) ./test/fixtures/bundled/bundled.min.js | awk '{ print "$(ARGUMENTS) " $$1 " " $$3}' | ./test/report
 	@ls -al ./test/fixtures/bundled/bundled.min.js | awk '{ print "$(ARGUMENTS) Uglified " $$5}' | ./test/report
-    
+node_modules/@gardenhq/o:
+	@cd node_modules/@gardenhq && ln -s ../../ o
 build: VERSION=6.2.0
-build: clean $(FILES);
+build: node_modules/@gardenhq/o clean $(FILES);
 	@cp -R src/dev ./dev
 	# Build
 	@./bin/o.js > ./src/o.max.js

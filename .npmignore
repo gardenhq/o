@@ -9,4 +9,6 @@
 !/registry/**
 !/proxy/**
 !/dev/**
+!/src/_o.js
+!/src/b.js
 
