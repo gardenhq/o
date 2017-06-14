@@ -7,6 +7,8 @@
 /transport
 /docs/build
 /o.js
+/b.js
+/r.js
 /o.dev.js
 /src/o.dev.js
 /src/dev/oDev.js

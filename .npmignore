@@ -1,10 +1,15 @@
 *
-!/index.js
 !/builder.js
-!/b.js
+!/runner.js
+
+!/index.js
+
+!/r.js
 !/o.js
+!/b.js
 !/o.dev.js
 !/transport/**
+
 !/parser/**
 !/registry/**
 !/proxy/**

@@ -1,7 +1,7 @@
 app.print:
   callable: ./print
 app.hello:
-  object: ../../hello-world
+  object: ../hello-world
 main:
   callable: ./main
   arguments:
