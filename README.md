@@ -15,14 +15,14 @@ Currently a usable work-in-progress.
 A CLI and/or Node is entirely optional, and not required at all. You can get going with module loading with a:
 
 ```html
-<script src="https://unpkg.com/@gardenhq/o@6.2.1/o.js"></script>
+<script src="https://unpkg.com/@gardenhq/o@6.3.0/o.js"></script>
 ```
 
 To be able to bundle (amongst other things - live reloading, transpiling and more), use the dev version. This is most
 likely what you want.
 
 ```html
-<script src="https://unpkg.com/@gardenhq/o@6.2.1/o.dev.js"></script>
+<script src="https://unpkg.com/@gardenhq/o@6.3.0/o.dev.js"></script>
 ```
 
 [View a 'Hello World'
