@@ -64,6 +64,11 @@ module.exports = function(load)
                         return builder;
                     }
                 }
+            ).catch(
+                function(e)
+                {
+                    console.error(e);
+                }
             );
         }
     );

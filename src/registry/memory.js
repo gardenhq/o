@@ -26,38 +26,6 @@ registry(
             return this.exports;
         }
         /* module */
-        var version = function(path)
-        {
-            var temp = path.split("#");
-            path = temp[0];
-            var hash = temp[1] || "";
-            if(hash) {
-                var headers = {};
-                if(hash.indexOf("{") === 0) {
-                    headers = JSON.parse(hash);
-                    hash = "";
-                } else if(hash.indexOf("@") === 0) {
-                    headers["X-Content-Version"] = hash.substr(1);
-                    hash = "";
-                } 
-                if(headers["X-Content-Version"] != null && path.indexOf("://") !== -1) {
-                    var parts = temp[0].split("/");
-                    var index = 3;
-                    if(parts[3].indexOf("@") === 0) {
-                        index = 4;
-                    }
-                    parts[index] += "@" + headers['X-Content-Version'];
-                    path = parts.join("/");
-                }
-                if(headers['Content-Type']) {
-                    hash = headers['Content-Type'];
-                }
-                if(hash) {
-                    hash = "#" + hash;
-                }
-            }
-            return path + hash;
-        }
         return function(m)
         {
             var cache = m || {};
@@ -65,9 +33,8 @@ registry(
             var keys = cache.keys = [];
             var _require = function(path)
             {
-                path = version(path);
                 try {
-                    return modules[path]._load(_require)
+                    return modules[path.split("#")[0]]._load(_require)
                 } catch(e) {
 
                     // TODO: Would be good to have this just for dev
@@ -83,8 +50,7 @@ registry(
             }
             var has = function(key)
             {
-                key = version(key);
-                return keys[key] === true;
+                return keys[key.split("#")[0]] === true;
             }
             var set = function(path, module)
             {
@@ -92,7 +58,7 @@ registry(
                 // return the Module?
                 // always return null ? **
                 // Keep as both means I know whether its already set or not?
-                path = version(path);
+                path = path.split("#")[0];
                 if(has(path)) {
                     return;
                 }
@@ -105,7 +71,6 @@ registry(
                 if(typeof _require.resolve === "undefined") {
                     _require.resolve = resolve;
                 }
-                path = version(resolve(path));
                 if(has(path)) {
                     return get(path);
                 }
@@ -175,7 +140,7 @@ registry(
             registry.get = get;
             registry.delete = function(key)
             {
-                key = version(key);
+                key = key.split("#")[0]
                 keys[key] = null;
                 modules[key] = null;
             };

@@ -1,8 +1,5 @@
-module.exports = function(storage, prefix, engine, bundleTemplate, appTemplate, oMin, oMax, minner)
+module.exports = function(storage, prefix, bundles, app, oMin, oMax, minify)
 {
-    // these are just filenames for debugging
-    var bundles = engine.compile(bundleTemplate, ["register", "items", "exports"], "/node_modules/o/util/templates/bundle.js");
-    var app = engine.compile(appTemplate, ["o", "bundles", "main", "config"], "/node_modules/o/util/templates/app.js");
     return function(config)
     {
         return function(bundleOnly, register, download)
@@ -16,8 +13,7 @@ module.exports = function(storage, prefix, engine, bundleTemplate, appTemplate, 
                 {
                     if(key.indexOf(prefix) === 0) {
                         var path = key.substr(prefix.length);
-                        // TODO: This should change!
-                        if(path.indexOf("@gardenhq/o/_o.js") !== -1 || path.indexOf("@gardenhq/o/src/_o.js") !== -1) {
+                        if(path.indexOf("@gardenhq/o/_o.js") !== -1 || path.indexOf("/src/_o.js") !== -1) {
                             return;
                         }
                         try {
@@ -46,35 +42,26 @@ module.exports = function(storage, prefix, engine, bundleTemplate, appTemplate, 
             if(bundleOnly) {
                 if(download) {
                     // return Promise.resolve(bundled);
-                    return Promise.resolve(minner.transform(bundled).code);
+                    return Promise.resolve(minify(bundled));
                 }
                 return "Bundled '" + bundleOnly + "'";
             }
-            return fetch(o).then(
-                function(response)
+            var bundle = app.render(
                 {
-                    return response.text()
-                }
-            ).then(
-                function(o)
-                {
-                    var bundle = app.render(
-                        {
-                            o: o,
-                            bundles: bundled,
-                            main: config.src,
-                            config: config
-                        }
-                    );
-                    bundle = minner.transform(bundle).code;
-                    console.debug("Bundling " + location.protocol + "//" + location.host + config.src);
-                    console.log(bundle);
-                    console.debug("Bundled " + location.protocol + "//" + location.host + config.src);
-                    if(download) {
-                        return bundle;
-                    }
+                    o: o.render(),
+                    bundles: bundled,
+                    main: config.src,
+                    config: config
                 }
             );
+            console.log(bundle.length);
+            console.debug("Bundling " + config.src + " (if your source is large this may take a few seconds to minify...)");
+            bundle = minify(bundle);
+            console.log(bundle);
+            console.debug("Bundled " + config.src);
+            if(download) {
+                return Promise.resolve(bundle);
+            }
             bundleOnly = bundleOnly || "*";
             return "Bundling '" + bundleOnly + "'";
         }

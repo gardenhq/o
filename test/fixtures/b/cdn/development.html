@@ -7,10 +7,10 @@
     <body>
         <script type="text/javascript">
             var cdnHost = location.protocol + "//cdn." + location.hostname;
-            var cdn = cdnHost + "/@gardenhq/o@^5.0.0";
+            var cdn = cdnHost + "/@gardenhq/o@^6.3.0";
             var $script = document.createElement("script");
             $script.setAttribute("src", cdn + "/o.dev.js");
-            $script.setAttribute("data-src", cdn + "/src/b.js#../services.js:main");
+            $script.setAttribute("data-src", cdn + "/b.js#../services.js:main");
             document.body.appendChild($script);
         </script>
     </body>

@@ -8,19 +8,6 @@
                     function(System)
                     {
                         load = o = undefined;
-                        System.config(
-                            {
-                                bundled: true,
-                                ${
-                                    Object.keys(config).map(
-                                        function(key)
-                                        {
-                                            return key + ': "' + config[key] + '"';
-                                        }
-                                    ).join(",\n")
-                                }
-                            }
-                        );
                         ${bundles}.then(
                             function()
                             {
@@ -46,4 +33,23 @@
             )
         );
     }
-)(${ o })
+)(
+    (
+        function(_bundleConfig)
+        {
+            return (${o});
+        }
+    )(
+        {
+            bundled: true,
+            ${
+                Object.keys(config).map(
+                    function(key)
+                    {
+                        return '"' + key + '": "' + config[key] + '"';
+                    }
+                ).join(",\n")
+            }
+        }
+    )
+)

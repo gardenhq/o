@@ -1,145 +1,66 @@
 module.exports = function(builder)
 {
-    // TODO: imports are in reverse??
-    var win = window;
-    var doc = document;
-    var bundlerPrefix = "o+file://";
     var invalidatorPrefix = "*";
-    var root = __dirname;
-    var env = function(key, defaultValue)
-    {
-        key = "o+env://" + key;
-        return typeof win.localStorage[key] !== "undefined" ? win.localStorage[key] : defaultValue;
-    }
     return {
         "imports": [
             {
-                resource: root + "/transformers/index"
+                resource: "@gardenhq/tick-control/container.js",
+                version: "^1.0.0"
             },
             {
-                resource: "@gardenhq/component-factory/conf/index",
-                version: "^1.1.0"
+                resource: "@gardenhq/domino/container.js",
+                version: "^1.0.0"
             },
             {
-                resource: root + "/components/toolbar/index"
+                resource: __dirname + "/transformer/container.js"
+            },
+            {
+                resource: __dirname + "/shell/container.js"
+            },
+            {
+                resource: __dirname + "/gui/container.js"
+            },
+            {
+                resource: __dirname + "/bundler/container.js"
             }
         ],
-        "o.dev.toolbar.defaults": {
-            "resolve": [
-                "@o.dev.reloader.websocket.url",
-                "@o.dev.bundler.filename",
-                "@o.dev.cache.invalidator.files"
-            ],
-            "service": function(filewatcher, bundle, files)
-            {
-                return function(key, defaultValue)
-                {
-                    switch(key) {
-                        case "filewatcher":
-                            return filewatcher;
-                            break
-                        case "bundle":
-                            return bundle;
-                            break;
-                        case "invalidate":
-                            return files;
-                            break
-                        default:
-                            return defaultValue;
-                    }
-                }
-            }
-        },
-        // TODO: replace with 'process' and ${O_DEV_RELOADER_URL:-/_index.ws}
-        "o.dev.reloader.websocket.url": env("O_DEV_RELOADER_URL", "/_index.ws"),
-        "o.dev.bundler.filename": env("O_DEV_BUNDLER_FILENAME", "bundle.min.js"),
-        "o.dev.cache.invalidator.files": env("O_DEV_INVALIDATOR_FILES", "*"),
-
-        "o.dev.bundler.o.maximal": root + "/oMaximal.js",
-        "o.dev.bundler.o.minimal": root + "/oMinimal.js",
-        
-        "main": {
-            "callable": root + "/main.js",
+        "o.dev.templates": {
+            "iterator": "@gardenhq.tick-control.iterator",
             "arguments": [
-                "@o.dev.translator",
-                "@o.dev.reloader.websocket",
-                "@o.dev.flash",
-                "@o.dev.cache.invalidator",
-                "@o.dev.bundler",
-                "@o.dev.toolbar",
-                "@component-factory.factory",
-                "@filesaver",
-                "@mousetrap",
-                win,
-                doc
-            ],
-        },
-        "o.dev.flash": {
-            "callable": root + "/flash.js",
-            "arguments": [
-                win.localStorage
+                "#o.dev.template"
             ]
         },
-        "o.dev.cache.invalidator": {
-            "callable": root + "/clearCache.js",
+        
+        "main": {
+            "callable": __dirname + "/main.js",
             "arguments": [
-                win.localStorage,
-                win.location.reload.bind(win.location),
-                "@o.dev.flash",
+                "@o.dev.reloader.websocket",
+                "@o.dev.cache.invalidator",
+                "@o.dev.transformer",
+                "@o.dev.bundler",
+                "@o.dev.shell.hash",
+                "@o.dev.shell.console",
+                "@o.dev.gui",
+                "@dom.window",
+                "@dom.document"
+            ],
+        },
+        "o.dev.cache.invalidator": {
+            "callable": __dirname + "/cache/invalidator.js",
+            "arguments": [
+                "@dom.localStorage",
+                "@dom.location.reload",
+                "@o.dev.shell.flash",
                 invalidatorPrefix
             ]
         },
-        "o.dev.translator": {
-            "callable": root + "/translator.js",
-            "arguments": [
-                builder
-            ]
-        },
         "o.dev.reloader.websocket": {
-            "callable": root + "/reload.js",
+            "callable": __dirname + "/reloader/websocket.js",
             "arguments": [
-                "@o.dev.reloader.websocket.url",
+                "@O_DEV_RELOADER_URL",
                 "@o.dev.cache.invalidator",
-                "@o.dev.flash"
+                "@o.dev.shell.flash"
             ]
-        },
-        "o.dev.bundler.template.app":{
-            "object": root + "/templates/app.js#text/javascript+literal"
-        },
-        "o.dev.bundler.template.bundle":{
-            "object": root + "/templates/bundle.js#text/javascript+literal"
-        },
-        "o.dev.bundler": {
-            "callable": root + "/bundler.js",
-            "arguments": [
-                win.localStorage,
-                bundlerPrefix,
-                "@parse-template-literal",
-                "@o.dev.bundler.template.bundle",
-                "@o.dev.bundler.template.app",
-                "@o.dev.bundler.o.minimal",
-                "@o.dev.bundler.o.maximal",
-                "@babili.standalone"
-            ]
-        },
-        "babili.standalone": {
-            "requires": {
-                "Babel": "@babel.standalone"
-            },
-            "object": "babili-standalone/babili.min.js",
-            "version": "0.0.10",
-            "ignore-require": true
-        },
-        "parse-template-literal": {
-            "object": "@gardenhq/parse-template-literal/index.js"
-        },
-        "filesaver": {
-            "object": "file-saver/FileSaver",
-            "version": "^1.3.3"
-        },
-        "mousetrap": {
-            "object": "mousetrap/mousetrap",
-            "version": "^1.6.1"
         }
     };
 };

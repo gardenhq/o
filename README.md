@@ -15,21 +15,21 @@ Currently a usable work-in-progress.
 A CLI and/or Node is entirely optional, and not required at all. You can get going with module loading with a:
 
 ```html
-<script src="https://unpkg.com/@gardenhq/o@6.3.0/o.js"></script>
+<script src="https://unpkg.com/@gardenhq/o@6.4.0/o.js"></script>
 ```
 
 To be able to bundle (amongst other things - live reloading, transpiling and more), use the dev version. This is most
 likely what you want.
 
 ```html
-<script src="https://unpkg.com/@gardenhq/o@6.3.0/o.dev.js"></script>
+<script src="https://unpkg.com/@gardenhq/o@6.4.0/o.dev.js"></script>
 ```
 
 [View a 'Hello World'
 here](https://greenhouse.gardenhq.io/o/examples/o/development.html). Click the
 [Bundle] button to bundle.
 
-If ES6 is your thing, transpiling and minification is all done in the browser with Babel/Babili (you still don't have to use Node or install/configure anything extra).
+Transpiling and minification is all done in the browser with babel and uglify-es (you still don't have to use Node or install/configure anything extra).
 
 Once you are bundled you can remove `o` and just load your bundle.
 

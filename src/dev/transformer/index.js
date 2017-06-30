@@ -1,15 +1,5 @@
-module.exports = function(builder)
+module.exports = function(builder, loadable)
 {
-    // TODO: Refactor this out once the bugfix has gone up, too much repetition
-    var loadable = {
-        "js": [
-            "javascript", "json", "js",
-            "jsx", "es6" // its just javascript!
-        ], 
-        "css": ["css"],
-        "html": ["html"],
-        "yaml": ["yaml", "yml"]
-    };
     return function(file, loader)
     {
         var temp = file.path.split(".");
@@ -18,12 +8,14 @@ module.exports = function(builder)
         if(file.headers && file.headers['Content-Type']) {
             type = file.headers['Content-Type'].split("/").pop();
         }
-        var extension = Object.keys(
-            loadable
-        ).find(
-            function(key)
+        //IE doesn't like find, use reduce for now
+        var extension = Object.keys(loadable).reduce(
+            function(prev, key)
             {
-                return loadable[key].indexOf(type) !== -1;
+                if(loadable[key].indexOf(type) !== -1) {
+                    return key;
+                }
+                return prev;
             }
         );
         if(extension != null) {
@@ -70,7 +62,6 @@ module.exports = function(builder)
                     );
                 }
                 return data;
-
             }
         );
     };

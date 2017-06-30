@@ -111,7 +111,6 @@ transport(
         return function(path, Ajax)
         {
             Ajax = Ajax || XMLHttpRequest;
-            // path = version(path);
             var filename = path.split("/").pop().split("@")[0];
             var fetchlike = getFetchLike(path, new Ajax());
             return Object.keys(attempts).reduce(

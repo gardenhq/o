@@ -75,6 +75,7 @@ parser(
                         relativePath = relativePath.indexOf("/") === 0 ? relativePath : resolve(relativePath, from);
                         return _require(relativePath);
                     }
+                    relativeRequire.resolve = resolve;
                     registry.set(
                         path,
                         function(module, exports, $require, __filename, __dirname)

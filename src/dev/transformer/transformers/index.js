@@ -1,33 +1,32 @@
 module.exports = function()
 {
-    var root = __dirname;
     return {
         "imports": [
-            root + "/babel/index.js"
+            __dirname + "/babel/index.js"
         ],
-        "babel.transformer.js": {
-         "tags": [
-             "system.transformer.js"
-         ]
-        },
+        // "babel.transformer.js": {
+        //  "tags": [
+        //      "system.transformer.js"
+        //  ]
+        // },
         "js-yaml": {
             "object": "js-yaml/dist/js-yaml.min.js",
             "version": "3.8.4"
         },
         "system.loaders.css": {
-            "callable": root + "/css"
+            "callable": __dirname + "/css"
         },
         "system.loaders.yaml": {
-            "callable": root + "/yaml",
+            "callable": __dirname + "/yaml",
             "arguments": [
                 "@js-yaml"
             ]
         },
         "system.loaders.html": {
-            "callable": root + "/html"
+            "callable": __dirname + "/html"
         },
         "system.loaders.js": {
-            "callable": root + "/js",
+            "callable": __dirname + "/js",
             "arguments": [
                 "#system.transformer.js"
             ]

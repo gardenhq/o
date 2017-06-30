@@ -1,0 +1,40 @@
+<div>
+    <a href="https://greenhouse.gardenhq.io/o/" target="_blank">
+        <img src="${ 'https://www.google-analytics.com/collect?v=1&aip=1&t=event&ec=devbar&ea=load&tid=UA-98735002-3&cid=' + props.uid + '&z=' + (new Date().getTime()) }" width="1" height="1" style="opacity: 0;" /><img src="${ props.root + "/images/leaf.svg"}" height="33" alt="GardenHQ" />
+    </a>
+
+    <div>
+        <div>
+            <div>
+                <label>Reloader</label>
+                <div>
+                    <label>
+                        <span>Filewatcher Endpoint:</span>
+                        <input type="text" value="${ props.filewatcher }" placeholder="Filewatcher Endpoint" oninput="${ dispatch("filewatcher") }" />
+                        <button onclick="${ dispatch("clear") }">Set</button>
+                    </label>
+                    <label>
+                        <span>[Clear Cache] clears:</span>
+                        <input type="text" value="${ props.invalidate }" placeholder="*" oninput="${ dispatch("invalidate") }" />
+                    </label>
+                </div>
+            </div>
+            <button onclick="${ dispatch("clear") }">Clear Cache</button>
+        </div>
+        <div>
+            <div>
+                <label>Bundler</label>
+                <div>
+                    <label>
+                        <span>
+                            Filename
+                        </span>
+                        <input type="text" value="${ props.bundle }" placeholder="Output filename" oninput="${ dispatch("bundle") }" />
+                    </label>
+                </div>
+            </div>
+            <button onclick="${ dispatch("build") }">Bundle</button>
+        </div>
+    </div>
+
+</div>

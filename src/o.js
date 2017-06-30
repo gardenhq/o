@@ -1,5 +1,5 @@
 (
-    function(win, doc, script)
+    function(win, doc, script, bundleConfig)
     {
         "use strict";
         var registryFactory;
@@ -56,6 +56,11 @@
                                     }
 
                                 }
+                            ).catch(
+                                function(e)
+                                {
+                                    console.error(e);
+                                }
                             );
                         }
                     );
@@ -63,31 +68,36 @@
                 if(config.module) {
                     exportTo(win, _o, config.export);
                 } else {
-                    _o();
+                    _o(doc);
                 }
             } else {
                 exportTo(win, o, config.export);
             }
             return o;
         }
-        runner.config = function(script, resolve)
+        runner.config = function(script, resolve, _config)
         {
             var temp;
             // TODO: take some bits out? or namespace them with o?
-            var config = [].slice.call(script.attributes).reduce(
-                function(prev, item, i, arr)
-                {
-                    var key = item.nodeName;
-                    if(key.indexOf("data-") === 0) {
-                        prev[key.substr(5)] = item.value;
-                    }
-                    return prev;
-                },
-                {}
+            var config = Object.assign(
+                {},
+                _config || {},
+                [].slice.call(script.attributes).reduce(
+                    function(prev, item, i, arr)
+                    {
+                        var key = item.nodeName;
+                        if(key.indexOf("data-") === 0) {
+                            prev[key.substr(5)] = item.value;
+                        }
+                        return prev;
+                    },
+                    {}
+                )
             );
 
             // get a default includepath from the src
             var src = getAttribute(doc, "src", "").split("/");
+            
             config.includepath = config.includepath || (src.length > 3 ? src.slice(0, -3).concat("").join("/") : "./node_modules/");
             // resolve anything pathlike
             if(config.basepath) {
@@ -144,6 +154,7 @@
             // TODO: should doc be an arg?
             return getAttribute(doc, "data-" + key, value)
         }
+        /* resolve */
         var normalizeName = function (child, parentBase)
         {
             var parts = child.split("/").filter(
@@ -173,14 +184,79 @@
             ).join("/")
         }
 
+        var appendVersionToPackageNameRewriter = function(includePath, rewriter)
+        {
+            return function(path, headers)
+            {
+                var hash = "";
+                // this is unpkg specific
+                if(headers["X-Content-Version"] != null) {
+                    var parts = path.split("/");
+                    var index = 0;
+                    // check to make sure it doen't already have one
+                    if(parts[index].indexOf("@") === 0) {
+                        index = 1;
+                    }
+                    parts[index] += "@" + headers['X-Content-Version'];
+                    path = parts.join("/");
+                }
+                return rewriter(path, headers);
+            }
+        }
+        var getRewriter = function(includePath)
+        {
+            var rewriter = defaultRewriter(includePath);
+            if(includePath.indexOf("://") !== -1) {
+                return appendVersionToPackageNameRewriter(includePath, rewriter);
+            } else {
+                return rewriter;
+            }
+        }
+        var defaultRewriter = function()
+        {
+            return function(path, headers)
+            {
+                return {
+                    path: path,
+                    hash: Object.keys(headers).length > 0 ? "#" + JSON.stringify(headers) : ""
+                };
+            }
+        }
+        var normalizeHash = function(path, rewriter)
+        {
+            var temp = path.split("#");
+            path = temp[0];
+            var hash = temp[1] || "";
+            if(hash) {
+                var headers = {};
+                if(hash.indexOf("{") === 0) {
+                    headers = JSON.parse(hash);
+                } else if(hash.indexOf("@") === 0) {
+                    headers["X-Content-Version"] = hash.substr(1);
+                    // TODO: rethink? 
+                } else if(hash.indexOf(".") !== 0 && hash.indexOf("/") > 0) {
+                    headers['Content-Type'] = hash;
+                }
+                if(Object.keys(headers).length > 0) {
+                    return rewriter(path, headers)
+                }
+                hash = "#" + hash;
+            }
+            return {
+                path: path,
+                hash: hash
+            };
+        }
         var getResolve = function(includePath, defaultBase)
         {
+            includePath = includePath || "";
+            var rewriter = getRewriter(includePath);
             return function(path, base)
             {
+                var obj = normalizeHash(path, rewriter);
+
+                path = obj.path;
                 base = base || defaultBase;
-                var temp = path.split("#");
-                var hash = temp.length === 2 ? "#" + temp[1] : "";
-                path = temp[0];
                 var first2Chars = path.substr(0, 2);
                 var firstChar = first2Chars[0];
                 if(
@@ -189,20 +265,20 @@
                     if(path.indexOf("/") === -1) {
                         path += "/";
                     }
-                    path = (includePath || "") + path;
+                    path = includePath + path;
                 }
                 // TODO: this should go?
                 if(path[path.length - 1] === "/") {
                     path += "index";
                 }
-                temp = path.split("/");
+                var temp = path.split("/");
                 var filename = temp[temp.length - 1];
                 if(filename.indexOf(".") === -1) {
                     temp[temp.length - 1] += ".js";
                 }
                 //
                 if(path.indexOf("://") !== -1) {
-                    return temp.slice(0, 3).join("/") + normalizeName(temp.slice(3).join("/"), [""]) + hash;
+                    return temp.slice(0, 3).join("/") + normalizeName(temp.slice(3).join("/"), [""]) + obj.hash;
                 }
                 path = normalizeName(temp.join("/"), base.split("/").slice(0, -1));
                 // TODO: this should go, deal with it in the transport?
@@ -210,9 +286,10 @@
                 if(firstChar != "/" && path.indexOf("://") === -1) {
                     path = "/" + path;
                 }
-                return path + hash;
+                return path + obj.hash;
             }
         }
+        /* resolve */
         var basepath = function(doc, src)
         {
             src = getAttribute(doc, src || "src", "");
@@ -329,11 +406,24 @@
                     function(cb)
                     {
                         var registerDynamic;
-                        // TODO: resolve will change here, is that ok?
-                        var localConfig = runner.config(getCurrentScript(doc), resolve);
-                        if(!getConfig("includepath")) {
-                            localConfig.includepath = config.includepath;
-                        }
+                        // TODO: resolve will change here, is that ok? Yes
+                        var localConfig = runner.config(
+                            getCurrentScript(doc),
+                            resolve,
+                            // TODO: Allow bundle config to be overwritable? Good/bad idea?
+                            // inherit everything apart from the baseURL
+                            Object.assign(
+                                {},
+                                config,
+                                bundleConfig,
+                                {
+                                    baseURL: bundleConfig.baseURL || null
+                                }
+                            )
+                        );
+                        // if(bundleConfig == null && !getConfig("includepath")) {
+                        //     localConfig.includepath = config.includepath;
+                        // }
 
                         resolve = getResolve(localConfig.includepath, basepath(doc));
                         return Promise.all(
@@ -398,5 +488,6 @@
         inject.path = path;
         return inject;
         /* scripts */
-    }
+    },
+    typeof arguments !== "undefined" ? arguments[0] : {} // protect
 )

@@ -48,7 +48,7 @@ module.exports = function(url, clear, flash, shouldReload, win, doc)
                     onerror: function(e)
                     {
                         reconnect = false;
-                        console.debug("Unable to connect to websocket");
+                        console.debug("Unable to connect to websocket. Please see https://greenhouse.gardenhq.io/o/docs/development/setting-up-reloading.html");
                     },
                     onclose: function(e)
                     {
