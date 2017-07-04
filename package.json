@@ -1,6 +1,6 @@
 {
   "name": "@gardenhq/o",
-  "version": "6.4.0",
+  "version": "6.5.0",
   "description": "An in-browser loader, bundler and dependency injection builder.",
   "author": {
     "name": "GardenHQ",

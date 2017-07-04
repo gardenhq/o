@@ -1,17 +1,17 @@
 module.exports = function(load)
 {
     return load.then(
-        function(System)
+        function(_import)
         {
             return Promise.all(
                 [
                     __dirname + "/b.js",
-                    "@gardenhq/willow/util/destructure.js", //sieve
+                    "@gardenhq/willow/util/destructure.js",
                     "@gardenhq/willow/util/runnerFactory.js"
                 ].map(
                     function(item)
                     {
-                        return System.import(item);
+                        return _import(item);
                     }
                 )
             ).then(
@@ -20,7 +20,7 @@ module.exports = function(load)
                     return (
                         function(b, destructure, getRunner)
                         {
-                            return b(Promise.resolve(System)).then(
+                            return b(Promise.resolve(_import)).then(
                                 function(builder)
                                 {
                                     return getRunner(builder, destructure);

@@ -13,7 +13,7 @@ module.exports = function()
                 bundlerPrefix,
                 "@o.dev.templates:bundle",
                 "@o.dev.templates:app",
-                "@o.dev.templates:minimal",
+                "@o.dev.minimal",
                 "@o.dev.templates:maximal",
                 "@o.dev.bundler.minifier"
             ]
@@ -36,9 +36,25 @@ module.exports = function()
         //         "@babili-standalone"
         //     ]
         // },
-        "o.dev.bundler.template.o.minimal": {
-            "object": root + "/oMinimal.js#text/javascript",
+        "o.dev.minimal": {
+            "callable": __dirname + "/minimal.js",
+            "arguments": [
+                "@o.dev.templates:minimal",
+                "@o.dev.templates:rewriterFunctions",
+                "@o.dev.templates:rewriterHash"
+            ]
+        },
+        "o.dev.bundler.template.o.minimal.base": {
+            "object": root + "/oMinimal.js#text/javascript+literal",
             "tags": [ { name: "o.dev.template", key: "minimal" } ]
+        },
+        "o.dev.bundler.template.o.minimal.rewriter.functions": {
+            "object": __dirname + "/templates/rewriter/functions.js#text/javascript",
+            "tags": [ { name: "o.dev.template", key: "rewriterFunctions" } ]
+        },
+        "o.dev.bundler.template.o.minimal.rewriter.hash": {
+            "object": __dirname + "/templates/rewriter/hash.js#text/javascript",
+            "tags": [ { name: "o.dev.template", key: "rewriterHash" } ]
         },
         "o.dev.bundler.template.o.maximal": {
             "object": root + "/oMaximal.js#text/javascript",

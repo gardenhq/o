@@ -19,7 +19,7 @@ module.exports = function(storage, prefix, bundles, app, oMin, oMax, minify)
                         try {
                             var data = JSON.parse(storage.getItem(key));
                             if(data.headers['Cache-Control'] === "private") {
-                                o = oMax;
+                                o = function(config){ return oMax.render(); };
                                 return;
                             }
                             data.path = path;
@@ -34,7 +34,7 @@ module.exports = function(storage, prefix, bundles, app, oMin, oMax, minify)
             );
             var bundled = bundles.render(
                 {
-                    register: register || "function(path, func){ return System.registerDynamic(path, [], true, func); }",
+                    register: register || "function(path, func){ return _import.registerDynamic(path, [], true, func); }",
                     items: files,
                     exports: config.export
                 }
@@ -48,13 +48,13 @@ module.exports = function(storage, prefix, bundles, app, oMin, oMax, minify)
             }
             var bundle = app.render(
                 {
-                    o: o.render(),
+                    o: o(config),
                     bundles: bundled,
                     main: config.src,
                     config: config
                 }
             );
-            console.log(bundle.length);
+            // console.log(bundle.length);
             console.debug("Bundling " + config.src + " (if your source is large this may take a few seconds to minify...)");
             bundle = minify(bundle);
             console.log(bundle);

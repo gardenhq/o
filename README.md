@@ -15,21 +15,21 @@ Currently a usable work-in-progress.
 A CLI and/or Node is entirely optional, and not required at all. You can get going with module loading with a:
 
 ```html
-<script src="https://unpkg.com/@gardenhq/o@6.4.0/o.js"></script>
+<script src="https://unpkg.com/@gardenhq/o@6.5.0/o.js"></script>
 ```
 
 To be able to bundle (amongst other things - live reloading, transpiling and more), use the dev version. This is most
 likely what you want.
 
 ```html
-<script src="https://unpkg.com/@gardenhq/o@6.4.0/o.dev.js"></script>
+<script src="https://unpkg.com/@gardenhq/o@6.5.0/o.dev.js"></script>
 ```
 
 [View a 'Hello World'
 here](https://greenhouse.gardenhq.io/o/examples/o/development.html). Click the
 [Bundle] button to bundle.
 
-Transpiling and minification is all done in the browser with babel and uglify-es (you still don't have to use Node or install/configure anything extra).
+If ES6 is your thing, transpiling and minification is all done in the browser with Babel and UglifyJS (you still don't have to use Node or install/configure anything extra).
 
 Once you are bundled you can remove `o` and just load your bundle.
 
@@ -37,8 +37,9 @@ Once you are bundled you can remove `o` and just load your bundle.
 <script src="bundle.min.js"></script>
 ```
 
-Small bundles **will be slightly bigger than `browserify`** at least for the
-moment, but bundling with `o` also gives you `resolve`, `__dirname` and `__filename`. On the other hand, in some initial comparisons we did with a larger bundle with `require("react")` and `o` bundle came out smaller than a `browserify` one. We can't quite believe this as we've not even looked at optimizations yet, once we've spent some time doing more comparisions and verifying we'll publish some results. With this same test `webpack` kills us due to tree shaking, but we've not looked at this 'yet' - plus we'd prefer to use `willow` and build/grow our tree, rather than include everything and shake it to death.
+Small bundles **will be slightly bigger than `browserify` (a couple of hundred bytes)** at least for the moment, but bundling with `o` also gives you `resolve`, `__dirname` and `__filename`. On the other hand, in some initial comparisons we did with a larger bundle with `require("react")` and `o` bundle came out smaller than a `browserify` one. Roughly it seems, once you get over ~50 `requires`, `o` becomes smaller than `browserify`.
+
+`webpack`, `rollup` and Closure Compiler, as you can imagine, are smaller due, at least, to scope-hoisting.
 
 Things get far more interesting when used with `@gardenhq/willow` which is why `o` exists. The fact that `o` also works as a 'common or garden' module loader is a bit of a by-product.
 

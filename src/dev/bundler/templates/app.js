@@ -5,17 +5,18 @@
             function(load)
             {
                 load.then(
-                    function(System)
+                    function(_import)
                     {
                         load = o = undefined;
                         ${bundles}.then(
                             function()
                             {
-                                System.import("${ main }").then(
+                                _import("${ main }").then(
                                     function(module)
                                     {
+                                        // this is needed for data-module support
                                         if(typeof module === "function") {
-                                            module(Promise.resolve(System));
+                                            module(Promise.resolve(_import));
                                         }
                                     }
                                 );
@@ -41,9 +42,19 @@
         }
     )(
         {
-            bundled: true,
             ${
-                Object.keys(config).map(
+                Object.keys(config).filter(
+                    function(key)
+                    {
+                        return [
+                            "transport",
+                            "proxy",
+                            "parser",
+                            "registry",
+                            "export"
+                        ].indexOf(key) === -1;
+                    }
+                ).map(
                     function(key)
                     {
                         return '"' + key + '": "' + config[key] + '"';

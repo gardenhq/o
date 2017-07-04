@@ -154,36 +154,7 @@
             // TODO: should doc be an arg?
             return getAttribute(doc, "data-" + key, value)
         }
-        /* resolve */
-        var normalizeName = function (child, parentBase)
-        {
-            var parts = child.split("/").filter(
-                function(item)
-                {
-                    return item !== "";
-                }
-            );
-            if (child[0] === "/") {
-                parentBase = [parts.shift()];
-            }
-            if (child[0] !== ".") {
-                parts = ["."].concat(parts);
-            } 
-            return parentBase.concat(parts).reduce(
-                function(prev, item, i, arr)
-                {
-                    if(item == "..") {
-                        return prev.slice(0, -1);
-                    }
-                    if(item == ".") {
-                        return prev;
-                    }
-                    return prev.concat(item);
-                },
-                []
-            ).join("/")
-        }
-
+        /* rewrite */
         var appendVersionToPackageNameRewriter = function(includePath, rewriter)
         {
             return function(path, headers)
@@ -247,6 +218,37 @@
                 hash: hash
             };
         }
+        /* rewrite */
+        /* resolve */
+        var normalizeName = function (child, parentBase)
+        {
+            var parts = child.split("/").filter(
+                function(item)
+                {
+                    return item !== "";
+                }
+            );
+            if (child[0] === "/") {
+                parentBase = [parts.shift()];
+            }
+            if (child[0] !== ".") {
+                parts = ["."].concat(parts);
+            } 
+            return parentBase.concat(parts).reduce(
+                function(prev, item, i, arr)
+                {
+                    if(item == "..") {
+                        return prev.slice(0, -1);
+                    }
+                    if(item == ".") {
+                        return prev;
+                    }
+                    return prev.concat(item);
+                },
+                []
+            ).join("/")
+        }
+
         var getResolve = function(includePath, defaultBase)
         {
             includePath = includePath || "";
@@ -254,8 +256,8 @@
             return function(path, base)
             {
                 var obj = normalizeHash(path, rewriter);
-
                 path = obj.path;
+
                 base = base || defaultBase;
                 var first2Chars = path.substr(0, 2);
                 var firstChar = first2Chars[0];
@@ -421,10 +423,6 @@
                                 }
                             )
                         );
-                        // if(bundleConfig == null && !getConfig("includepath")) {
-                        //     localConfig.includepath = config.includepath;
-                        // }
-
                         resolve = getResolve(localConfig.includepath, basepath(doc));
                         return Promise.all(
                             utils

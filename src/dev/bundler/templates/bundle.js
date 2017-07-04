@@ -37,7 +37,7 @@ r(
     ${ register }${(exports ? `,
         function()
         {
-            return Promise.resolve(System);
+            return Promise.resolve(_import);
         }` : "")
     }
 )

@@ -1,0 +1,9 @@
+app.print:
+  callable: ./print
+app.hello:
+  object: ../hello-world
+main:
+  callable: ./main
+  arguments:
+    - "@app.hello"
+    - "@app.print"

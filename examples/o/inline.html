@@ -6,7 +6,7 @@
     </head>
     <body>
         <script type="text/javascript"
-            src="https://unpkg.com/@gardenhq/o@6.4.0/o.js"
+            src="https://unpkg.com/@gardenhq/o@6.5.0/o.js"
             data-export="o"
         ></script>
         <script type="text/javascript">
@@ -25,9 +25,9 @@
             function(load)
             {
                 load.then(
-                    function(System)
+                    function(_import)
                     {
-                        return System.import("../hello-world.js").then(
+                        return _import("../hello-world.js").then(
                             function(helloWorld)
                             {
                                 print(helloWorld);
