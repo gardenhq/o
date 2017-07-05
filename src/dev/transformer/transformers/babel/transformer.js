@@ -1,7 +1,9 @@
 module.exports = function(babel, presets, plugins)
 {
-    return function(content)
+    return function(content, path)
     {
-        return babel.transform(content, { presets: presets, plugins: plugins }).code;
+        var res = babel.transform(content, { presets: presets, plugins: plugins, sourceMaps: "inline", sourceFileName: path });//.code;
+        // console.log(res);
+        return res.code;
     }
 }

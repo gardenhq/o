@@ -4,11 +4,11 @@ module.exports = function()
         "imports": [
             __dirname + "/babel/index.js"
         ],
-        // "babel.transformer.js": {
-        //  "tags": [
-        //      "system.transformer.js"
-        //  ]
-        // },
+        "babel.transformer.js": {
+         "tags": [
+             "system.transformer.js"
+         ]
+        },
         "js-yaml": {
             "object": "js-yaml/dist/js-yaml.min.js",
             "version": "3.8.4"

@@ -1,6 +1,6 @@
 {
   "name": "@gardenhq/o",
-  "version": "6.5.0",
+  "version": "6.5.1",
   "description": "An in-browser loader, bundler and dependency injection builder.",
   "author": {
     "name": "GardenHQ",
@@ -14,6 +14,7 @@
   },
   "devDependencies": {
     "@gardenhq/js-test-harness": "^2.2.0",
+    "@gardenhq/tick-control": "^1.0.0",
     "istanbul": "^0.4.5",
     "mocha": "^3.3.0",
     "mocha-multi": "^0.11.0",

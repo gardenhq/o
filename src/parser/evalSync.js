@@ -85,7 +85,7 @@ parser(
                                     switch(true) {
                                         case format.indexOf("javascript") === 0:
                                             var map = "//# sourceURL=" + data.url;
-                                            if(data.content.indexOf("//# sourceURL") === -1) {
+                                            if(data.content.indexOf("//# source") === -1) {
                                                 data.content += map; 
                                             }
                                             evaluate(data.content)(

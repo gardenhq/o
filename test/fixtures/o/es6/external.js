@@ -11,10 +11,14 @@
             console.log(helloWorld);
         }
         load.then(
-            function(System)
+            function(_import)
             {
-                var world = "World";
-                print(`Hello ${world}!`);
+                _import("./import-export.js").then(
+                    function(world)
+                    {
+                        print(`Hello ${world.default}!`);
+                    }
+                );
             }
         ).catch(
             function(e)
