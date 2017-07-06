@@ -1,6 +1,6 @@
 export PATH := ./node_modules/.bin:${PATH}
 ARGUMENTS := $(wordlist 2,$(words $(MAKECMDGOALS)),$(MAKECMDGOALS))
-FILES=parser/eval.js parser/evalSync.js parser/function.js parser/script.js registry/memory.js transport/xhr.js transport/xhrNodeResolver.js transport/iframe.js proxy/localStorage.js b.js r.js
+FILES=parser/eval.js parser/evalSync.js parser/function.js parser/script.js registry/memory.js transport/xhr.js transport/xhrNodeResolver.js transport/iframe.js proxy/localStorage.js b.js r.js s.js
 clean:
 	rm -rf $(FILES) \
 			o.js o.dev.js \

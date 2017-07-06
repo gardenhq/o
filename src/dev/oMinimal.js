@@ -4,17 +4,6 @@
         return function(cb)
         {
             var modules = {};
-            // TODO: Decide whether to annoyingly add process
-            // or pass it in as an extra arg
-            // prefer extra arg for now
-            // window.process = {
-            //     env: {},
-            //     argv: ""
-            // }
-            var process = {
-                env: {},
-                argv: ""
-            };
 
             ${ rewriter }
 
@@ -110,7 +99,7 @@
                     this[unique] = undefined;
                     // (exports, require, module, __filename, __dirname)
                     // module.bind(null)(this.exports, _require, this, this.filename, temp.join("/"));
-                    module.bind(null)(this, this.exports, _require, this.filename, temp.join("/"), process);
+                    module.bind(null)(this, this.exports, _require, this.filename, temp.join("/"));
                 }
                 return this.exports;
             }

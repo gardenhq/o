@@ -139,7 +139,10 @@
                                         ).then(
                                             function(builder)
                                             {
-                                                var main = discoverMain(services, resolve);
+                                                var main = discoverMain(
+                                                    typeof config['entry-dev'] !== "undefined" ? config['entry-dev'] : services,
+                                                    resolve
+                                                );
                                                 // TODO: if builder always gets Promises, should it always set promises?
                                                 builder.set(
                                                     "o.dev.delete",
@@ -148,6 +151,18 @@
                                                 return builder.build(resolve(main.container, location.pathname)).get(main.id).then(
                                                     function(devtools)
                                                     {
+                                                        builder.set(
+                                                            "o.dev.loader",
+                                                            Promise.resolve(
+                                                                loader
+                                                            )
+                                                        );
+                                                        // builder.set(
+                                                        //     "o.dev.transformer",
+                                                        //     Promise.resolve(
+                                                        //         loader
+                                                        //     )
+                                                        // );
                                                         builder.set(
                                                             "o.dev.import",
                                                             Promise.resolve(

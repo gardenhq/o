@@ -51,7 +51,8 @@
                             "proxy",
                             "parser",
                             "registry",
-                            "export"
+                            "export",
+                            "entry-dev"
                         ].indexOf(key) === -1;
                     }
                 ).map(

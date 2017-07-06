@@ -8,38 +8,78 @@ Currently a usable work-in-progress.
 
 <https://greenhouse.gardenhq.io/o/>
 
+## Features
+
+### Loader
+
+* CommonJS support
+* Promised/Asynchronous true dynamic-import loading (via TC39 `import` or `System.import` like syntax)
+* Synchronous static loading (via CommonJS/NodeJS like `require` syntax)
+* Local and remote/CDN include paths - `/node_modules/` (or other local path) or `unpkg.com`
+* Node-like `__dirname`, `__filename` for both synchronous and asynchronous CommonJS modules.
+* ES6 module support (only during development, bundling required for your final build as per other bundlers)
+
+### Bundler / development
+
+* True dynamic-imports `import("a" + path + "/" + here + "/module.js").then()`
+* Super fast file-watching/live-reloading (file watcher configuration required)
+* ES6 transpiling (via Babel)
+* ES6 scope-hoisting/tree shaking (via Rollup)
+* Traditional static `require` bundling
+* Minification (via UglifyJS)
+* Sourcemaps (only required for ES6 transpiling)
+* 'Safe', in-browser execution and support for environments where no CLI is available (sensitive environments, iOS)
+
+### Other
+
+* Zero installation (just use a single script tag, but you can also use the traditional `npm` route if you like)
+* Almost zero configuration (apart from scope-hoisting which currently requires the addition of a single HTML attribute to your script tag, and file watching)
+* 'Install size'
+	* Loader only: ~3kb (can be made smaller by omitting static/synchronous Node-like loading support)
+	* Bundler (needed during development only): ~400kb, half of which is babel. For comparision, `webpack`/`browserify`/`requirejs` are ~10MB
+* 100% Bundled runtime size: ~740 bytes
+
+
 ## Brief-ish overview
 
 ### Frontend development
 
-A CLI and/or Node is entirely optional, and not required at all. You can get going with module loading with a:
+A CLI with Node is entirely optional, and not required at all. You can get going with module loading with a:
 
 ```html
-<script src="https://unpkg.com/@gardenhq/o@6.5.1/o.js"></script>
+<script src="https://unpkg.com/@gardenhq/o@7.0.0/o.js"></script>
+
+OR (if you want to use npm)
+
+<script src="/node_modules/@gardenhq/o/o.js"></script>
 ```
 
 To be able to bundle (amongst other things - live reloading, transpiling and more), use the dev version. This is most
 likely what you want.
 
 ```html
-<script src="https://unpkg.com/@gardenhq/o@6.5.1/o.dev.js"></script>
+<script src="https://unpkg.com/@gardenhq/o@7.0.0/o.dev.js"></script>
+
+OR (if you want to use npm)
+
+<script src="/node_modules/@gardenhq/o/o.dev.js"></script>
 ```
 
 [View a 'Hello World'
 here](https://greenhouse.gardenhq.io/o/examples/o/development.html). Click the
 [Bundle] button to bundle.
 
-If ES6 is your thing, transpiling and minification is all done in the browser with Babel and UglifyJS (you still don't have to use Node or install/configure anything extra).
+For ES6, transpiling and minification is all done in the browser with Babel and/or Rollup and UglifyJS. You still don't have to use Node or install/configure anything extra, apart from a single HTML attribute on your script tag if you want to switch to Rollup for ES6 imports.
 
-Once you are bundled you can remove `o` and just load your bundle.
+Once you are bundled you can remove `o` completely and just load your bundle.
 
 ```html
-<script src="bundle.min.js"></script>
+<script src="bundle.js"></script>
 ```
 
-Small bundles **will be slightly bigger than `browserify` (a couple of hundred bytes)** at least for the moment, but bundling with `o` also gives you `resolve`, `__dirname` and `__filename`. On the other hand, in some initial comparisons we did with a larger bundle with `require("react")` and `o` bundle came out smaller than a `browserify` one. Roughly it seems, once you get over ~50 `requires`, `o` becomes smaller than `browserify`.
+Small CommonJS-only bundles with less than ~50 modules **will be slightly bigger than `browserify` (a couple of hundred bytes)** at least for the moment, but bundling with `o` also gives you `resolve`, `__dirname` and `__filename`, dynamic-imports etc etc, and of course the ability to write javascript without installing/configuring anything. On the other hand, in some initial comparisons we did with a larger bundle with `require("react")` an `o` bundle came out smaller than a `browserify` one. Roughly it seems, once you get over ~50 `requires`, `o` becomes smaller than `browserify`.
 
-`webpack`, `rollup` and Closure Compiler, as you can imagine, are smaller due, at least, to scope-hoisting.
+ES6 transpiling sizes are similar to `webpack` and `rollup` as we use `rollup` for scope-hoisting and tree-shaking.
 
 Things get far more interesting when used with `@gardenhq/willow` which is why `o` exists. The fact that `o` also works as a 'common or garden' module loader is a bit of a by-product.
 
@@ -48,8 +88,8 @@ Things get far more interesting when used with `@gardenhq/willow` which is why `
 Essentially you can write your app something like this (you can also use json or a CommonJS module):
 
 ```html
-<script src="https://unpkg.com/@gardenhq/o@6.5.1/o.dev.js"
-   data-src="https://unpkg.com/@gardenhq/o@6.5.1/b.js#./container.yaml:main"
+<script src="https://unpkg.com/@gardenhq/o@7.0.0/o.dev.js"
+   data-src="https://unpkg.com/@gardenhq/o@7.0.0/b.js#./container.yaml:main"
 ></script>
 ```
 
@@ -69,9 +109,11 @@ app.some.nice.logic:
 app.data:
   object: "./someJsonMaybe"
 react:
-  object: "react"
+  object: "react/dist/react.min.js"
 react.dom:
-  object: "react-dom"
+  requires: 
+    react: "@react" # inject our @react service when we encounter require("react")
+  object: "react-dom/dist/react-dom.min.js"
 
 ```
 
@@ -85,7 +127,7 @@ module.exports = function(React, ReactDOM, instanceOfLogicCalculator)
 }
 ```
 
-Everything is loaded asyncronously, and your index.js file will only execute once its arguments (and their dependencies) are all available. Your arguments can be local in node_modules, on a CDN, or on the night bus home from a big night out. Your module will only execute once everything is ready (BTW things are cached, so generally during development, once you've loaded a file once its available straight away unless you edit it, see reloading)
+Everything is loaded asyncronously, and your index.js file will only execute once its arguments (and their dependencies) are all available. Your arguments can be local in node_modules, on a CDN, or on the night bus home from a big night out. Your module will only execute once everything is ready. During development, things are cached, so once you've loaded a file once its available straight away unless you edit it (see reloading). Once you are finished you can bundle, meaning everything is available instantly as you would imagine.
 
 Building your app like this, not only frees you up from a load of plumbing, but also makes everything much easier to **test** and mock. But if you are here reading this, you probably know that :)
 

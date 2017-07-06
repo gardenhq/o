@@ -12,7 +12,7 @@ ${
                 return `
 r(
     "${ item.path }",
-    function(module, exports, require, __filename, __dirname, process)
+    function(module, exports, require, __filename, __dirname)
     {
         module.exports = ${ JSON.stringify(item.content) };
     }
@@ -21,7 +21,7 @@ r(
                 return `
 r(
     "${ item.path }",
-    function(module, exports, require, __filename, __dirname, process)
+    function(module, exports, require, __filename, __dirname)
     {
         ${ item.content }
     }

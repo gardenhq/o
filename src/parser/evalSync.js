@@ -7,12 +7,6 @@ parser(
             // return function(exports, require, module, __filename, __dirname)
             return function(module, exports, require, __filename, __dirname)
             {
-                var process = {
-                    env: {
-                        // NODE_ENV: "production"
-                    },
-                    argv: ""
-                };
                 eval(source)
             }
         }

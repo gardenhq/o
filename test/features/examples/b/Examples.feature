@@ -19,18 +19,18 @@ Feature: Examples
   @javascript
   Scenario: It can import within external scripts using a `data-src` path ready for bundling
     Given I am on "/examples/b/development.html"
-    And I execute "sleep 3"
+    And I execute "sleep 5"
     Then I should see "Hello World!"
 
 
   @javascript
   Scenario: It can run the bundled script
     Given I am on "/examples/b/development.html"
-    And I execute "sleep 3"
+    And I execute "sleep 5"
     Then I should see "Hello World!"
     And I am on "/"
     Given I am on "/examples/b/development.html#bundle"
-    Then I execute "sleep 3"
+    Then I execute "sleep 5"
     And save the html in "pre" to "bundled.js"
 
     Given I execute "make report /examples/b/development.html"

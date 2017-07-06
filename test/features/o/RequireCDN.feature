@@ -13,7 +13,7 @@ Feature: Require CDN
   @javascript
   Scenario: It can run the bundled script
     Given I am on "/test/fixtures/o/require/cdn/development.html"
-    Then I execute "sleep 15"
+    Then I execute "sleep 20"
     Then I should see "Hello World!"
 
     And I am on "/"

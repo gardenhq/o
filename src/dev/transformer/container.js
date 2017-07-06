@@ -3,7 +3,7 @@ module.exports = function(builder)
     return {
         "imports": [
             {
-                resource: __dirname + "/transformers/index.js"
+                resource: __dirname + "/transformers/container"
             }
         ],
         "o.dev.transformer": {

@@ -1,6 +1,12 @@
 (
     function(load)
     {
+        window.process = {
+            env: {
+                // NODE_ENV: "production"
+            },
+            argv: ""
+        };
         load.then(
             function(System)
             {

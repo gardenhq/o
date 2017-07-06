@@ -9,6 +9,7 @@
 !/b.js
 !/o.dev.js
 !/transport/**
+!/s.js
 
 !/parser/**
 !/registry/**

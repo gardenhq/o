@@ -16,10 +16,10 @@ module.exports = function(transformers)
         ).then(
             function(content)
             {
-                var map = "//# sourceURL=" + path;
                 if(content.indexOf("//# source") === -1) {
-                    content += map; 
+                    content += "//# sourceURL=" + path; 
                 }
+                // data.source = data.content;
                 data.content = content;
                 data.headers['Content-Type'] = "application/javascript";
                 return data;

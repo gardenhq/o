@@ -34,12 +34,12 @@ module.exports = function(storage, reload, flash, prefix)
         ).then(
             function(items)
             {
-                items.forEach(
-                    function(item)
-                    {
-                        // flash.add("Cache cleared for " + item);
-                    }
-                );
+                // items.forEach(
+                //     function(item)
+                //     {
+                //         // flash.add("Cache cleared for " + item);
+                //     }
+                // );
                 var cleared = id == "file://" ? "entire cache" : id;
                 flash.add("Cleared " + cleared)
                 return reload;
