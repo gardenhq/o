@@ -12,7 +12,7 @@ Feature: CDN
   @javascript
   Scenario: It can run the bundled script
     Given I am on "/test/fixtures/o/cdn/development.html#bundle"
-    Then I execute "sleep 2"
+    Then I execute "sleep 3"
     And save the html in "pre" to "bundled.js"
 
     Given I execute "make report /test/fixtures/o/cdn/development.html"

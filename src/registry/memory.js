@@ -3,10 +3,10 @@ registry(
     {
         var unique = "o"
         /* module */
-        var Module = function(id, parent, module)
+        var Module = function(id, parent, module, filename)
         {
             this.id = id;
-            this.filename = id;
+            this.filename = filename || id;
             this.parent = parent;
             this.exports = {};
             this[unique] = module;
@@ -52,18 +52,18 @@ registry(
             {
                 return keys[key.split("#")[0]] === true;
             }
-            var set = function(path, module)
+            var set = function(key, module, filename)
             {
                 // TODO: This can return null when you might expect the module
                 // return the Module?
                 // always return null ? **
                 // Keep as both means I know whether its already set or not?
-                path = path.split("#")[0];
-                if(has(path)) {
+                key = key.split("#")[0];
+                if(has(key)) {
                     return;
                 }
-                keys[path] = true;
-                modules[path] = new Module(path, null, module);
+                keys[key] = true;
+                modules[key] = new Module(key, null, module, filename);
                 return module;
             }
             var registry = function(path, loader, parser, resolve)
@@ -90,51 +90,6 @@ registry(
                     }
                 );
             };
-            // TODO: node polyfills
-            // set(
-            //  "/node_modules/tty/index.js",
-            //  function(module)
-            //  {
-            //      module.exports = {
-            //          isatty: function()
-            //          {
-            //              return false;
-            //          }
-            //      };
-            //  }
-            // );
-            // set(
-            //  "/node_modules/fs/index.js",
-            //  function(module)
-            //  {
-            //      module.exports = {
-            //      };
-            //  }
-            // );
-            // set(
-            //  "/node_modules/path/index.js",
-            //  function(module)
-            //  {
-            //      module.exports = {
-            //      };
-            //  }
-            // );
-            // set(
-            //  "/node_modules/module/index.js",
-            //  function(module)
-            //  {
-            //      module.exports = {
-            //      };
-            //  }
-            // );
-            // set(
-            //  "/node_modules/net/index.js",
-            //  function(module)
-            //  {
-            //      module.exports = {
-            //      };
-            //  }
-            // );
             registry.set = set;
             registry.has = has;
             registry.get = get;

@@ -148,7 +148,7 @@
                                                     "o.dev.delete",
                                                     Promise.resolve(function(key){return Promise.resolve(registry.delete(key))})
                                                 );
-                                                return builder.build(resolve(main.container, location.pathname)).get(main.id).then(
+                                                return builder.build(resolve(main.container)).get(main.id).then(
                                                     function(devtools)
                                                     {
                                                         builder.set(

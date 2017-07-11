@@ -21,7 +21,7 @@ module.exports = function(commands, env, File, bindings, flash)
                 }
             );   
         };
-        console.info("Type `bundle()` to bundle. Type `dirty()` or 'command-r' to clear the entire cache.");
+        console.info("Type `bundle()` to bundle. Type `dirty()` or 'command-r' to clear the **entire** cache and request everything again.\n  If you want to just reload **without clearing the cache**, click the browser's reload button.");
         bindings.bind(
             [
                 'command+r',

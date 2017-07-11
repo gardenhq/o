@@ -5,7 +5,7 @@ module.exports = function(builder)
         "imports": [
             {
                 resource: "@gardenhq/tick-control/container.js",
-                version: "^1.0.0"
+                version: "^2.0.0"
             },
             {
                 resource: "@gardenhq/domino/container.js",

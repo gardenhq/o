@@ -18,12 +18,12 @@ module.exports = function(builder)
             {
                 return {
                     "js": [
-                        "javascript", "json", "js",
-                        "jsx", "es6" // its just javascript!
+                        "javascript", "js",
+                        "jsx", "es6"
                     ], 
+                    "yaml": ["yaml", "yml"],
                     "css": ["css"],
-                    "html": ["html"],
-                    "yaml": ["yaml", "yml"]
+                    "html": ["html"]
                 };
             }
         }

@@ -1,6 +1,6 @@
 (
                     /* o */
-    function(r${ exports ? ", " + exports : "" })
+    function(module${ exports ? ", " + exports : "" })
     {
         return Promise.all(
             [
@@ -8,23 +8,27 @@ ${
     items.map(
         function(item)
         {
+            var filename = "";
+            if(item.path !== item.url) {
+                filename = ',"' + item.url.replace(item.path, "") + '"';
+            }
             if(item.headers['Content-Type'] != "application/javascript") {
                 return `
-r(
+module(
     "${ item.path }",
     function(module, exports, require, __filename, __dirname)
     {
         module.exports = ${ JSON.stringify(item.content) };
-    }
+    }${ filename }
 )`;
             } else {
                 return `
-r(
+module(
     "${ item.path }",
     function(module, exports, require, __filename, __dirname)
     {
         ${ item.content }
-    }
+    }${ filename }
 )`;
             }
         }

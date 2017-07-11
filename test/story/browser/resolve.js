@@ -57,16 +57,16 @@ describe(
                     "resolves with a CDN Base",
                     function()
                     {
-                        const resolve = getResolve("/node_modules/", "http://cdn.somewhere.com/react-dom@15.5.4/index.js");
+                        const resolve = getResolve("/node_modules/", "http://cdn.somewhere.com/react-dom@15.5.4");
                         var res;
                         res = resolve(
                         	"./lib/ReactDOM"
                         );
-						expect(res).to.equal("http://cdn.somewhere.com/react-dom@15.5.4/lib/ReactDOM.js");
+						expect(res).to.equal("http://cdn.somewhere.com/react-dom@15.5.4/lib/ReactDOM");
                         res = resolve(
                         	"./lib/ReactDOM/deep/down/elsewhere"
                         );
-						expect(res).to.equal("http://cdn.somewhere.com/react-dom@15.5.4/lib/ReactDOM/deep/down/elsewhere.js");
+						expect(res).to.equal("http://cdn.somewhere.com/react-dom@15.5.4/lib/ReactDOM/deep/down/elsewhere");
                     }
                 )
             }

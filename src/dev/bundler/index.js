@@ -34,7 +34,7 @@ module.exports = function(storage, prefix, bundles, app, oMin, oMax, minify)
             );
             var bundled = bundles.render(
                 {
-                    register: register || "function(path, func){ return _import.registerDynamic(path, [], true, func); }",
+                    register: register || "function(path, func, filename){ return _import.registerDynamic(path, [], true, func, path + (filename || '')); }",
                     items: files,
                     exports: config.export
                 }

@@ -16,13 +16,13 @@ Feature: Standalone (i.e. built /o.js not src/o.js)
   @javascript
   Scenario: It can import within external scripts using a `data-src` path ready for bundling
     Given I am on "/test/fixtures/o/standalone/development.html"
-    And I execute "sleep 2"
+    And I execute "sleep 3"
     Then I should see "Hello World! (from o/external.js)"
 
   @javascript
   Scenario: It produces a bundle without 'willow' (and therefore not the toolbar)
     Given I am on "/test/fixtures/o/standalone/development.html#bundle"
-    Then I execute "sleep 2"
+    Then I execute "sleep 3"
     And save the html in "pre" to "bundled.js"
     Then I execute "grep -c 'willow' ./test/results/bundled.js"
     And I should see the output "0"
@@ -30,7 +30,7 @@ Feature: Standalone (i.e. built /o.js not src/o.js)
   @javascript
   Scenario: It can run the bundled script
     Given I am on "/test/fixtures/o/standalone/development.html#bundle"
-    Then I execute "sleep 2"
+    Then I execute "sleep 3"
     And save the html in "pre" to "bundled.js"
 
     Given I execute "make report /test/fixtures/o/standalone/development.html"

@@ -10,7 +10,7 @@
         var pathname = win.location.pathname;
         var dirname = function(path)
         {
-            return path.split("/").slice(0, -1).concat("").join("/")
+            return path.split("/").slice(0, -1).join("/")
         }
         var exportTo = function(where, what, path)
         {
@@ -78,6 +78,7 @@
         runner.config = function(script, resolve, _config)
         {
             var temp;
+            var __dirname = dirname(pathname);
             // TODO: take some bits out? or namespace them with o?
             var config = Object.assign(
                 {},
@@ -87,56 +88,75 @@
                     {
                         var key = item.nodeName;
                         if(key.indexOf("data-") === 0) {
-                            prev[key.substr(5)] = item.value;
+                            var value = item.value;
+                            key = key.substr(5);
+                            switch(key) {
+                                case "basepath":
+                                case "includepath":
+                                    if(value[value.length - 1] === "/") {
+                                        value = value.substr(0, value.length - 1);
+                                    }
+                                    break;
+                            }
+                            prev[key] = value;
                         }
                         return prev;
                     },
                     {}
                 )
             );
-
-            // get a default includepath from the src
-            var src = getAttribute(doc, "src", "").split("/");
-            
-            config.includepath = config.includepath || (src.length > 3 ? src.slice(0, -3).concat("").join("/") : "./node_modules/");
-            // resolve anything pathlike
-            if(config.basepath) {
-                config.basepath = resolve(config.basepath, pathname);
-            }
-            // append / to includepath
-            if(config.includepath.lastIndexOf("/") !== config.includepath.length -1) {
-                config.includepath += "/";
-            }
-            var basepath = config.basepath || pathname;
-            [
-                "includepath",
-                "src"
-            ].forEach(
-                function(item)
-                {
-                    if(config[item] != null) {
-                        config[item] = resolve(config[item], basepath);
-                    }
-                }
-            );
-            // pop off the index.js for now
-            config.includepath = dirname(config.includepath);
-            // data-src is set
+            var _src = getAttribute(doc, "src", "").split("/");
+            config.includepath = config.includepath || (_src.length > 3 ? _src.slice(0, -3).join("/") : "./node_modules");
+            var src;
             if(config.src) {
                 temp = config.src.split("#");
                 config.src = temp[0];
                 if(temp[1]) {
-                    // if I have a hash resolve it to the page url and save it
-                    config.hash = resolve(temp[1], basepath);
+                    config.hash = resolve(temp[1], __dirname);
                 }
-                // baseURL should be the resolved data-src path unless basepath is set
-                config.baseURL = config.basepath || config.src;
+                src = config.src;
             } else if(script.hasAttribute("src")) {
-                // config.src = script.getAttribute("src") 
-                // data-src isn't set, but src is, surely this is only for bundles?
-                config.baseURL = config.basepath || resolve(script.getAttribute("src"), pathname);
+                src = script.getAttribute("src");
             }
-            config.baseURL = dirname(config.baseURL || basepath);
+            if(config.basepath) {
+                config.basepath = resolve(config.basepath, __dirname);
+                if(src) {
+                    config.baseURL = resolve(src, config.basepath);
+                    if(config.src) {
+                        config.src = config.baseURL;
+                    }
+                } else {
+                    config.baseURL = pathname, config.basepath;
+                }
+            } else {
+                if(src) {
+                    config.baseURL = resolve(src, __dirname);
+                    if(config.src) {
+                        config.src = config.baseURL;
+                    }
+                } else {
+                    config.baseURL = pathname;
+                }
+                config.basepath = dirname(config.baseURL);
+            }
+            if(config.hash) {
+                config.basepath = dirname(config.hash);
+            }
+
+            // if(Object.keys(bundleConfig).length === 0) {
+                [
+                    "includepath",
+                    "src"
+                ].forEach(
+                    function(item)
+                    {
+                        if(config[item] != null) {
+                            config[item] = resolve(config[item], config.basepath);
+                        }
+                    }
+                );
+
+            // }
             return config;
         }
         var getCurrentScript = function(doc)
@@ -255,37 +275,27 @@
             var rewriter = getRewriter(includePath);
             return function(path, base)
             {
+                // base should always be a dirname with no trailing slash
                 var obj = normalizeHash(path, rewriter);
                 path = obj.path;
-
-                base = base || defaultBase;
                 var first2Chars = path.substr(0, 2);
                 var firstChar = first2Chars[0];
                 if(
                     first2Chars != ".." && first2Chars != "./" && firstChar != "/" && path.indexOf("://") === -1
                 ) {
-                    if(path.indexOf("/") === -1) {
-                        path += "/";
-                    }
-                    path = includePath + path;
-                }
-                // TODO: this should go?
-                if(path[path.length - 1] === "/") {
-                    path += "index";
+                    path = includePath + "/" + path;
                 }
                 var temp = path.split("/");
-                var filename = temp[temp.length - 1];
-                if(filename.indexOf(".") === -1) {
-                    temp[temp.length - 1] += ".js";
-                }
-                //
                 if(path.indexOf("://") !== -1) {
                     return temp.slice(0, 3).join("/") + normalizeName(temp.slice(3).join("/"), [""]) + obj.hash;
                 }
-                path = normalizeName(temp.join("/"), base.split("/").slice(0, -1));
-                // TODO: this should go, deal with it in the transport?
-                firstChar = path[0];
-                if(firstChar != "/" && path.indexOf("://") === -1) {
+                base = base || defaultBase;
+                // try {
+                path = normalizeName(temp.join("/"), base.split("/"));
+                // } catch(e) {
+                //     console.log(path, base);
+                // }
+                if(path[0] != "/" && path.indexOf("://") === -1) {
                     path = "/" + path;
                 }
                 return path + obj.hash;
@@ -294,15 +304,20 @@
         /* resolve */
         var basepath = function(doc, src)
         {
-            src = getAttribute(doc, src || "src", "");
-            var parts = pathname.split("/");
-            if(src[0] !== "/") {
-                parts[parts.length - 1] = src;
+            var path = getConfig("basepath",  false);
+            if(!path) {
+                src = getAttribute(doc, src || "src", "");
+                var parts = pathname.split("/");
+                if(src[0] !== "/") {
+                    parts[parts.length - 1] = src;
+                }
+                path = dirname(parts.join("/"));
+            } else {
+                if(path[path.length - 1] === "/") {
+                    path = path.substr(0, path.length -1)
+                }
             }
-            return getConfig(
-                "basepath",
-                parts.join("/")
-            );
+            return path;
         };
         /* test */
         if(window.test) {
@@ -349,7 +364,7 @@
                 ).map(
                     function(item)
                     {
-                        return script(resolve(item.path, config.baseURL), item.key, currentScript, config.includepath)
+                        return script(resolve(item.path, config.basepath), item.key, currentScript, config.includepath)
                     }
                 ).map(
                     function(injectScript, i)
@@ -389,7 +404,7 @@
                         return function(path)
                         {
                             return register(
-                                resolve(path, (this ? this.getConfig() : config).baseURL),
+                                resolve(path, (this ? this.getConfig() : config).basepath),
                                 _proxy(
                                     transport,
                                     factory,
@@ -419,7 +434,8 @@
                                 config,
                                 bundleConfig,
                                 {
-                                    baseURL: bundleConfig.baseURL || null
+                                    baseURL: bundleConfig.baseURL || null,
+                                    basepath: bundleConfig.basepath || null
                                 }
                             )
                         );
@@ -433,9 +449,9 @@
                                 parser = modules[1];
                                 registry = modules[2];
                                 proxy = modules[3];
-                                registerDynamic = function(path, deps, executingRequire, cb)
+                                registerDynamic = function(path, deps, executingRequire, cb, filename)
                                 {
-                                    return Promise.resolve(registry.set(path, cb));
+                                    return Promise.resolve(registry.set(path, cb, filename));
                                 }
 /*_o*/
                                 return getPromisedLoader(resolve, localConfig)(doc)("/src/_o.js");

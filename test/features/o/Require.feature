@@ -13,12 +13,12 @@ Feature: Require
   @javascript
   Scenario: It can run the bundled script
     Given I am on "/test/fixtures/o/require/local/development.html"
-    Then I execute "sleep 20"
+    Then I execute "sleep 30"
     Then I should see "Hello World!"
 
     And I am on "/"
     Then I am on "/test/fixtures/o/require/local/development.html#bundle"
-    And I execute "sleep 3"
+    And I execute "sleep 5"
 
     And save the html in "pre" to "bundled.js"
     And I execute "cp ./test/results/bundled.js ./test/fixtures/bundled/bundled.js"

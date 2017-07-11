@@ -1,6 +1,8 @@
 transport(
     function(scriptPath)
     {
+        // TODO: this can be much simpler now
+        // I'm not getting modified paths (+= ".js" etc)
         var extension = ".js";
         var jsonExtension = ".json";
         var index = "index" + extension;
@@ -75,7 +77,7 @@ transport(
                 },
                 try: function(path, fetch)
                 {
-                    return fetch(path.split(".").slice(0, -1) + jsonExtension);
+                    return fetch(path + jsonExtension);
                 }
             },
             {
@@ -85,20 +87,19 @@ transport(
                 },
                 try: function(path, fetch)
                 {
-                    return fetch(path.split(".").slice(0, -1) + "/" + index);
+                    return fetch(path + "/" + index);
                 }
             },
             {
                 test: function(filename)
                 {
-                    // right now everything will come in with '/index.js' unless its a real 404
-                    return isIndex(filename);
+                    // if I can't find anything else plumb for package.json
+                    return true;
                 },
                 try: function(path, fetch)
                 {
                     var temp = path.split("/");
-                    temp.pop();
-                    return fetch(temp.join("/") + "/package.json").then(
+                    return fetch(path + "/package.json").then(
                         function(data)
                         {
                             temp.push(JSON.parse(data.content).main);
@@ -113,10 +114,10 @@ transport(
             Ajax = Ajax || XMLHttpRequest;
             var filename = path.split("/").pop().split("@")[0];
             var fetchlike = getFetchLike(path, new Ajax());
-            return Object.keys(attempts).reduce(
+            return attempts.reduce(
                 function(prev, item, i)
                 {
-                    var attempt = attempts[item];
+                    var attempt = item;
                     return prev.catch(
                         function(data)
                         {

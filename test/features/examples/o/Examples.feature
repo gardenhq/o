@@ -16,13 +16,13 @@ Feature: Examples
   @javascript
   Scenario: It can import within external scripts using a `data-src` path ready for bundling
     Given I am on "/examples/o/development.html"
-    And I execute "sleep 2"
+    And I execute "sleep 3"
     Then I should see "Hello World!"
 
   @javascript
   Scenario: It produces a bundle without 'willow' (and therefore not the toolbar)
     Given I am on "/examples/o/development.html#bundle"
-    Then I execute "sleep 2"
+    Then I execute "sleep 3"
     And save the html in "pre" to "o-bundled.js"
     Then I execute "grep -c 'willow' ./test/results/o-bundled.js"
     And I should see the output "0"
@@ -30,7 +30,7 @@ Feature: Examples
   @javascript
   Scenario: It can run the bundled script
     Given I am on "/examples/o/development.html#bundle"
-    Then I execute "sleep 2"
+    Then I execute "sleep 3"
     And save the html in "pre" to "bundled.js"
 
     # And I execute "cp ./test/results/bundled.js ./examples/o/bundled.js"

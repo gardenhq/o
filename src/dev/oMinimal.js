@@ -47,32 +47,18 @@
 
                     ${ hash }
 
-                    base = base || defaultBase;
                     var first2Chars = path.substr(0, 2);
                     if(
                         first2Chars != ".." && first2Chars != "./" && first2Chars[0] != "/" && path.indexOf("://") === -1
                     ) {
-                        if(path.indexOf("/") === -1) {
-                            path += "/";
-                        }
-                        path = includePath + path;
-                    }
-                    // TODO: this should go?
-                    if(path[path.length - 1] === "/") {
-                        path += "index";
+                        path = includePath + "/" + path;
                     }
                     var temp = path.split("/");
-                    // filename
-                    if(temp[temp.length - 1].indexOf(".") === -1) {
-                        temp[temp.length - 1] += ".js";
-                    }
-                    //
                     if(path.indexOf("://") !== -1) {
                         return temp.slice(0, 3).join("/") + normalizeName(temp.slice(3).join("/"), [""])${ addHash };
                     }
-                    path = normalizeName(temp.join("/"), base.split("/").slice(0, -1));
-                    // TODO: this should go, deal with it in the transport?
-                    // firstChar
+                    base = base || defaultBase;
+                    path = normalizeName(temp.join("/"), base.split("/"));
                     if(path[0] != "/" && path.indexOf("://") === -1) {
                         path = "/" + path;
                     }
@@ -81,10 +67,10 @@
             }
             /* resolve */
             /* Module */
-            var Module = function(id, parent, module)
+            var Module = function(id, parent, module, filename)
             {
                 this.id = id;
-                this.filename = id;
+                this.filename = filename || id;
                 // this.parent = parent;
                 this.exports = {};
                 this[unique] = module;
@@ -107,12 +93,15 @@
             var _require = function(path)
             {
                 path = _require.resolve(path).split("#")[0];
+                var module = modules[path];
+                var from = module.filename.split("/").slice(0, -1).join("/");
                 var relativeRequire = function(relativePath)
                 {
-                    return _require(relativePath.indexOf("/") === 0 ? relativePath : _require.resolve(relativePath, path));
+                    return _require(relativePath.indexOf("/") === 0 ? relativePath : _require.resolve(relativePath, from));
                 }
+                return module._load(relativeRequire);
                 // try {
-                    return modules[path]._load(relativeRequire)
+                    // return modules[path]._load(relativeRequire)
                 // } catch(e) {
                     // console.error(path);
                     // e.message = "Unable to require '" + path + "'";
@@ -123,9 +112,9 @@
             {
                 return Promise.resolve(_require(path));
             }
-            o.registerDynamic = function(path, deps, bool, module)
+            o.registerDynamic = function(path, deps, bool, module, filename)
             {
-                modules[path] = new Module(path, null, module);
+                modules[path] = new Module(path, null, module, filename);
             };
             o.import = function(path)
             {
@@ -141,7 +130,7 @@
             {
                 // b.js will change baseURL post init
                 if(_config.baseURL !== config.baseURL) {
-                    this.resolve = _require.resolve = getResolve(_config.includepath || config.includepath, _config.baseURL);
+                    this.resolve = _require.resolve = getResolve(_config.includepath || config.includepath, _config.basepath);
                 }
                 config = Object.assign(
                     {},
@@ -149,7 +138,7 @@
                     _config
                 );
             }
-            o.resolve = _require.resolve = getResolve(_bundleConfig.includepath, _bundleConfig.baseURL);
+            o.resolve = _require.resolve = getResolve(_bundleConfig.includepath, _bundleConfig.basepath);
             return Promise.resolve(o);
         };
     }

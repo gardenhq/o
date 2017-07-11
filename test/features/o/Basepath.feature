@@ -20,19 +20,19 @@ Feature: Basepath
   @javascript
   Scenario: During development I can use a relative data-src path
     Given I am on "/test/fixtures/o/basepath/development/relative.html"
-    And I execute "sleep 1"
+    And I execute "sleep 3"
     Then I should see "Hello World! (from o/external.js)"
 
   @javascript
   Scenario: During development I can use a basepath plus a data-src path
     Given I am on "/test/fixtures/o/basepath/development/basepath.html"
-    And I execute "sleep 1"
+    And I execute "sleep 3"
     Then I should see "Hello World! (from o/external.js)"
 
   @javascript
   Scenario: It can run the bundled script
     Given I am on "/test/fixtures/o/basepath/development/basepath.html#bundle"
-    Then I execute "sleep 2"
+    Then I execute "sleep 3"
     And save the html in "pre" to "bundled.js"
 
     Given I execute "make report /test/fixtures/o/basepath/development/basepath.html"
@@ -45,7 +45,7 @@ Feature: Basepath
   @javascript
   Scenario: It can run the bundled script
     Given I am on "/test/fixtures/o/basepath/development/relative.html#bundle"
-    Then I execute "sleep 2"
+    Then I execute "sleep 3"
     And save the html in "pre" to "bundled.js"
 
     Given I execute "make report /test/fixtures/o/basepath/development/relative.html"

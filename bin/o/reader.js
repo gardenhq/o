@@ -17,7 +17,7 @@ module.exports = function(fs, pwd)
                         }
                         return part;
                     }
-                ).join("/")
+                ).join("/");
                 return fs.readFile(
                     require.resolve(local),
                     function(err, content)

@@ -26,7 +26,7 @@ module.exports = function(configurable)
                                     {
                                         var func = function(){ ${item.content} };
                                         func.callback = "${item.callback}";
-                                        func.path = version(includePath + "${item.path}", "${item.version}");
+                                        func.path = version(includePath + "/${item.path}", "${item.version}");
                                         return func;
                                     }
                                 )()

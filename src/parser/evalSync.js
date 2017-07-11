@@ -14,19 +14,18 @@ parser(
         {
             var resolve = _require.resolve;
             evaluate = evaluate || defaultEvaluate;
-            var loadSynchronousRequires = function(data)
+            var loadSynchronousRequires = function(data, basedir)
             {
                 var re = /(?:^|[^\w\$_.])require\s*\(\s*["']([^"']*)["']\s*\)/g;
                 var arr;
                 var syncRequires = [];
                 while((arr = re.exec(data.content)) !== null) {
-                    syncRequires.push(resolve(arr[1], data.url));
+                    syncRequires.push(resolve(arr[1], basedir));
                 }
                 if(syncRequires.length == 0) {
                     return data;
                 }
                 syncRequires.push(null);
-                var parent = data.url;
                 return syncRequires.reduce(
                     function(prev, item, i, arr)
                     {
@@ -63,9 +62,9 @@ parser(
                     var type = temp[0];
                     var format = temp[1];
                     var isBundle = format.indexOf("+bundle") !== -1;
+                    var from = data.url.split("/").slice(0, -1).join("/");
                     var relativeRequire = function(relativePath)
                     {
-                        var from = data.url;
                         relativePath = relativePath.indexOf("/") === 0 ? relativePath : resolve(relativePath, from);
                         return _require(relativePath);
                     }
@@ -100,10 +99,11 @@ parser(
                                     break;
                             }
                             return module.exports;
-                        }
+                        },
+                        data.url
                     );
                     if(!isBundle) {
-                        return loadSynchronousRequires(data);
+                        return loadSynchronousRequires(data, from);
                     }
                     return data;
 

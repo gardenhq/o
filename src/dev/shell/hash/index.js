@@ -14,7 +14,7 @@ module.exports = function(html, win, doc)
                             }
                         );
                     },  
-                    1000
+                    2000
                 );
                 break;
             case "dirty":
