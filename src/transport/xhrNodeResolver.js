@@ -1,5 +1,5 @@
 transport(
-    function(scriptPath)
+    function(scriptPath, config)
     {
         // TODO: this can be much simpler now
         // I'm not getting modified paths (+= ".js" etc)
@@ -56,6 +56,37 @@ transport(
 
                     }
                 );
+            }
+        }
+        var forwardPackageNameToMain;        
+        if(config.includepath.indexOf("://") !== -1) {
+            forwardPackageNameToMain = function(path, fetchlike)
+            {
+                return function(data)
+                {
+                    var url = data.url;
+                    if(url.indexOf(config.includepath) !== -1) {
+                        var filename = url.replace(config.includepath + "/", "");
+                        var temp = filename.split("/");
+                        var len = 1;
+                        if(temp[0].indexOf("@") === 0) {
+                            len = 2;
+                        }
+                        if(temp.length === len) {
+                            return attempts[attempts.length - 1].try(path, fetchlike);
+                        }
+                    }
+                    return data;
+                }
+                
+            }
+        } else {
+            forwardPackageNameToMain = function(path, fetchlike)
+            {
+                return function(data)
+                {
+                    return data;
+                }
             }
         }
         // TODO: Order. https://nodejs.org/api/modules.html#modules_file_modules
@@ -127,13 +158,14 @@ transport(
                                     fetchlike
                                 );
                             } else {
-
                                 return Promise.reject(data);
                             }
                         }
                     );
                 },
                 fetchlike(path)
+            ).then(
+                forwardPackageNameToMain(path, fetchlike)
             ).catch(
                 function(data)
                 {

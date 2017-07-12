@@ -47,7 +47,7 @@ Currently a usable work-in-progress.
 A CLI with Node is entirely optional, and not required at all. You can get going with module loading with a:
 
 ```html
-<script src="https://unpkg.com/@gardenhq/o@7.1.0/o.js"></script>
+<script src="https://unpkg.com/@gardenhq/o@7.1.1/o.js"></script>
 
 OR (if you want to use npm)
 
@@ -58,7 +58,7 @@ To be able to bundle (amongst other things - live reloading, transpiling and mor
 likely what you want.
 
 ```html
-<script src="https://unpkg.com/@gardenhq/o@7.1.0/o.dev.js"></script>
+<script src="https://unpkg.com/@gardenhq/o@7.1.1/o.dev.js"></script>
 
 OR (if you want to use npm)
 
@@ -88,8 +88,8 @@ Things get far more interesting when used with `@gardenhq/willow` which is why `
 Essentially you can write your app something like this (you can also use json or a CommonJS module):
 
 ```html
-<script src="https://unpkg.com/@gardenhq/o@7.1.0/o.dev.js"
-   data-src="https://unpkg.com/@gardenhq/o@7.1.0/b.js#./container.yaml:main"
+<script src="https://unpkg.com/@gardenhq/o@7.1.1/o.dev.js"
+   data-src="https://unpkg.com/@gardenhq/o@7.1.1/b.js#./container.yaml:main"
 ></script>
 ```
 
