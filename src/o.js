@@ -10,7 +10,8 @@
         var pathname = win.location.pathname;
         var dirname = function(path)
         {
-            return path.split("/").slice(0, -1).join("/")
+            path = path.split("/").slice(0, -1).join("/");
+            return path === "" ? "." : path;
         }
         var exportTo = function(where, what, path)
         {

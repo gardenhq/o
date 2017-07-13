@@ -1,7 +1,7 @@
 (
     function(win, storage)
     {
-        var version = "#@6.1.0";
+        var version = "#@6.2.0";
         var doc = document;
         var getStore = function(key)
         {

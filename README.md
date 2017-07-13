@@ -12,11 +12,10 @@ Currently a usable work-in-progress.
 
 ### Loader
 
-* CommonJS support
 * Promised/Asynchronous true dynamic-import loading (via TC39 `import` or `System.import` like syntax)
 * Synchronous static loading (via CommonJS/NodeJS like `require` syntax)
 * Local and remote/CDN include paths - `/node_modules/` (or other local path) or `unpkg.com`
-* Node-like `__dirname`, `__filename` for both synchronous and asynchronous CommonJS modules.
+* Node-like `__dirname`, `__filename` for both synchronous and asynchronous modules.
 * ES6 module support (only during development, bundling required for your final build as per other bundlers)
 
 ### Bundler / development
@@ -47,9 +46,9 @@ Currently a usable work-in-progress.
 A CLI with Node is entirely optional, and not required at all. You can get going with module loading with a:
 
 ```html
-<script src="https://unpkg.com/@gardenhq/o@7.1.1/o.js"></script>
+<script src="https://unpkg.com/@gardenhq/o@7.1.2/o.js"></script>
 
-OR (if you want to use npm)
+OR (if you want to use npm/yarn)
 
 <script src="/node_modules/@gardenhq/o/o.js"></script>
 ```
@@ -58,16 +57,14 @@ To be able to bundle (amongst other things - live reloading, transpiling and mor
 likely what you want.
 
 ```html
-<script src="https://unpkg.com/@gardenhq/o@7.1.1/o.dev.js"></script>
+<script src="https://unpkg.com/@gardenhq/o@7.1.2/o.dev.js"></script>
 
-OR (if you want to use npm)
+OR (if you want to use npm/yarn)
 
 <script src="/node_modules/@gardenhq/o/o.dev.js"></script>
 ```
 
-[View a 'Hello World'
-here](https://greenhouse.gardenhq.io/o/examples/o/development.html). Click the
-[Bundle] button to bundle.
+[View a 'Hello World' here](https://greenhouse.gardenhq.io/o/examples/o/development.html). Click the [Bundle] button to bundle.
 
 For ES6, transpiling and minification is all done in the browser with Babel and/or Rollup and UglifyJS. You still don't have to use Node or install/configure anything extra, apart from a single HTML attribute on your script tag if you want to switch to Rollup for ES6 imports.
 
@@ -85,11 +82,11 @@ Things get far more interesting when used with `@gardenhq/willow` which is why `
 
 ### Usage with @gardenhq/willow our dependency injection builder
 
-Essentially you can write your app something like this (you can also use json or a CommonJS module):
+Essentially you can write your app something like this (you can also use json or a javascript module):
 
 ```html
-<script src="https://unpkg.com/@gardenhq/o@7.1.1/o.dev.js"
-   data-src="https://unpkg.com/@gardenhq/o@7.1.1/b.js#./container.yaml:main"
+<script src="https://unpkg.com/@gardenhq/o@7.1.2/o.dev.js"
+   data-src="https://unpkg.com/@gardenhq/o@7.1.2/b.js#./container.yaml:main"
 ></script>
 ```
 
@@ -117,15 +114,22 @@ react.dom:
 
 ```
 
-See <https://greenhouse.gardenhq.io/o/examples/yaml/index.html> for a working example of yaml usage.
+```javascript
+// index.js - ES6. As pure as the driven snow - no yellow imports
+export default (React, ReactDOM, instanceOfLogicCalculator) => {
+    ///
+}
+```
 
 ```javascript
-// index.js - almost as pure as the driven snow - no yellow requires
+// index.js - CommonJS. Almost as pure as the driven snow - no yellow requires
 module.exports = function(React, ReactDOM, instanceOfLogicCalculator)
 {
     ///
 }
 ```
+
+See <https://greenhouse.gardenhq.io/o/examples/yaml/index.html> for a working example of yaml usage.
 
 Everything is loaded asyncronously, and your index.js file will only execute once its arguments (and their dependencies) are all available. Your arguments can be local in node_modules, on a CDN, or on the night bus home from a big night out. Your module will only execute once everything is ready. During development, things are cached, so once you've loaded a file once its available straight away unless you edit it (see reloading). Once you are finished you can bundle, meaning everything is available instantly as you would imagine.
 

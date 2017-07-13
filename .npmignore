@@ -1,4 +1,5 @@
 *
+!/scripts/**
 !/builder.js
 !/runner.js
 

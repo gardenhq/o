@@ -1,6 +1,6 @@
 module.exports = function(load)
 {
-    var version = "#@6.1.0";
+    var version = "#@6.2.0";
     return load.then(
         function(System)
         {
