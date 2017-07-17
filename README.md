@@ -22,7 +22,7 @@ Currently a usable work-in-progress.
 
 * True dynamic-imports `import("a/" + path + "/" + here + "/module.js").then()`
 * Super fast file-watching/live-reloading (file watcher configuration required)
-* ES6 transpiling (via Babel)
+* ES6 transpiling (via Babel), including ES6 modules
 * ES6 scope-hoisting/tree shaking (via Rollup)
 * Traditional static `require` bundling
 * Minification (via UglifyJS)
@@ -32,11 +32,15 @@ Currently a usable work-in-progress.
 ### Other
 
 * Zero installation (just use a single script tag, but you can also use the traditional `npm` route if you like)
-* Almost zero configuration (apart from scope-hoisting which currently requires the addition of a single HTML attribute to your script tag, and file watching)
+* Almost zero configuration (apart from scope-hoisting which currently requires the addition of a single HTML attribute to your script tag, and file watching set up)
 * 'Install size'
 	* Loader only: ~3kb (can be made smaller by omitting static/synchronous Node-like loading support)
 	* Bundler (needed during development only): ~400kb, half of which is babel. For comparision, `webpack`/`browserify`/`requirejs` are ~10MB
-* 100% Bundled runtime size: ~740 bytes
+* 100% Bundled runtime size:
+    * `o` ~600 bytes
+    * `browserify` ~415 bytes
+    * `webpack` ~243 bytes
+
 
 
 ## Brief-ish overview
@@ -46,7 +50,7 @@ Currently a usable work-in-progress.
 A CLI with Node is entirely optional, and not required at all. You can get going with module loading with a:
 
 ```html
-<script src="https://unpkg.com/@gardenhq/o@7.1.2/o.js"></script>
+<script src="https://unpkg.com/@gardenhq/o@7.2.0/o.js"></script>
 
 OR (if you want to use npm/yarn)
 
@@ -57,7 +61,7 @@ To be able to bundle (amongst other things - live reloading, transpiling and mor
 likely what you want.
 
 ```html
-<script src="https://unpkg.com/@gardenhq/o@7.1.2/o.dev.js"></script>
+<script src="https://unpkg.com/@gardenhq/o@7.2.0/o.dev.js"></script>
 
 OR (if you want to use npm/yarn)
 
@@ -85,8 +89,8 @@ Things get far more interesting when used with `@gardenhq/willow` which is why `
 Essentially you can write your app something like this (you can also use json or a javascript module):
 
 ```html
-<script src="https://unpkg.com/@gardenhq/o@7.1.2/o.dev.js"
-   data-src="https://unpkg.com/@gardenhq/o@7.1.2/b.js#./container.yaml:main"
+<script src="https://unpkg.com/@gardenhq/o@7.2.0/o.dev.js"
+   data-src="https://unpkg.com/@gardenhq/o@7.2.0/b.js#./container.yaml:main"
 ></script>
 ```
 

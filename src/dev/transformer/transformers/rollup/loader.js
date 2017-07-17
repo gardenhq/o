@@ -12,6 +12,9 @@ module.exports = function(load, resolve, babel)
                 }
             );
         },
-        resolveId: resolve
+        resolveId: function(importee, importer)
+        {
+            return resolve(importee, importer.split("/").slice(0, -1).join("/") || ".")
+        }
     };
 }

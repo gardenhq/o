@@ -41,7 +41,7 @@ module(
     ${ register }${(exports ? `,
         function()
         {
-            return Promise.resolve(_import);
+            return Promise.resolve(module);
         }` : "")
     }
 )

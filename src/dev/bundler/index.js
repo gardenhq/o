@@ -6,6 +6,21 @@ module.exports = function(storage, prefix, bundles, app, oMin, oMax, minify)
         {
             var o = oMin;
             var files = [];
+            var maxConfigIgnore = [
+                "transport",
+                "proxy",
+                "parser",
+                "registry",
+                "export",
+                "entry-dev"
+            ];
+            var configIgnore = maxConfigIgnore.concat(
+                [
+                    "includepath",
+                    "basepath",
+                    "src"
+                ]
+            );
             Object.keys(
                 storage
             ).forEach(
@@ -18,14 +33,15 @@ module.exports = function(storage, prefix, bundles, app, oMin, oMax, minify)
                         }
                         try {
                             var data = JSON.parse(storage.getItem(key));
-                            if(data.headers['Cache-Control'] === "private") {
-                                o = function(config){ return oMax.render(); };
-                                return;
-                            }
-                            data.path = path;
                         } catch(e) {
                             throw e;
                         }
+                        if(data.headers['Cache-Control'] === "private") {
+                            configIgnore = maxConfigIgnore;
+                            o = function(config){ return oMax.render(); };
+                            return;
+                        }
+                        data.path = path;
                         if(path.indexOf(bundleOnly) !== -1 || bundleOnly == null) {
                             files.push(data);
                         }
@@ -34,7 +50,7 @@ module.exports = function(storage, prefix, bundles, app, oMin, oMax, minify)
             );
             var bundled = bundles.render(
                 {
-                    register: register || "function(path, func, filename){ return _import.registerDynamic(path, [], true, func, path + (filename || '')); }",
+                    register: register || "function(path, func, filename){ return module.registerDynamic(path, [], true, func, path + (filename || '')); }",
                     items: files,
                     exports: config.export
                 }
@@ -51,12 +67,22 @@ module.exports = function(storage, prefix, bundles, app, oMin, oMax, minify)
                     o: o(config),
                     bundles: bundled,
                     main: config.src,
-                    config: config
+                    config: config,
+                    keys: Object.keys(config).filter(
+                        function(key)
+                        {
+                            return configIgnore.indexOf(key) === -1;
+                        }
+                    )
                 }
             );
             // console.log(bundle.length);
             console.debug("Bundling " + config.src + " (if your source is large this may take a few seconds to minify...)");
-            bundle = minify(bundle);
+            try {
+                bundle = minify(bundle);
+            } catch(e) {
+                console.log(e);
+            }
             console.log(bundle);
             console.debug("Bundled " + config.src);
             if(download) {

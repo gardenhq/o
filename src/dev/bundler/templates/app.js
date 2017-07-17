@@ -1,67 +1,38 @@
 (
-    function(o)
+    function(exports)
     {
-        (
-            function(load)
+        ${o}(
+            // this never gets called in minimal
+            function(o){return o(document);} 
+        ).then(
+            function(module) // actually import but module will get overwritten
             {
-                load.then(
-                    function(_import)
+                ${bundles}.then(
+                    function()
                     {
-                        load = o = undefined;
-                        ${bundles}.then(
-                            function()
+                        module("${ main }").then(
+                            function(_module)
                             {
-                                _import("${ main }").then(
-                                    function(module)
-                                    {
-                                        // this is needed for data-module support
-                                        if(typeof module === "function") {
-                                            module(Promise.resolve(_import));
-                                        }
-                                    }
-                                );
+                                // this is needed for data-module support
+                                if(typeof _module === "function") {
+                                    _module(Promise.resolve(module), exports);
+                                }
                             }
                         );
                     }
                 );
             }
-        )(
-            o(
-                function(promised)
-                {
-                    return promised(document);
-                }
-            )
         );
     }
 )(
-    (
-        function(_bundleConfig)
-        {
-            return (${o});
+    {
+        ${
+            keys.map(
+                function(key)
+                {
+                    return '"' + key + '": "' + config[key] + '"';
+                }
+            ).join(",\n")
         }
-    )(
-        {
-            ${
-                Object.keys(config).filter(
-                    function(key)
-                    {
-                        return [
-                            "transport",
-                            "proxy",
-                            "parser",
-                            "registry",
-                            "export",
-                            "entry-dev"
-                        ].indexOf(key) === -1;
-                    }
-                ).map(
-                    function(key)
-                    {
-                        return '"' + key + '": "' + config[key] + '"';
-                    }
-                ).join(",\n")
-            }
-        }
-    )
-)
+    }
+);

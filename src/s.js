@@ -1,25 +1,16 @@
-module.exports = function(load)
+module.exports = function(load, exports, module) // this can be window, but in actual usage will be undefined
 {
-    // yey or nay?
-    window.process = {
-        env: {
-            // NODE_ENV: "production"
-        },
-        argv: ""
-    };
+    module = module || window;
     return load.then(
-        function(System)
+        function(require)
         {
-            var config = System.getConfig();
-            var entry = config.hash;
-            if(!config.basepath) {
-                System.config(
-                    {
-                        baseURL: entry
-                    }
-                );
-            }
-            return System.import(entry);
+            module.process = module.process || {
+                env: {
+                    // NODE_ENV: "production"
+                },
+                argv: ""
+            };
+            return require(exports.entry || exports.hash);
         }
     ).catch(
         function(e)

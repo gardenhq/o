@@ -1,13 +1,18 @@
 (
     function(unique)
     {
-        return function(cb)
+        return function()
         {
             var modules = {};
 
             ${ rewriter }
 
             /* resolve */
+            var dirname = function(path)
+            {
+                path = path.split("/").slice(0, -1).join("/");
+                return path === "" ? "." : path;
+            }
             var normalizeName = function (child, parentBase)
             {
                 var parts = child.split("/").filter(
@@ -36,70 +41,42 @@
                     []
                 ).join("/")
             }
-            var getResolve = function(includePath, defaultBase)
-            {
-                includePath = includePath || "";
-
-                ${ getRewriter }
-
-                return function(path, base)
-                {
-
-                    ${ hash }
-
-                    var first2Chars = path.substr(0, 2);
-                    if(
-                        first2Chars != ".." && first2Chars != "./" && first2Chars[0] != "/" && path.indexOf("://") === -1
-                    ) {
-                        path = includePath + "/" + path;
-                    }
-                    var temp = path.split("/");
-                    if(path.indexOf("://") !== -1) {
-                        return temp.slice(0, 3).join("/") + normalizeName(temp.slice(3).join("/"), [""])${ addHash };
-                    }
-                    base = base || defaultBase;
-                    path = normalizeName(temp.join("/"), base.split("/"));
-                    if(path[0] != "/" && path.indexOf("://") === -1) {
-                        path = "/" + path;
-                    }
-                    return path${ addHash };
-                }
-            }
             /* resolve */
             /* Module */
-            var Module = function(id, parent, module, filename)
+            var Module = function(id, module, filename)
             {
-                this.id = id;
-                this.filename = filename || id;
+                var o = this;
+                o.id = id;
+                o.filename = filename || id;
                 // this.parent = parent;
-                this.exports = {};
-                this[unique] = module;
+                o.exports = {};
+                o[unique] = module;
             }
-            var o = Module.prototype;
-            o._load = function(_require)
+            var loadModule = function(module, _require, dirname)
             {
-                if(typeof this[unique] !== "undefined") {
-                    var temp = this.filename.split("/");
-                    temp.pop();
-                    var module = this[unique];
-                    this[unique] = undefined;
+                if(typeof module[unique] !== "undefined") {
+                    var src = module[unique];
+                    module[unique] = undefined;
                     // (exports, require, module, __filename, __dirname)
                     // module.bind(null)(this.exports, _require, this, this.filename, temp.join("/"));
-                    module.bind(null)(this, this.exports, _require, this.filename, temp.join("/"));
+                    src.bind(null)(module, module.exports, _require, module.filename, dirname);
                 }
-                return this.exports;
+                return module.exports;
             }
             /* module */
             var _require = function(path)
             {
                 path = _require.resolve(path).split("#")[0];
                 var module = modules[path];
-                var from = module.filename.split("/").slice(0, -1).join("/");
-                var relativeRequire = function(relativePath)
-                {
-                    return _require(relativePath.indexOf("/") === 0 ? relativePath : _require.resolve(relativePath, from));
-                }
-                return module._load(relativeRequire);
+                var from = dirname(module.filename);
+                return loadModule(
+                    module,
+                    function(relativePath)
+                    {
+                        return _require(relativePath.indexOf("/") === 0 ? relativePath : _require.resolve(relativePath, from));
+                    },
+                    from
+                );
                 // try {
                     // return modules[path]._load(relativeRequire)
                 // } catch(e) {
@@ -111,34 +88,37 @@
             var o = function(path)
             {
                 return Promise.resolve(_require(path));
-            }
+            };
             o.registerDynamic = function(path, deps, bool, module, filename)
             {
-                modules[path] = new Module(path, null, module, filename);
+                modules[path] = new Module(path, module, filename);
             };
             o.import = function(path)
             {
-                return this.apply(null, arguments);
+                return o(path);
             };
-            // still need this for data-module stuff
-            var config = _bundleConfig || {};
-            o.getConfig = function()
+            ${ getRewriter }
+
+            o.resolve = _require.resolve = function(path, base)
             {
-                return Object.assign({}, config);
-            }
-            o.config = function(_config)
-            {
-                // b.js will change baseURL post init
-                if(_config.baseURL !== config.baseURL) {
-                    this.resolve = _require.resolve = getResolve(_config.includepath || config.includepath, _config.basepath);
+                ${ hash }
+
+                var first2Chars = path.substr(0, 2);
+                if(
+                    first2Chars != ".." && first2Chars != "./" && first2Chars[0] != "/" && path.indexOf("://") === -1
+                ) {
+                    path = "${includepath}/" + path;
                 }
-                config = Object.assign(
-                    {},
-                    config,
-                    _config
-                );
-            }
-            o.resolve = _require.resolve = getResolve(_bundleConfig.includepath, _bundleConfig.basepath);
+                var temp = path.split("/");
+                if(~path.indexOf("://")) {
+                    return "${includepath}" + normalizeName(temp.slice(3).join("/"), [""])${ addHash };
+                }
+                path = normalizeName(temp.join("/"), (base || "${basepath}").split("/"));
+                if(path[0] != "/" && path.indexOf("://") === -1) {
+                    path = "/" + path;
+                }
+                return path${ addHash };
+            };
             return Promise.resolve(o);
         };
     }

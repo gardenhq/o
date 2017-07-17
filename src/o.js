@@ -51,7 +51,7 @@
                                 function(module)
                                 {
                                     if(typeof module === "function") {
-                                        return module(Promise.resolve(System))
+                                        return module(Promise.resolve(System), config)
                                     } else {
                                         return Promise.resolve(System);
                                     }
@@ -291,11 +291,7 @@
                     return temp.slice(0, 3).join("/") + normalizeName(temp.slice(3).join("/"), [""]) + obj.hash;
                 }
                 base = base || defaultBase;
-                // try {
                 path = normalizeName(temp.join("/"), base.split("/"));
-                // } catch(e) {
-                //     console.log(path, base);
-                // }
                 if(path[0] != "/" && path.indexOf("://") === -1) {
                     path = "/" + path;
                 }

@@ -104,6 +104,7 @@ transport(
             {
                 test: function(filename)
                 {
+                    // node will take something.js and look for something.js.json
                     return !hasJsonExtension(filename);
                 },
                 try: function(path, fetch)

@@ -63,10 +63,10 @@ parser(
                     var format = temp[1];
                     var isBundle = format.indexOf("+bundle") !== -1;
                     var from = data.url.split("/").slice(0, -1).join("/");
+                    from = from === "" ? "." : from;
                     var relativeRequire = function(relativePath)
                     {
-                        relativePath = relativePath.indexOf("/") === 0 ? relativePath : resolve(relativePath, from);
-                        return _require(relativePath);
+                        return _require(relativePath.indexOf("/") === 0 ? relativePath : resolve(relativePath, from));
                     }
                     relativeRequire.resolve = resolve;
                     registry.set(
