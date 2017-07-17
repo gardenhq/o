@@ -29,9 +29,8 @@ module.exports = function(load, config)
                                 temp[1] || "main"
                             );
                         }
-                    } else {
-                        return builder;
                     }
+                    return builder;
                 }
             );
         }
