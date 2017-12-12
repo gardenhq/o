@@ -30,12 +30,6 @@ module.exports = function()
                 }
             ]
         },
-        // "o.dev.bundler.minifier": {
-        //     "callable": __dirname + "/minifier.js",
-        //     "arguments": [
-        //         "@babili-standalone"
-        //     ]
-        // },
         "o.dev.minimal": {
             "callable": __dirname + "/minimal.js",
             "arguments": [
@@ -67,14 +61,10 @@ module.exports = function()
         "o.dev.bundler.template.bundle": {
             "object": __dirname + "/templates/bundle.js#text/javascript+literal",
             "tags": [ { name: "o.dev.template", key: "bundle" } ]
+        },
+        "o.dev.bundler.template.o": {
+            "object": __dirname + "/templates/o.js#text/javascript+literal",
+            "tags": [ { name: "o.dev.template", key: "o" } ]
         }
-        // "babili-standalone": {
-        //     "requires": {
-        //         "Babel": "@babel.standalone"
-        //     },
-        //     "object": "babili-standalone/babili.min.js",
-        //     "version": "0.0.10",
-        //     "ignore-require": true
-        // }
     };
 }

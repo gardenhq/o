@@ -1,14 +1,15 @@
 <!DOCTYPE html>
-<html lang="en" class="no-js" xmlns:og="http://ogp.me/ns#">
+<html>
 	<head>
 		<meta charset="utf-8" />
 		<title>Inline Example</title>
 	</head>
 	<body>
-		<script type="text/javascript" src="/src/o.js"
+		<script src="/node_modules/@gardenhq/o/src/o.js"
+		    data-includepath="/node_modules"
    			data-export="o"
 			></script>
-		<script type="text/javascript">
+		<script>
 			var print = function(helloWorld)
 			{
 				if(typeof document !== "undefined") {
@@ -19,15 +20,15 @@
 				console.log(helloWorld);
 			}
 		</script>
-		<script type="text/javascript">
+		<script>
 		(
 			function(load)
 			{
 				// when data-basepath is not set then window.location.pathname is used
 				load.then(
-					function(System)
+					function(_import)
 					{
-						return System.import("../../hello-world.js").then(
+						return _import("../../hello-world.js").then(
 							function(helloWorld)
 							{
 								print(helloWorld + " (using a ../../ relative path)");
@@ -42,17 +43,17 @@
 					}
 				);
 			}
-		)(o(function(promised){return promised(document)}))
+		)(o(function(o){return o(document)}))
 		</script>
 		<!-- setting a basepath via data-basepath -->
-		<script type="text/javascript" data-basepath="/test/fixtures/o/basepath/sub/">
+		<script data-basepath="/test/fixtures/o/basepath/sub/">
 		(
 			function(load)
 			{
 				load.then(
-					function(System)
+					function(_import)
 					{
-						return System.import("./hello-world.js").then(
+						return _import("./hello-world.js").then(
 							function(helloWorld)
 							{
 								print(helloWorld + " (using a ./ relative path with a basepath set)");
@@ -67,7 +68,7 @@
 					}
 				);
 			}
-		)(o(function(promised){return promised(document)}))
+		)(o(function(o){return o(document)}))
 		</script>
 	</body>
 </html>

@@ -1,9 +1,7 @@
-proxy(
-    function(scriptPath)
+module.exports = function(config)
+{
+    return function(transport)
     {
-        return function(transport)
-        {
-            return transport;
-        }
+        return transport;
     }
-);
+}

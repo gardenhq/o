@@ -1,10 +1,9 @@
-            var React = require("react");
-            var ReactDOM = require("react-dom");
+var React = require("react");
+var ReactDOM = require("react-dom");
 (
     function(require)
     {
         try {
-
             var $root = document.createElement("div");
             document.body.appendChild($root);
             ReactDOM.render(

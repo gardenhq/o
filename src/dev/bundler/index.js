@@ -18,7 +18,8 @@ module.exports = function(storage, prefix, bundles, app, oMin, oMax, minify)
                 [
                     "includepath",
                     "basepath",
-                    "src"
+                    "src",
+                    "baseURL"
                 ]
             );
             Object.keys(
@@ -50,9 +51,9 @@ module.exports = function(storage, prefix, bundles, app, oMin, oMax, minify)
             );
             var bundled = bundles.render(
                 {
-                    register: register || "function(path, func, filename){ return module.registerDynamic(path, [], true, func, path + (filename || '')); }",
                     items: files,
-                    exports: config.export
+                    exports: config.export,
+                    main: config.src
                 }
             );
             if(bundleOnly) {
@@ -66,7 +67,7 @@ module.exports = function(storage, prefix, bundles, app, oMin, oMax, minify)
                 {
                     o: o(config),
                     bundles: bundled,
-                    main: config.src,
+                    main: '"' + config.src + '"',
                     config: config,
                     keys: Object.keys(config).filter(
                         function(key)

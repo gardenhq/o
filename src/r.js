@@ -1,4 +1,4 @@
-module.exports = function(load)
+module.exports = function(load, config, register, resolve)
 {
     return load.then(
         function(_import)

@@ -1,21 +1,27 @@
 (
-    function(exports)
+    // bundleConfig //, register, require, resolve
+    function(exports, module, require, __filename)
     {
-        ${o}(
-            // this never gets called in minimal
-            function(o){return o(document);} 
+        Promise.resolve(
+            ${o}
         ).then(
-            function(module) // actually import but module will get overwritten
+            function(o)
+            {
+                return o(function(o){return o(document);})
+            }
+        ).then(
+            function(require) // actually import but require will get overwritten
             {
                 ${bundles}.then(
                     function()
                     {
-                        module("${ main }").then(
+                        require(${ main }).then(
                             function(_module)
                             {
                                 // this is needed for data-module support
                                 if(typeof _module === "function") {
-                                    _module(Promise.resolve(module), exports);
+                                    // load, config, register, resolve
+                                    _module(Promise.resolve(require), exports, module, __filename);
                                 }
                             }
                         );

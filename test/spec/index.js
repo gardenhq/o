@@ -121,7 +121,6 @@ describe(
                                 expect(_require).to.have.been.calledWith("./path/to/one.js");
                                 expect(_require).to.have.been.calledWith("./path/to/two.js");
                                 return p;
-                                
                             }
                         );
 

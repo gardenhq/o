@@ -25,9 +25,9 @@
             function(load)
             {
                 load.then(
-                    function(System)
+                    function(_import)
                     {
-                        return System.import("../../hello-world.js").then(
+                        return _import("../../hello-world.js").then(
                             function(helloWorld)
                             {
                                 print(helloWorld);

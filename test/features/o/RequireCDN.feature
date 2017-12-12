@@ -7,13 +7,13 @@ Feature: Require CDN
   @javascript
   Scenario: I should be able to 'require' inline
     Given I am on "/test/fixtures/o/require/cdn/inline.html"
-    And I execute "sleep 3"
+    And I execute "sleep 30"
     Then I should see "Hello World!"
 
   @javascript
   Scenario: It can run the bundled script
     Given I am on "/test/fixtures/o/require/cdn/development.html"
-    Then I execute "sleep 20"
+    Then I execute "sleep 30"
     Then I should see "Hello World!"
 
     And I am on "/"

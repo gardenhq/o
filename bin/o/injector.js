@@ -18,7 +18,9 @@ module.exports = function(fs, pwd, configurable)
                             temp[1] = scripts;
                         } else {
                             // if I am configurable, keep the ability to get options of the data- vars
-                            temp.splice(1, 0, scripts);
+                            // temp[1].replace("/* check */", "if(scripts[key]) {return module.apply(null, arguments);}");
+                            // temp.splice(1, 0, scripts);
+                            // temp[3]
                         }
                         resolve(temp.join("/* scripts */"));
                     }

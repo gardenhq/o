@@ -8,7 +8,7 @@
             argv: ""
         };
         load.then(
-            function(System)
+            function(_import)
             {
                 Promise.all(
                     [
@@ -17,7 +17,7 @@
                     ].map(
                         function(item)
                         {
-                            return System.import(item);
+                            return _import(item);
                         }
                     )
                 ).then(
@@ -32,7 +32,7 @@
                                 null,
                                 "Hello World!"
                             ),
-                            $root 
+                            $root
                         )
                     }
                 );

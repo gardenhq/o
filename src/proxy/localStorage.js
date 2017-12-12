@@ -3,7 +3,7 @@
     {
         var getProxy = function(id)
         {
-            return function(scriptPath)
+            return function(config)
             {
                 return function(loader, factory, registry, config)
                 {

@@ -3,11 +3,11 @@ Feature: Require
     Given I am on "/"
     And I am on "/test/fixtures/o/require/local/development.html#clear"
     And I am on "/"
-
+  @skip
   @javascript
   Scenario: I should be able to 'require' inline
     Given I am on "/test/fixtures/o/require/local/inline.html"
-    And I execute "sleep 3"
+    And I execute "sleep 30"
     Then I should see "Hello World!"
 
   @javascript

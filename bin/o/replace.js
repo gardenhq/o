@@ -10,9 +10,7 @@ module.exports = function(fs, pwd)
                     pwd + "/src/_o.js",
                     function(err, content)
                     {
-                        // TODO: We can't use includepath here as we don't know what it will be, lets just namaespace for now
-                        const _o = `registerDynamic("/@gardenhq/o/_o.js", [], true, function(module, exports, require){ return ${content.toString()}})`;
-                        o = o.replace("/src/_o.js", "/@gardenhq/o/_o.js")
+                        const _o = `registerDynamic(resolve(base + "/_o.js"), [], true, function(module){ return ${content.toString()}})`;
                         resolve(
                             o.split("/*_o*/").join(_o)
                         );

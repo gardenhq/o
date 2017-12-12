@@ -35,9 +35,9 @@ Currently a usable work-in-progress.
 * Almost zero configuration (apart from scope-hoisting which currently requires the addition of a single HTML attribute to your script tag, and file watching set up)
 * 'Install size'
 	* Loader only: ~3kb (can be made smaller by omitting static/synchronous Node-like loading support)
-	* Bundler (needed during development only): ~400kb, half of which is babel. For comparision, `webpack`/`browserify`/`requirejs` are ~10MB
+	* Bundler (needed during development only): ~400kb, half of which is babel. For comparison, `webpack`/`browserify`/`requirejs` are ~10MB
 * 100% Bundled runtime size:
-    * `o` ~600 bytes
+    * `o` ~424 bytes
     * `browserify` ~415 bytes
     * `webpack` ~243 bytes
 
@@ -54,7 +54,7 @@ Here's a green 5x5 pixel jpeg saved at 50% quality, to give us a 628 byte jpeg.
 A CLI with Node is entirely optional, and not required at all. You can get going with module loading with a:
 
 ```html
-<script src="https://unpkg.com/@gardenhq/o@7.2.1/o.js"></script>
+<script src="https://unpkg.com/@gardenhq/o@8.0.0/o.js"></script>
 
 OR (if you want to use npm/yarn)
 
@@ -65,7 +65,7 @@ To be able to bundle (amongst other things - live reloading, transpiling and mor
 likely what you want.
 
 ```html
-<script src="https://unpkg.com/@gardenhq/o@7.2.1/o.dev.js"></script>
+<script src="https://unpkg.com/@gardenhq/o@8.0.0/o.dev.js"></script>
 
 OR (if you want to use npm/yarn)
 
@@ -88,12 +88,12 @@ ES6 transpiling sizes are similar to `webpack` and `rollup` as we use `rollup` f
 
 ### Usage with node `require`-like scripts
 
-`o` can be used to load traditional CommonJS/node `require` based scripts using the synchronous runner `s.js`. [`s.js` simply contains the `o` wrapper](https://github.com/gardenhq/o/blob/master/src/s.js) and an empty `process` for scripts that assume its available. You can change this functionlaity by simply creating your own 'runner'. This is the equivalent of `browserify ./your-entry-script.js` etc.
+`o` can be used to load traditional CommonJS/node `require` based scripts using the synchronous runner `s.js`. [`s.js` simply contains the `o` wrapper](https://github.com/gardenhq/o/blob/master/src/s.js) and an empty `process` for scripts that assume its available. You can change this functionality by simply creating your own 'runner'. This is the equivalent of `browserify ./your-entry-script.js` etc.
 
 
 ```html
-<script src="https://unpkg.com/@gardenhq/o@7.2.1/o.dev.js"
-   data-src="https://unpkg.com/@gardenhq/o@7.2.1/s.js#./your-entry-script.js"
+<script src="https://unpkg.com/@gardenhq/o@8.0.0/o.dev.js"
+   data-src="https://unpkg.com/@gardenhq/o@8.0.0/s.js#./your-entry-script.js"
 ></script>
 ```
 
@@ -117,8 +117,8 @@ Things get far more interesting when used with `@gardenhq/willow` which is why `
 Essentially you can write your app something like this (here in yaml, but you can also use json or a javascript module):
 
 ```html
-<script src="https://unpkg.com/@gardenhq/o@7.2.1/o.dev.js"
-   data-src="https://unpkg.com/@gardenhq/o@7.2.1/b.js#./container.yaml:main"
+<script src="https://unpkg.com/@gardenhq/o@8.0.0/o.dev.js"
+   data-src="https://unpkg.com/@gardenhq/o@8.0.0/b.js#./container.yaml:main"
 ></script>
 ```
 
@@ -163,7 +163,7 @@ module.exports = function(React, ReactDOM, instanceOfLogicCalculator)
 
 See <https://greenhouse.gardenhq.io/o/examples/yaml/index.html> for a working example of yaml usage.
 
-Everything is loaded asyncronously, and your index.js file will only execute once its arguments (and their dependencies) are all available. Your arguments can be local in node_modules, on a CDN, or on the night bus home from a big night out. Your module will only execute once everything is ready. During development, things are cached, so once you've loaded a file once its available straight away unless you edit it (see reloading). Once you are finished you can bundle, meaning everything is available instantly as you would imagine.
+Everything is loaded asynchronously, and your index.js file will only execute once its arguments (and their dependencies) are all available. Your arguments can be local in node_modules, on a CDN, or on the night bus home from a big night out. Your module will only execute once everything is ready. During development, things are cached, so once you've loaded a file once its available straight away unless you edit it (see reloading). Once you are finished you can bundle, meaning everything is available instantly as you would imagine.
 
 Building your app like this, not only frees you up from a load of plumbing, but also makes everything much easier to **test** and mock. But if you are here reading this, you probably know that :)
 

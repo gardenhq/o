@@ -1,8 +1,8 @@
-module.exports = function(load, exports, module) // this can be window, but in actual usage will be undefined
+module.exports = function(load, exports, register, resolve, module) // this can be window, but in actual usage will be undefined
 {
     module = module || window;
     return load.then(
-        function(require)
+        function(_import)
         {
             module.process = module.process || {
                 env: {
@@ -10,7 +10,8 @@ module.exports = function(load, exports, module) // this can be window, but in a
                 },
                 argv: ""
             };
-            return require(exports.entry || exports.hash);
+            module._import = _import;
+            return _import(exports.entry || exports.hash);
         }
     ).catch(
         function(e)

@@ -4,7 +4,7 @@
         module.exports = load.then(
             function(builder)
             {
-                return builder.build("./conf").get("test.loader").then(
+                return builder.build("./container.js").get("test.loader").then(
                     function(loader)
                     {
                         return loader(
@@ -16,7 +16,7 @@
         );
     }
 )(
-     typeof document !== "undefined" ? 
+     typeof document !== "undefined" ?
         b(function(o){return o(document)}) :
         require("../builder")(function(o){return o(require)})
 );

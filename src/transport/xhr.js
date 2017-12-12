@@ -1,5 +1,5 @@
 transport(
-    function(scriptPath)
+    function(config)
     {
         return function(path, ajax)
         {

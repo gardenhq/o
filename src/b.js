@@ -1,4 +1,4 @@
-module.exports = function(load, config)
+module.exports = function(load, config, register, resolve)
 {
     return load.then(
         function(_import)
@@ -10,8 +10,8 @@ module.exports = function(load, config)
                 {
                     return createJsBuilder(
                         _import,
-                        typeof _import.resolve !== "undefined" ? _import.resolve.bind(_import) : null,
-                        typeof _import.registerDynamic !== "undefined" ? _import.registerDynamic.bind(_import) : null//,
+                        resolve,
+                        register//,
                         // "@gardenhq/willow/conf/javascript.js" + version
                     );
                 }

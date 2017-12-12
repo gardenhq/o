@@ -1,5 +1,5 @@
 parser(
-    function(scriptPath)
+    function(config)
     {
         var defaultEvaluate = function(source)
         {

@@ -8,10 +8,28 @@
         var transport;
         var proxy;
         var pathname = win.location.pathname;
-        var dirname = function(path)
+        pathname = pathname == "/" ? "index.html" : pathname;
+        var hasProtocol = function(path, first2Chars)
         {
-            path = path.split("/").slice(0, -1).join("/");
-            return path === "" ? "." : path;
+            return first2Chars === "//" || path.indexOf("://") !== -1;
+        }
+        var isAbsolute = function(path, first2Chars)
+        {
+            return path[0] === "/" || hasProtocol(path, first2Chars || path.substr(0, 2));
+        }
+        // base should always be without a trailing /
+        var url = function(path, base)
+        {
+            base = base && base !== "/"  ? base + "/" : "/";
+            if(
+                !hasProtocol(base, base.substr(0, 2))
+            ) {
+                base = win.location.origin + base;
+            }
+            path = new win.URL(path, base).href.replace(win.location.origin, "");
+            // if it has a trailing slash i.e. a directory, remove the trailing slash
+            var len = path.length - 1;
+            return path[len] === "/" ? path.substr(0, len) : path;
         }
         var exportTo = function(where, what, path)
         {
@@ -26,7 +44,7 @@
                 where
             );
         };
-        var runner = function(o, config)
+        var runner = function(o, config, register, resolve)
         {
             if(config.src || config.module) {
                 var _o = function(doc)
@@ -37,30 +55,24 @@
                             return promised(doc)
                         }
                     ).then(
-                        function(System)
+                        function(_import)
                         {
                             exportTo(
                                 win,
                                 function()
                                 {
-                                    return Promise.resolve(System);
+                                    return Promise.resolve(_import);
                                 },
                                 config.export
                             );
-                            return System.import((config.src || config.module).split("#")[0]).then(
+                            return _import((config.src || config.module).split("#")[0]).then(
                                 function(module)
                                 {
                                     if(typeof module === "function") {
-                                        return module(Promise.resolve(System), config)
+                                        return module(Promise.resolve(_import), config, register, resolve())
                                     } else {
-                                        return Promise.resolve(System);
+                                        return Promise.resolve(_import);
                                     }
-
-                                }
-                            ).catch(
-                                function(e)
-                                {
-                                    console.error(e);
                                 }
                             );
                         }
@@ -76,104 +88,72 @@
             }
             return o;
         }
-        runner.config = function(script, resolve, _config)
+        var configuration = function(script, resolve, _config)
         {
-            var temp;
-            var __dirname = dirname(pathname);
-            // TODO: take some bits out? or namespace them with o?
-            var config = Object.assign(
-                {},
-                _config || {},
-                [].slice.call(script.attributes).reduce(
-                    function(prev, item, i, arr)
-                    {
-                        var key = item.nodeName;
-                        if(key.indexOf("data-") === 0) {
+            if(Object.keys(bundleConfig).length === 0) {
+                var __dirname = pathname === "/" ? pathname : url(pathname + "/..");
+                // TODO: take some bits out? or namespace them with o?
+                var attr = {};
+                var config = Object.assign(
+                    {},
+                    [].slice.call(script.attributes).reduce(
+                        function(prev, item, i, arr)
+                        {
+                            var key = item.nodeName;
                             var value = item.value;
-                            key = key.substr(5);
-                            switch(key) {
-                                case "basepath":
-                                case "includepath":
-                                    if(value[value.length - 1] === "/") {
-                                        value = value.substr(0, value.length - 1);
-                                    }
-                                    break;
+                            if(key.indexOf("data-") === 0) {
+                                key = key.substr(5);
+                                switch(key) {
+                                    case "basepath":
+                                    case "includepath":
+                                        if(value[value.length - 1] === "/") {
+                                            value = value.substr(0, value.length - 1);
+                                        }
+                                        value = resolve(value, __dirname);
+                                        break;
+                                }
+                                prev[key] = value;
+                            } else {
+                                attr[key] = value;
                             }
-                            prev[key] = value;
-                        }
-                        return prev;
-                    },
-                    {}
-                )
-            );
-            var _src = getAttribute(doc, "src", "").split("/");
-            config.includepath = config.includepath || (_src.length > 3 ? _src.slice(0, -3).join("/") : "./node_modules");
-            var src;
-            if(config.src) {
-                temp = config.src.split("#");
-                config.src = temp[0];
-                if(temp[1]) {
-                    config.hash = resolve(temp[1], __dirname);
-                }
-                src = config.src;
-            } else if(script.hasAttribute("src")) {
-                src = script.getAttribute("src");
-            }
-            if(config.basepath) {
-                config.basepath = resolve(config.basepath, __dirname);
-                if(src) {
-                    config.baseURL = resolve(src, config.basepath);
-                    if(config.src) {
-                        config.src = config.baseURL;
+                            return prev;
+                        },
+                        _config || {}
+                    )
+                );
+                config.includepath = config.includepath || resolve(
+                    (
+                        attr.src && attr.src.length > 3 ?
+                            attr.src.split("/").slice(0, -3).join("/") : "./node_modules"
+                        ),
+                    __dirname
+                );
+                if(config.src) {
+                    var temp;
+                    temp = config.src.split("#");
+                    config.src = temp[0];
+                    if(temp[1]) {
+                        config.hash = resolve(temp[1], __dirname);
                     }
+                    config.src = resolve(config.src, __dirname);
+                    config.basepath = config.basepath || url(config.src + "/..");
+                } else if(attr.src) {
+                    config.basepath = config.basepath || resolve(attr.src + "/..", __dirname);
                 } else {
-                    config.baseURL = pathname, config.basepath;
+                    config.basepath = config.basepath || __dirname;
+                }
+                if(config.hash) {
+                    config.basepath = url(config.hash + "/..");
                 }
             } else {
-                if(src) {
-                    config.baseURL = resolve(src, __dirname);
-                    if(config.src) {
-                        config.src = config.baseURL;
-                    }
-                } else {
-                    config.baseURL = pathname;
-                }
-                config.basepath = dirname(config.baseURL);
+                return bundleConfig;
             }
-            if(config.hash) {
-                config.basepath = dirname(config.hash);
-            }
-
-            // if(Object.keys(bundleConfig).length === 0) {
-                [
-                    "includepath",
-                    "src"
-                ].forEach(
-                    function(item)
-                    {
-                        if(config[item] != null) {
-                            config[item] = resolve(config[item], config.basepath);
-                        }
-                    }
-                );
-
-            // }
             return config;
         }
         var getCurrentScript = function(doc)
         {
             var scripts = doc.getElementsByTagName("script");
             return scripts[scripts.length - 1];
-        }
-        var getAttribute = function(doc, attr, value)
-        {
-            var script = getCurrentScript(doc);
-            return script.hasAttribute(attr) ? script.getAttribute(attr) : value;
-        };
-        var getConfig = function(key, value)
-        {
-            // TODO: should doc be an arg?
-            return getAttribute(doc, "data-" + key, value)
         }
         /* rewrite */
         var appendVersionToPackageNameRewriter = function(includePath, rewriter)
@@ -225,7 +205,7 @@
                     headers = JSON.parse(hash);
                 } else if(hash.indexOf("@") === 0) {
                     headers["X-Content-Version"] = hash.substr(1);
-                    // TODO: rethink? 
+                    // TODO: rethink?
                 } else if(hash.indexOf(".") !== 0 && hash.indexOf("/") > 0) {
                     headers['Content-Type'] = hash;
                 }
@@ -241,35 +221,6 @@
         }
         /* rewrite */
         /* resolve */
-        var normalizeName = function (child, parentBase)
-        {
-            var parts = child.split("/").filter(
-                function(item)
-                {
-                    return item !== "";
-                }
-            );
-            if (child[0] === "/") {
-                parentBase = [parts.shift()];
-            }
-            if (child[0] !== ".") {
-                parts = ["."].concat(parts);
-            } 
-            return parentBase.concat(parts).reduce(
-                function(prev, item, i, arr)
-                {
-                    if(item == "..") {
-                        return prev.slice(0, -1);
-                    }
-                    if(item == ".") {
-                        return prev;
-                    }
-                    return prev.concat(item);
-                },
-                []
-            ).join("/")
-        }
-
         var getResolve = function(includePath, defaultBase)
         {
             includePath = includePath || "";
@@ -280,128 +231,89 @@
                 var obj = normalizeHash(path, rewriter);
                 path = obj.path;
                 var first2Chars = path.substr(0, 2);
-                var firstChar = first2Chars[0];
                 if(
-                    first2Chars != ".." && first2Chars != "./" && firstChar != "/" && path.indexOf("://") === -1
+                    first2Chars !== ".." && first2Chars !== "./" && first2Chars !== "//" && first2Chars[0] !== "/" && path.indexOf("://") === -1
                 ) {
                     path = includePath + "/" + path;
                 }
-                var temp = path.split("/");
-                if(path.indexOf("://") !== -1) {
-                    return temp.slice(0, 3).join("/") + normalizeName(temp.slice(3).join("/"), [""]) + obj.hash;
-                }
-                base = base || defaultBase;
-                path = normalizeName(temp.join("/"), base.split("/"));
-                if(path[0] != "/" && path.indexOf("://") === -1) {
-                    path = "/" + path;
-                }
-                return path + obj.hash;
+                return url(path, (base || defaultBase)) + obj.hash;
             }
         }
         /* resolve */
-        var basepath = function(doc, src)
-        {
-            var path = getConfig("basepath",  false);
-            if(!path) {
-                src = getAttribute(doc, src || "src", "");
-                var parts = pathname.split("/");
-                if(src[0] !== "/") {
-                    parts[parts.length - 1] = src;
-                }
-                path = dirname(parts.join("/"));
-            } else {
-                if(path[path.length - 1] === "/") {
-                    path = path.substr(0, path.length -1)
-                }
-            }
-            return path;
-        };
         /* test */
         if(window.test) {
             Object.assign(
                 window,
                 {
-                    basepath: basepath,
-                    normalizeName: normalizeName,
+                    hasProtocol: hasProtocol,
+                    isAbsolute: isAbsolute,
                     getResolve: getResolve,
+                    appendVersionToPackageNameRewriter: appendVersionToPackageNameRewriter,
+                    normalizeHash: normalizeHash,
+                    getRewriter: getRewriter,
+                    defaultRewriter: defaultRewriter,
                     exportTo: exportTo,
-                    dirname: dirname
+                    url: url,
+                    runner: runner,
+                    configuration: configuration
                 }
             );
             return;
         }
         /* test */
         return (
-            function(includePath, currentScript, currentBase)
+            function(currentScript)
             {
+                var base = "@gardenhq/o/src";
                 var config = Object.assign(
                     {},
                     {
-                        registry: "/src/registry/memory.js",
-                        parser: "/src/parser/evalSync.js",
-                        transport: "/src/transport/xhrNodeResolver.js",
-                        proxy: "/src/proxy/noop.js"
+                        // runner
+                        // resolver
+                        // configure
+                        registry: base + "/registry/memory.js",
+                        parser: base + "/parser/evalSync.js",
+                        transport: base + "/transport/xhrNodeResolver.js",
+                        proxy: base + "/proxy/noop.js"
                     },
-                    runner.config(currentScript, getResolve(includePath, currentBase))
+                    configuration(currentScript, url)
                 );
-                var resolve = getResolve(config.includepath, currentBase);
+                // node like resolve based on the o script tag
                 var utils = [
                     "transport",
                     "parser",
                     "registry",
                     "proxy"
-                ].map(
-                    function(item)
+                ].reduce(
+                    function(prev, item, i)
                     {
-                        return {
-                            path: config[item],
-                            key: item
-                        };
-                    }
-                ).map(
-                    function(item)
-                    {
-                        return script(resolve(item.path, config.basepath), item.key, currentScript, config.includepath)
-                    }
-                ).map(
-                    function(injectScript, i)
-                    {
-                        if(injectScript) {
-                            return new Promise(
-                                function(resolve, reject)
-                                {
-                                    var previous = win[injectScript.callback];
-                                    win[injectScript.callback] = function(func)
+                        return prev.then(
+                            function(modules)
+                            {
+                                return script(config, item, url, isAbsolute, win, currentScript).then(
+                                    function(module)
                                     {
-                                        delete win[injectScript.callback];
-                                        if(typeof previous !== "undefined") {
-                                            win[injectScript.callback] = previous;
+                                        if(typeof module !== "undefined") {
+                                            modules.push(module);
                                         }
-                                        var result = func(injectScript.path, config);
-                                        if(i == 2) {
-                                            registryFactory = result;
-                                            result = result();
-                                        }
-                                        resolve(
-                                            result
-                                        );
+                                        return modules;
                                     }
-                                    injectScript();
-                                }
-                            );
-                        }
-                    }
+                                );
+                            }
+                        );
+                    },
+                    Promise.resolve([])
                 );
                 var getPromisedLoader = function(resolve, config)
                 {
                     var factory = function(doc, _proxy, register)
                     {
                         register = register || registry;
-                        _proxy = _proxy || proxy; 
+                        _proxy = _proxy || proxy;
                         return function(path)
                         {
                             return register(
-                                resolve(path, (this ? this.getConfig() : config).basepath),
+                                resolve(path, config.basepath),
                                 _proxy(
                                     transport,
                                     factory,
@@ -416,89 +328,135 @@
                     }
                     return factory;
                 };
+                var resolve = getResolve(config.includepath, config.basepath);
+                var registerDynamic;
+                var load = utils.then(
+                    function(modules)
+                    {
+                        transport = modules[0];
+                        parser = modules[1];
+                        registryFactory = modules[2];
+                        registry = registryFactory();
+                        proxy = modules[3];
+                        // TODO: make same simpler api
+                        registerDynamic = function(path, deps, executingRequire, cb, filename)
+                        {
+                            // TODO: minimal should also return a promise
+                            return Promise.resolve(registry.set(path, cb, filename));
+                        };
+                        if(Object.keys(bundleConfig).length > 0) {
+                            module = function(path, module, filename)
+                            {
+                                return registerDynamic(path, [], true, module, filename);
+                            }
+                        }
+                        /*_o*/
+                        // TODO: could this get away with using url?
+                        return getPromisedLoader(resolve, config)(doc)(base + "/_o.js");
+                    }
+                );
                 return runner(
                     function(cb)
                     {
-                        var registerDynamic;
-                        // TODO: resolve will change here, is that ok? Yes
-                        var localConfig = runner.config(
+                        var currentConfig = configuration(
                             getCurrentScript(doc),
-                            resolve,
-                            // TODO: Allow bundle config to be overwritable? Good/bad idea?
-                            // inherit everything apart from the baseURL
+                            url,
                             Object.assign(
                                 {},
                                 config,
-                                bundleConfig,
                                 {
-                                    baseURL: bundleConfig.baseURL || null,
-                                    basepath: bundleConfig.basepath || null
-                                }
+                                    src: null,
+                                    basepath: null
+                                },
+                                bundleConfig
                             )
                         );
-                        resolve = getResolve(localConfig.includepath, basepath(doc));
-                        return Promise.all(
-                            utils
-                        ).then(
-                            function(modules)
-                            {
-                                transport = modules[0];
-                                parser = modules[1];
-                                registry = modules[2];
-                                proxy = modules[3];
-                                registerDynamic = function(path, deps, executingRequire, cb, filename)
-                                {
-                                    return Promise.resolve(registry.set(path, cb, filename));
-                                }
-/*_o*/
-                                return getPromisedLoader(resolve, localConfig)(doc)("/src/_o.js");
-                            }
-                        ).then(
+
+                        resolve = getResolve(
+                            currentConfig.includepath,
+                            currentConfig.basepath
+                        );
+                        return load.then(
                             function(_o)
                             {
-                                var System = Object.assign(
-                                    _o(
-                                        getPromisedLoader(resolve, localConfig)
-                                    )(cb),
+                                var _import = _o(
+                                    getPromisedLoader(
+                                        resolve,
+                                        currentConfig
+                                    )
+                                )(cb);
+                                registerDynamic(
+                                    "/" + currentConfig.includepath + "/@gardenhq/o/o.js",
+                                    [],
+                                    true,
+                                    function(module)
                                     {
-                                        registry: registry,
-                                        registerDynamic: registerDynamic,
-                                        resolve: resolve
+                                        module.exports = Promise.resolve(_import);
                                     }
                                 );
-                                System.config(localConfig);
-                                registerDynamic("/" + localConfig.includepath + "/@gardenhq/o/o.js", [], true, function(module){module.exports = Promise.resolve(System);});
-                                return System;
+                                return _import;
                             }
                         );
                     },
-                    config
+                    config,
+                    registerDynamic,
+                    function()
+                    {
+                        return resolve;
+                    }
                 );
             }
         )(
-            getConfig("includepath"),
-            getCurrentScript(doc),
-            basepath(doc)
+            getCurrentScript(doc)
         );
     }
 )(
     window,
     document,
-    function(path, callbackName, script, includePath)
-    {
-        /* scripts */
-        var temp = path.split("?");
-        var inject = function()
+    (
+        function()
         {
-            var newNode = script.ownerDocument.createElement("script");
-            newNode.setAttribute("type", "text/javascript");
-            newNode.setAttribute("src", path);
-            script.parentNode.insertBefore(newNode, script);
+            /* scripts */
+            return function(config, key, url, isAbsolute, win, script)
+            {
+                /* check */
+                return new Promise(
+                    function(resolve, reject)
+                    {
+                        var previous = win.module;
+                        win.module = {
+                            exports: {}
+                        };
+                        var path = config[key];
+                        var newNode = script.ownerDocument.createElement("script");
+                        newNode.onload = function()
+                        {
+                            var module = win.module;
+                            delete win.module;
+                            if(typeof previous !== "undefined") {
+                                win.module = previous;
+                            }
+                            var previousFilename = win.__filename;
+                            win.__filename = path;
+                            var result = module.exports.apply(null, [config]);
+                            delete win.__filename;
+                            if(typeof previousFilename !== "undefined") {
+                                win.__filename = previousFilename;
+                            }
+                            resolve(result);
+                            script.parentNode.removeChild(newNode);
+                        }
+                        var first2Chars = path.substr(0, 2);
+                        if(first2Chars !== ".." && first2Chars !== "./" && !isAbsolute(path, first2Chars)) {
+                            path = config.includepath + "/" + path;
+                        }
+                        newNode.setAttribute("src", url(path, location.pathname));
+                        script.parentNode.insertBefore(newNode, script);
+                    }
+                );
+            }
+            /* scripts */
         }
-        inject.callback = temp.length === 2 ? temp[1] : callbackName
-        inject.path = path;
-        return inject;
-        /* scripts */
-    },
+    )(),
     typeof arguments !== "undefined" ? arguments[0] : {} // protect
 )

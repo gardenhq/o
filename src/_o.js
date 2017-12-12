@@ -16,19 +16,19 @@ module.exports = function(promised)
             import: function(path)
             {
                 return this.apply(null, arguments);
-            },
-            getConfig: function()
-            {
-                return Object.assign({}, config);
-            },
-            config: function(_config)
-            {
-                config = Object.assign(
-                    {},
-                    config,
-                    _config
-                );
-            }
+            }//,
+            // getConfig: function()
+            // {
+            //     return Object.assign({}, config);
+            // },
+            // config: function(_config)
+            // {
+            //     config = Object.assign(
+            //         {},
+            //         config,
+            //         _config
+            //     );
+            // }
         }
     );
     return o;

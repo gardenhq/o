@@ -64,8 +64,8 @@
             return factory(
                 doc,
                 cache,
-                registry            
-            )   
+                registry
+            );
         }
         var discoverMain = function(str)
         {
@@ -103,6 +103,7 @@
                         services = temp[1];
                     }
                 }
+
                 return function(loader, factory, registryFactory, config, resolve)
                 {
                     return function(path)
@@ -203,8 +204,11 @@
                 }
             }
         }
-        proxy(
-            getCache("o+file://")
-        );
+        module.exports = function(config)
+        {
+            return getCache(
+                "o+file://"
+            )(__filename, config)
+        }
     }
 )(window, window.localStorage);

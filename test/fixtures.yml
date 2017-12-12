@@ -1,0 +1,71 @@
+---
+rewriter:
+  fixtures:
+    - path: "node-module"
+      headers:
+        X-Content-Version: 1.0.0
+    - path: "@organization/node-module"
+      headers:
+        X-Content-Version: 1.0.0
+    - path: "node-module/path.js"
+      headers:
+        X-Content-Version: 1.0.0
+    - path: "@organization/node-module/path.js"
+      headers:
+        X-Content-Version: 1.0.0
+  default:
+    expected:
+      - path: "node-module"
+        hash: '#{"X-Content-Version":"1.0.0"}'
+      - path: "@organization/node-module"
+        hash: '#{"X-Content-Version":"1.0.0"}'
+      - path: "node-module/path.js"
+        hash: '#{"X-Content-Version":"1.0.0"}'
+      - path: "@organization/node-module/path.js"
+        hash: '#{"X-Content-Version":"1.0.0"}'
+  versionAppending:
+    # should hash be wiped?
+    expected:
+      - path: "node-module@1.0.0"
+        hash: '#{"X-Content-Version":"1.0.0"}'
+      - path: "@organization/node-module@1.0.0"
+        hash: '#{"X-Content-Version":"1.0.0"}'
+      - path: "node-module@1.0.0/path.js"
+        hash: '#{"X-Content-Version":"1.0.0"}'
+      - path: "@organization/node-module@1.0.0/path.js"
+        hash: '#{"X-Content-Version":"1.0.0"}'
+
+getResolve:
+  - includepath: /node_modules/
+    base: http://cdn.somewhere.com/react-dom@15.5.4
+    resolve:
+      - path: ./lib/ReactDom
+        expected: http://cdn.somewhere.com/react-dom@15.5.4/lib/ReactDOM
+url:
+    # basic
+  - path: index.html
+    base: http://google.com
+    expected: http://google.com/index.html
+  - path: http://www.google.com/index.html
+    base: http://google.com
+    expected: http://www.google.com/index.html
+    # check root and none
+  - path: index.html
+    base: ""
+    expected: /index.html
+  - path: index.html
+    base: /
+    expected: /index.html
+    # relative with ../'s and ./'s
+  - path: index.html
+    base: /some/levels/deep/to/make/sure/url/can/traverse/dots
+    expected: /some/levels/deep/to/make/sure/url/can/traverse/dots/index.html
+  - path: ../../index.html
+    base: /some/levels/deep/to/make/sure/url/can/traverse/dots
+    expected: /some/levels/deep/to/make/sure/url/can/index.html
+  - path: ../../.././../.././index.html
+    base: /some/levels/deep/to/make/sure/url/can/traverse/dots
+    expected: /some/levels/deep/to/make/index.html
+  # - path: index.html
+  #   base: //google.com
+  #   expected: //google.com/index.html

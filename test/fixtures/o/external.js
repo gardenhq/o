@@ -11,10 +11,10 @@
             console.log(helloWorld);
         }
         load.then(
-            function(System)
+            function(_import)
             {
                 // when data-basepath is not set then window.location.pathname is used
-                System.import("../hello-world.js").then(
+                _import("../hello-world.js").then(
                     function(helloWorld)
                     {
                         print(helloWorld + " (from o/external.js)");
@@ -29,5 +29,5 @@
             }
         );
     }
-)(o(function(promised){return promised(document)}))
+)(o(function(o){return o(document)}))
 

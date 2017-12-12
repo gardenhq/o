@@ -8,11 +8,11 @@ clean:
 			./dev 
 %.min.js: %.js
 	@uglifyjs --screw-ie8 --mangle --compress sequences=true,booleans=true,join_vars=true -o $@ $*.js
-	@printf "Uglified+gz : %d bytes\n" $$(cat $@ | gzip | wc -c)
+	@printf "Uglified+gz : %d bytes\n" $$(cat $@ | gzip -9 | wc -c)
 %.js:
 	@uglifyjs --screw-ie8 --mangle --compress sequences=true,booleans=true,join_vars=true -o $@ ./src/$@
 	@printf "$@: "
-	@cat $@ | gzip | wc -c
+	@cat $@ | gzip -9 | wc -c
 
 report: 
 	@mv ./test/results/bundled.js ./test/fixtures/bundled/bundled.js
@@ -35,9 +35,12 @@ build: node_modules/@gardenhq/o clean $(FILES);
 	# Uglify
 	@$(MAKE) o.max.js
 	@$(MAKE) o.dev.js
+	# cp ./src/o.max.js ./o.max.js
+	# cp ./src/o.dev.js ./o.dev.js
 	# Move templates into place
 	@mv ./src/o.max.js ./src/dev/oMaximal.js
 	@cp ./src/dev/oMaximal.js ./dev/oMaximal.js
+	# @cp ./src/dev/oMaximal.js o.js	
 	# @mv ./src/o.dev.js ./src/dev/oDev.js
 	# Move max (which is now minned) to o.js
 	@mv o.max.js o.js
@@ -46,8 +49,8 @@ build: node_modules/@gardenhq/o clean $(FILES);
 	# Report
 	@echo "# o.js"
 	@ls -al o.js | awk '{ print $$9 " Uglified " $$5}' | METRICS=127.0.0.1 ./test/report
-	@printf "o.js Uglified+gz %d" $$(cat o.js | gzip | wc -c) | METRICS=127.0.0.1 ./test/report
+	@printf "o.js Uglified+gz %d" $$(cat o.js | gzip -9 | wc -c) | METRICS=127.0.0.1 ./test/report
 	@echo "# o.dev.js"
 	@ls -al o.dev.js | awk '{ print $$9 " Uglified " $$5}' | METRICS=127.0.0.1 ./test/report
-	@printf "o.dev.js Uglified+gz %d" $$(cat ./o.dev.js | gzip | wc -c) | METRICS=127.0.0.1 ./test/report
+	@printf "o.dev.js Uglified+gz %d" $$(cat ./o.dev.js | gzip -9 | wc -c) | METRICS=127.0.0.1 ./test/report
 #$(eval $(ARGUMENTS):;@:)

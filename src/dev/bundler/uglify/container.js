@@ -23,7 +23,7 @@ module.exports = function()
             prev["uglify-js." + key] = {
                 "object": item + "#text/javascript",
                 "tags": [{name: "uglify-js.lib", key: key}],
-                "version": "3.0.17"
+                "version": "3.1"
             };
             return prev;
         },

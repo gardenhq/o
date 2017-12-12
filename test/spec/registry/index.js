@@ -8,17 +8,11 @@ var builder, expect, metrics, getAjaxDouble;
 ].forEach(
     function(item)
     {
-        var _registry;
-        global.registry = function(func)
-        {
-            _registry = func;
-        }
-        require(item.path);
+        const registryFactory = require(item.path)(/* config */);
         describe(
             item.name + ' register',
             function()
             {
-                var getModule = _registry;
                 before(
                     function()
                     {
@@ -46,27 +40,17 @@ var builder, expect, metrics, getAjaxDouble;
                     }
                 );
                 it(
-                    "is a function",
+                    "factory is a function",
                     function()
                     {
-                        expect(getModule).to.be.a("function");
-                        var module = getModule("actual/script/path");
-                        expect(module).to.be.a("function");
+                        expect(registryFactory).to.be.a("function");
                     }
                 );
                 context(
-                    ">",
+                    "register",
                     function()
                     {
                         // TODO: Decide how to make an injectable Module
-                        var module = getModule("actual/script/path");
-                        it(
-                            "is a function",
-                            function()
-                            {
-                                expect(module).to.be.a("function");
-                            }
-                        );
                         it(
                             "sets and gets (and too much other stuff)",
                             function()
@@ -76,7 +60,7 @@ var builder, expect, metrics, getAjaxDouble;
                                 const _exports = "hi";
                                 var called = false;
                                 const cache = {};
-                                const registry = module(cache);// m
+                                const registry = registryFactory(cache);// m
 
                                 registry.set(
                                     filename,
@@ -90,7 +74,7 @@ var builder, expect, metrics, getAjaxDouble;
                                     }
                                 );
                                 expect(registry.set(filename, "")).to.equal(undefined);
-                                console.log(cache.keys);
+                                // console.log(cache.keys);
                                 expect(cache.keys[filename]).to.equal(true);
                                 expect(cache.modules[filename]).to.not.equal(null);
                                 return registry.get(filename).then(

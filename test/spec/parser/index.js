@@ -84,7 +84,7 @@ var builder, expect, metrics, getLoaderDouble, getRegistryDouble, getRequireDoub
                                     "path.js",
                                     loaderDouble,
                                     requireDouble,
-                                    registryDouble                                  
+                                    registryDouble
                                 )
                                 return module.then(
                                     function(data)
@@ -114,7 +114,7 @@ var builder, expect, metrics, getLoaderDouble, getRegistryDouble, getRequireDoub
                                     "path.js",
                                     loaderDouble,
                                     requireDouble,
-                                    registryDouble                                  
+                                    registryDouble
                                 )
                                 return module.then(
                                     function(wrapper)
@@ -160,7 +160,7 @@ var builder, expect, metrics, getLoaderDouble, getRegistryDouble, getRequireDoub
                                     "path.js",
                                     loaderDouble,
                                     requireDouble,
-                                    registryDouble,                             
+                                    registryDouble,
                                     function(source)
                                     {
                                         return function(module, exports, require)
@@ -204,7 +204,7 @@ var builder, expect, metrics, getLoaderDouble, getRegistryDouble, getRequireDoub
                                     "path.json",
                                     loaderDouble,
                                     requireDouble,
-                                    registryDouble                                  
+                                    registryDouble
                                 )
                                 return module.then(
                                     function(wrapper)
@@ -235,7 +235,7 @@ var builder, expect, metrics, getLoaderDouble, getRegistryDouble, getRequireDoub
                                     "path.json",
                                     loaderDouble,
                                     requireDouble,
-                                    registryDouble,                             
+                                    registryDouble,
                                     function(source)
                                     {
                                         // this just uses JSON.parse
@@ -276,7 +276,7 @@ var builder, expect, metrics, getLoaderDouble, getRegistryDouble, getRequireDoub
                                     "path.txt",
                                     loaderDouble,
                                     requireDouble,
-                                    registryDouble                                  
+                                    registryDouble
                                 )
                                 return module.then(
                                     function(wrapper)
@@ -306,7 +306,7 @@ var builder, expect, metrics, getLoaderDouble, getRegistryDouble, getRequireDoub
                                     "path.txt",
                                     loaderDouble,
                                     requireDouble,
-                                    registryDouble,                             
+                                    registryDouble,
                                     function(source)
                                     {
                                         parserCalled = true;
@@ -325,15 +325,11 @@ var builder, expect, metrics, getLoaderDouble, getRegistryDouble, getRequireDoub
 
                                     }
                                 );
-
                             }
                         );
-
                     }
                 );
-
             }
         );
-
     }
 );
