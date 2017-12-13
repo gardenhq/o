@@ -18,9 +18,9 @@ module.exports = function(builder)
             {
                 return {
                     "js": [
-                        "javascript", "js",
+                        "javascript", "js", "x-javascript",
                         "jsx", "es6"
-                    ], 
+                    ],
                     "yaml": ["yaml", "yml"],
                     "css": ["css"],
                     "html": ["html"]

@@ -25,7 +25,10 @@
             ) {
                 base = location.origin + base;
             }
-            path = new URL(path, base).href.replace(location.origin, "");
+            var url = new URL(path, base);
+            path = url.origin + url.pathname;
+            path = path.replace(location.origin, "");
+            // path = new URL(path, base).href.replace(location.origin, "");
             // if it has a trailing slash i.e. a directory, remove the trailing slash
             var len = path.length - 1;
             return path[len] === "/" ? path.substr(0, len) : path;
